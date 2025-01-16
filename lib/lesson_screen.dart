@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:literacy_app/models/book.dart';
+import 'package:literacy_app/models/bookUser.dart';
+import 'package:literacy_app/widgets/floatingHintButton.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:literacy_app/backend_code/book.dart' show getBook;
-import 'package:literacy_app/backend_code/asr_model.dart' show inferenceASRModel;
+import 'package:literacy_app/backend_code/asr_model.dart'
+    show inferenceASRModel;
 import 'package:literacy_app/backend_code/lesson.dart';
-import 'package:literacy_app/materials/floating_hint_button.dart';
 import 'package:path_provider/path_provider.dart'; // For getting the temporary directory
-import 'package:path/path.dart' as path; // For manipulating file paths
+import 'package:path/path.dart' as path;
+
+import 'models/UserInfo.dart'; // For manipulating file paths
 
 class LessonScreen extends StatefulWidget {
   final String uid;
-  final Map<String, dynamic> userdata;
+  final UserInfo userdata;
   final String bookTitle;
 
   const LessonScreen({
@@ -43,7 +48,7 @@ class LessonScreenState extends State<LessonScreen> {
 
   // lessonScreen components variables
   String? _filePath;
-  Map<String, dynamic>? bookData;
+  Book? bookData;
   List<String> currentSentences = [];
   int currentPage = 0;
   int currentSentenceIndex = 0;
@@ -83,7 +88,7 @@ class LessonScreenState extends State<LessonScreen> {
           _currentPosition = _audioDuration;
         });
       } else {
-        if (mounted){
+        if (mounted) {
           setState(() {
             isPlaying = playerState.playing;
           });
@@ -93,7 +98,7 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> setupLesson() async {
-    Map<String, dynamic>? response = await getBook(widget.bookTitle);
+    Book? response = await getBook(widget.bookTitle);
     if (response != null) {
       setState(() {
         bookData = response;
@@ -106,26 +111,29 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   void setupInitialPageAndSentence() {
-    final bookmarkedIndex = widget.userdata['inProgressBooks'].indexWhere((book) => book['title'] == widget.bookTitle);
+    final bookmarkedIndex = widget.userdata.inProgressBooks
+        .indexWhere((book) => book.title == widget.bookTitle);
 
     if (bookmarkedIndex != -1) {
       isInProgress = true;
-      Map<String, dynamic> bookProgress = widget.userdata['inProgressBooks'][bookmarkedIndex];
+      BookUser bookProgress = widget.userdata.inProgressBooks[bookmarkedIndex];
 
-      String bookMarkAt = bookProgress['bookmark'] ?? 'Page 1';
+      String bookMarkAt = bookProgress.bookmark;
       currentPage = int.parse(bookMarkAt.split(' ')[1]);
-      if (currentPage == bookData!['content'].keys.length) {
+      if (currentPage == bookData!.content.keys.length) {
         lastPage = true;
       }
       // Set reading time and previous accuracies
-      readingTime = bookProgress['readingTime'] ?? 0;
-      accuracies = (bookProgress['accuracies'] as List<dynamic>).map((e) => e as double).toList();
+      readingTime = bookProgress.readingTime;
+      accuracies = (bookProgress.accuracies as List<dynamic>)
+          .map((e) => e as double)
+          .toList();
     } else {
       currentPage = 1;
     }
 
-    currentSentences = List<String>.from(
-        bookData!['content']['Page $currentPage']['sentences'] ?? []);
+    currentSentences =
+        List<String>.from(bookData!.content['Page $currentPage']!.sentences);
     currentSentence = currentSentences.isNotEmpty
         ? currentSentences[currentSentenceIndex]
         : '';
@@ -134,8 +142,7 @@ class LessonScreenState extends State<LessonScreen> {
     currentTextSpans = [TextSpan(text: currentSentence)];
 
     // Get the image URL for the current page
-    currentImageUrl =
-        bookData!['content']['Page $currentPage']['image'] ?? '';
+    currentImageUrl = bookData!.content['Page $currentPage']!.image;
 
     startTime = DateTime.now();
   }
@@ -262,13 +269,12 @@ class LessonScreenState extends State<LessonScreen> {
         currentSentenceIndex = 0;
         currentPage += 1;
         // Update the image URL for the new page
-        currentImageUrl =
-            bookData!['content']['Page $currentPage']['image'] ?? '';
+        currentImageUrl = bookData!.content['Page $currentPage']!.image;
 
         currentSentences = List<String>.from(
-            bookData!['content']['Page $currentPage']['sentences'] ?? []);
+            bookData!.content['Page $currentPage']!.sentences ?? []);
         currentSentence = currentSentences[currentSentenceIndex];
-        if (currentPage == bookData!['content'].keys.length) {
+        if (currentPage == bookData!.content.keys.length) {
           lastPage = true;
         }
       }
@@ -276,7 +282,9 @@ class LessonScreenState extends State<LessonScreen> {
       hasRecording = false;
       isPlaying = false;
       _currentPosition = Duration.zero;
-      currentTextSpans = [TextSpan(text: currentSentence)]; // Reset to default sentence
+      currentTextSpans = [
+        TextSpan(text: currentSentence)
+      ]; // Reset to default sentence
     });
   }
 
@@ -290,12 +298,14 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = true;
     });
 
-    Map<String, dynamic> updatedUserData = await bookmark(
+    UserInfo updatedUserData = await bookmark(
       widget.uid,
-      widget.bookTitle,
-      'Page $currentPage',
-      readingTime,
-      accuracies,
+      BookUser(
+        title: widget.bookTitle,
+        bookmark: 'Page $currentPage',
+        readingTime: readingTime,
+        accuracies: accuracies,
+      ),
       widget.userdata,
     );
 
@@ -310,7 +320,8 @@ class LessonScreenState extends State<LessonScreen> {
     // Calculate duration
     Duration duration = DateTime.now().difference(startTime!);
     readingTime += duration.inSeconds;
-    double readingTimeInMinutes = readingTime / 60;
+    double readTime = readingTime / 60;
+    int readingTimeInMinutes = readTime.toInt();
 
     // Set loading status to show progress Indicator
     setState(() {
@@ -319,10 +330,11 @@ class LessonScreenState extends State<LessonScreen> {
 
     Map<String, dynamic> result = await markBookAsCompleted(
       widget.uid,
-      widget.bookTitle,
-      'Page $currentPage',
-      readingTimeInMinutes,
-      accuracies,
+      BookUser(
+          title: widget.bookTitle,
+          bookmark: 'Page $currentPage',
+          readingTime: readingTimeInMinutes,
+          accuracies: accuracies),
       widget.userdata,
     );
 
@@ -330,17 +342,24 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = false;
     });
 
-    Map<String, dynamic> updatedUserData = result['userData'];
-    int earnedXp = result['earnedXp'];
-    double averageAccuracy = result['averageAccuracy'];
+    Map<String, dynamic> data = {
+      'userData': result['userData'],
+      'earnedXp': result['earnedXp'],
+      'averageAccuracy': result['averageAccuracy'],
+    };
+
+    UserInfo updatedUserData = data['userData'];
+    int earnedXp = data['earnedXp'];
+    double averageAccuracy = data['averageAccuracy'];
 
     // Calculate total word count of the book
-    int totalBookWordCount = bookData!['content'].values
-        .expand((pageContent) => pageContent['sentences'] as Iterable<dynamic>)
+    int totalBookWordCount = bookData!.content.values
+        .expand((pageContent) => pageContent.sentences)
         .map((sentence) => sentence.split(' ').length)
         .reduce((sum, count) => sum + count);
     // Calculate reading speed
-    String wordPerMin = (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2);
+    String wordPerMin =
+        (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2);
     // Calculate average accuracy
     String averageAcc = (averageAccuracy * 100).toStringAsFixed(2);
 
@@ -353,7 +372,7 @@ class LessonScreenState extends State<LessonScreen> {
           title: const Text('Congratulations!'),
           content: Text(
               'You gained $earnedXp XP from this lesson. The book was completed in ${readingTimeInMinutes.toStringAsFixed(2)} minutes, '
-                  'with an average reading speed of $wordPerMin words per minute and an average accuracy of $averageAcc%'),
+              'with an average reading speed of $wordPerMin words per minute and an average accuracy of $averageAcc%'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -419,9 +438,9 @@ class LessonScreenState extends State<LessonScreen> {
           // Progress line using Slider
           Slider(
             value: _currentPosition.inMilliseconds.toDouble().clamp(
-              0.0,
-              _audioDuration.inMilliseconds.toDouble(),
-            ),
+                  0.0,
+                  _audioDuration.inMilliseconds.toDouble(),
+                ),
             min: 0.0,
             max: _audioDuration.inMilliseconds.toDouble(),
             activeColor: Colors.purple,
@@ -468,7 +487,7 @@ class LessonScreenState extends State<LessonScreen> {
           onLongPress: startRecording,
           onPressed: moveToNextSentence,
         );
-    }
+      }
     } else {
       // Default state, show mic icon to start recording
       return FloatingActionButton(
@@ -506,7 +525,11 @@ class LessonScreenState extends State<LessonScreen> {
         actions: [
           IconButton(
             onPressed: () => bookmarkCurrentPageAndExit(context),
-            icon: const Icon(Icons.close, color: Colors.white, size: 30,),
+            icon: const Icon(
+              Icons.close,
+              color: Colors.white,
+              size: 30,
+            ),
           ),
         ],
       ),
@@ -529,7 +552,8 @@ class LessonScreenState extends State<LessonScreen> {
                     text: TextSpan(
                       text: '',
                       style: const TextStyle(fontSize: 21, color: Colors.black),
-                      children: currentTextSpans, // Use state-dependent variable
+                      children:
+                          currentTextSpans, // Use state-dependent variable
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -547,30 +571,29 @@ class LessonScreenState extends State<LessonScreen> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  if (hasRecording)
-                    buildAudioSection(),
-                    const SizedBox(height: 65),
-                  if (!hasRecording)
-                    const SizedBox(height: 115),
+                  if (hasRecording) buildAudioSection(),
+                  const SizedBox(height: 65),
+                  if (!hasRecording) const SizedBox(height: 115),
                 ],
               ),
             ),
           ),
           Positioned(
-            bottom: 0,
-            left: 20,
-            width: 50,
-            height: 50,
-            child: CircularProgressIndicator(
-            backgroundColor: Colors.grey.shade300,
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.black87),
-            value: currentPage / (bookData!['content'].keys.length), // Calculate progress
-            )
-            /*Text( Another option for progress indicator
+              bottom: 0,
+              left: 20,
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.grey.shade300,
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.black87),
+                value: currentPage /
+                    (bookData!.content.keys.length), // Calculate progress
+              )
+              /*Text( Another option for progress indicator
               'Page $currentPage/${bookData!['content'].keys.length}, Sentence ${currentSentenceIndex + 1}/${currentSentences.length}',
               style: const TextStyle(fontSize: 16),
             ),*/
-          ),
+              ),
           Positioned(
             bottom: 0,
             right: 20,

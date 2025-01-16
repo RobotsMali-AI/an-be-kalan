@@ -1,34 +1,31 @@
 /// Defining the main utility functions for a reading lesson
 import 'package:collection/collection.dart';
 import 'package:literacy_app/backend_code/user.dart' show saveUserData;
+import 'package:literacy_app/models/bookUser.dart';
 
-Future<Map<String, dynamic>> bookmark(
-    String uid,
-    String title,
-    String pageRef,
-    int readingTime,
-    List<double> accuracies,
-    Map<String, dynamic> userData
-    ) async {
+import '../models/UserInfo.dart';
 
+Future<UserInfo> bookmark(String uid, BookUser book, UserInfo userData) async {
   // Check if the book is already bookmarked
-  final bookmarkedIndex = userData['inProgressBooks'].indexWhere((book) => book['title'] == title);
+  final bookmarkedIndex =
+      userData.inProgressBooks.indexWhere((book) => book.title == book.title);
 
   if (bookmarkedIndex != -1) {
     // Update the existing bookmark
-    userData['inProgressBooks'][bookmarkedIndex]['bookmark'] = pageRef;
-    userData['inProgressBooks'][bookmarkedIndex]['readingTime'] = readingTime; // Increment reading time
-    userData['inProgressBooks'][bookmarkedIndex]['accuracies'] = accuracies;
+    userData.inProgressBooks[bookmarkedIndex].bookmark = book.bookmark;
+    userData.inProgressBooks[bookmarkedIndex].readingTime =
+        book.readingTime; // Increment reading time
+    userData.inProgressBooks[bookmarkedIndex].accuracies =
+        book.accuracies; // Update accuracies
   } else {
     // Create new bookmark
-    Map<String, dynamic> bookMarking = {
-      'title': title,
-      'bookmark': pageRef,
-      'readingTime': readingTime,
-      'accuracies': accuracies,
-    };
+    BookUser bookMarking = BookUser(
+        title: book.title,
+        bookmark: book.bookmark,
+        readingTime: book.readingTime,
+        accuracies: book.accuracies);
     // Add a new bookmark
-    userData['inProgressBooks'].add(bookMarking);
+    userData.inProgressBooks.add(bookMarking);
   }
   // Save new userData to firebase
   await saveUserData(uid, userData);
@@ -37,33 +34,31 @@ Future<Map<String, dynamic>> bookmark(
 }
 
 Future<Map<String, dynamic>> markBookAsCompleted(
-    String uid,
-    String title,
-    String pageRef,
-    double readingTime,
-    List<double> accuracies,
-    Map<String, dynamic> userData,
-    ) async {
+  String uid,
+  BookUser book,
+  UserInfo userData,
+) async {
   // Check if the book is already bookmarked
-  final bookmarkedIndex = userData['inProgressBooks']
-      .indexWhere((book) => book['title'] == title);
+  final bookmarkedIndex =
+      userData.inProgressBooks.indexWhere((book) => book.title == book.title);
 
   if (bookmarkedIndex != -1) {
     // Remove the bookmark
-    userData['inProgressBooks'].removeAt(bookmarkedIndex);
+    userData.inProgressBooks.removeAt(bookmarkedIndex);
   }
 
   // Add the book to completed books if not already present
-  if (!userData['completedBooks'].contains(title)) {
-    userData['completedBooks'].add(title);
+  if (!userData.completedBooks.contains(book.title)) {
+    userData.completedBooks.add(book.title);
   }
 
   // Calculate average accuracy
-  double averageAccuracy = accuracies.sum / accuracies.length;
+  double averageAccuracy = book.accuracies.sum / book.accuracies.length;
 
   // Update User XP based on reading time and average accuracy
-  int earnedXp = ((20 * averageAccuracy) + (50 / (readingTime + 1))).toInt();
-  userData['xp'] += earnedXp;
+  int earnedXp =
+      ((20 * averageAccuracy) + (50 / (book.readingTime + 1))).toInt();
+  userData.xp += earnedXp;
 
   // Save the updated userData (assuming you have a function to save it)
   await saveUserData(uid, userData);

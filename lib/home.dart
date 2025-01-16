@@ -7,6 +7,8 @@ import 'package:literacy_app/backend_code/user.dart' show getUserData;
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/lesson_screen.dart' show LessonScreen;
 
+import 'models/UserInfo.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -17,13 +19,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedTabIndex = 0;
   User? user;
-  Map<String, dynamic>? userData;
+  UserInfo? userData;
   bool isLoading = true; // Track loading state
 
   Future<void> initUserData() async {
     try {
       if (user != null) {
-        Map<String, dynamic> data = await getUserData(user!.uid);
+        UserInfo data = await getUserData(user!.uid);
         setState(() {
           userData = data;
           isLoading = false; // Data fetched
@@ -146,10 +148,10 @@ class _HomePageState extends State<HomePage> {
                 itemCount: books.length,
                 itemBuilder: (context, index) {
                   final book = books[index];
-                  final isInProgress = userData!['inProgressBooks']
-                      .any((b) => b['title'] == book['title']);
+                  final isInProgress = userData!.inProgressBooks
+                      .any((b) => b.title == book['title']);
                   final isCompleted =
-                  userData!['completedBooks'].contains(book['title']);
+                      userData!.completedBooks.contains(book['title']);
 
                   return GestureDetector(
                     onTap: () => openLesson(context, book['title']!),
@@ -175,8 +177,8 @@ class _HomePageState extends State<HomePage> {
                                   isCompleted
                                       ? 0.7 // Opacity for completed books
                                       : isInProgress
-                                      ? 0.35 // Opacity for in-progress books
-                                      : 0.0, // No overlay for other books
+                                          ? 0.35 // Opacity for in-progress books
+                                          : 0.0, // No overlay for other books
                                 ),
                                 borderRadius: BorderRadius.circular(15),
                               ),
@@ -215,7 +217,8 @@ class _HomePageState extends State<HomePage> {
           });
           if (index == 0) {
             if (Navigator.canPop(context)) {
-              Navigator.pop(context); // Go back to the existing HomePage instance
+              Navigator.pop(
+                  context); // Go back to the existing HomePage instance
             }
           } else if (index == 3) {
             showModalBottomSheet(
@@ -245,7 +248,8 @@ class _HomePageState extends State<HomePage> {
         },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Gafew'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_4x4), label: 'Crosswords'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.grid_4x4), label: 'Crosswords'),
           BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Daɲɛ'),
           BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
         ],
@@ -259,7 +263,7 @@ class _HomePageState extends State<HomePage> {
         context,
         MaterialPageRoute(
           builder: (context) => ProfilePage(
-            xp: userData!["xp"],
+            xp: userData!.xp,
             user: user!,
           ),
         ),

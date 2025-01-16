@@ -58,14 +58,14 @@ class _FloatingHintButtonState extends State<FloatingHintButton> {
       children: [
         if (_showHint)
           Positioned(
-            bottom: 70,// Position the hint above the button
+            bottom: 70, // Position the hint above the button
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Hint Bubble
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.black87,
                     borderRadius: BorderRadius.circular(25),

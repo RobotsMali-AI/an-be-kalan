@@ -55,8 +55,10 @@ dependencies:
   # Add http as a dependency
   http: ^1.2.0
   # Path packages
-  path: ^1.8.3
+  path: ^1.9.0
   path_provider: ^2.1.4
+  sqflite: ^2.4.1
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
