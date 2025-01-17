@@ -1,11 +1,13 @@
 import 'dart:developer' show log;
 import 'package:flutter/material.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/constant.dart' show books;
 import 'package:literacy_app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/backend_code/user.dart' show getUserData;
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/lesson_screen.dart' show LessonScreen;
+import 'package:provider/provider.dart';
 
 import 'models/UserInfo.dart';
 
@@ -25,9 +27,12 @@ class _HomePageState extends State<HomePage> {
   Future<void> initUserData() async {
     try {
       if (user != null) {
-        UserInfo data = await getUserData(user!.uid);
+        //UserInfo data = await getUserData(user!.uid);
         setState(() {
-          userData = data;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<ApiFirebaseService>().getUserData(user!.uid);
+            userData = context.read<ApiFirebaseService>().userInfo;
+          });
           isLoading = false; // Data fetched
         });
       }
@@ -72,139 +77,143 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Vocal Search Bar at the Top
-          Container(
-            color: Colors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: Column(
-              children: [
-                const Text(
-                  'An be Kalan',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+      body: Consumer<ApiFirebaseService>(
+          builder: (conext, apiFirebaseService, _) {
+        UserInfo userData = apiFirebaseService.userInfo!;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Vocal Search Bar at the Top
+            Container(
+              color: Colors.black,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Column(
+                children: [
+                  const Text(
+                    'An be Kalan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Gafe dɔ ɲini',
-                          fillColor: Colors.white,
-                          filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Gafe dɔ ɲini',
+                            fillColor: Colors.white,
+                            filled: true,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    IconButton(
-                      icon: const Icon(Icons.mic, color: Colors.white),
-                      onPressed: () {
-                        // Implement vocal search logic here
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 15),
-          // Book List
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'An ka gafew',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                      const SizedBox(width: 10),
+                      IconButton(
+                        icon: const Icon(Icons.mic, color: Colors.white),
+                        onPressed: () {
+                          // Implement vocal search logic here
+                        },
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 2),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.7,
-                ),
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  final book = books[index];
-                  final isInProgress = userData!.inProgressBooks
-                      .any((b) => b.title == book['title']);
-                  final isCompleted =
-                      userData!.completedBooks.contains(book['title']);
-
-                  return GestureDetector(
-                    onTap: () => openLesson(context, book['title']!),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Stack(
-                          children: [
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: DecorationImage(
-                                  image: NetworkImage(book['image']!),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(
-                                  isCompleted
-                                      ? 0.7 // Opacity for completed books
-                                      : isInProgress
-                                          ? 0.35 // Opacity for in-progress books
-                                          : 0.0, // No overlay for other books
-                                ),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          book['title']!,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                ],
               ),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(height: 15),
+            // Book List
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'An ka gafew',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 2),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.7,
+                  ),
+                  itemCount: books.length,
+                  itemBuilder: (context, index) {
+                    final book = books[index];
+                    final isInProgress = userData.inProgressBooks
+                        .any((b) => b.title == book['title']);
+                    final isCompleted =
+                        userData.completedBooks.contains(book['title']);
+
+                    return GestureDetector(
+                      onTap: () => openLesson(context, book['title']!),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  image: DecorationImage(
+                                    image: NetworkImage(book['image']!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(
+                                    isCompleted
+                                        ? 0.7 // Opacity for completed books
+                                        : isInProgress
+                                            ? 0.35 // Opacity for in-progress books
+                                            : 0.0, // No overlay for other books
+                                  ),
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            book['title']!,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        );
+      }),
       // Navigation Tab Bar at the Bottom
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedTabIndex,

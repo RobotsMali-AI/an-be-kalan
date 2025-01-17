@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 
 import 'package:literacy_app/auth.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/firebase_options.dart';
 import 'package:literacy_app/home.dart';
+import 'package:provider/provider.dart';
 
 /// Requires that a Firebase local emulator is running locally.
 /// See https://firebase.flutter.dev/docs/auth/start/#optional-prototype-and-test-with-firebase-local-emulator-suite
@@ -41,8 +43,12 @@ Future<void> main() async {
   if (shouldUseFirebaseEmulator) {
     await auth.useAuthEmulator('localhost', 9099);
   }
-
-  runApp(const LiteracyAppEntry());
+//const LiteracyAppEntry()
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => ApiFirebaseService())],
+    child: const LiteracyAppEntry(),
+  ));
+  //runApp();
 }
 
 /// The entry point of the application.
