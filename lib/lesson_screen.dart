@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
 import 'package:literacy_app/widgets/floatingHintButton.dart';
+import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:literacy_app/backend_code/book.dart' show getBook;
-import 'package:literacy_app/backend_code/asr_model.dart'
-    show inferenceASRModel;
-import 'package:literacy_app/backend_code/lesson.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:path_provider/path_provider.dart'; // For getting the temporary directory
 import 'package:path/path.dart' as path;
 
-import 'models/UserInfo.dart'; // For manipulating file paths
+import 'models/Users.dart'; // For manipulating file paths
 
 class LessonScreen extends StatefulWidget {
   final String uid;
-  final UserInfo userdata;
+  final Users userdata;
   final String bookTitle;
 
   const LessonScreen({
@@ -98,7 +97,8 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> setupLesson() async {
-    Book? response = await getBook(widget.bookTitle);
+    Book? response =
+        await context.read<ApiFirebaseService>().getBook(widget.bookTitle);
     if (response != null) {
       setState(() {
         bookData = response;
@@ -120,7 +120,7 @@ class LessonScreenState extends State<LessonScreen> {
 
       String bookMarkAt = bookProgress.bookmark;
       currentPage = int.parse(bookMarkAt.split(' ')[1]);
-      if (currentPage == bookData!.content.keys.length) {
+      if (currentPage == bookData!.content.length) {
         lastPage = true;
       }
       // Set reading time and previous accuracies
@@ -133,7 +133,7 @@ class LessonScreenState extends State<LessonScreen> {
     }
 
     currentSentences =
-        List<String>.from(bookData!.content['Page $currentPage']!.sentences);
+        List<String>.from(bookData!.content["Page $currentPage"]!.sentences);
     currentSentence = currentSentences.isNotEmpty
         ? currentSentences[currentSentenceIndex]
         : '';
@@ -142,7 +142,7 @@ class LessonScreenState extends State<LessonScreen> {
     currentTextSpans = [TextSpan(text: currentSentence)];
 
     // Get the image URL for the current page
-    currentImageUrl = bookData!.content['Page $currentPage']!.image;
+    currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
 
     startTime = DateTime.now();
   }
@@ -218,7 +218,8 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = true;
     });
 
-    String? transcription = await inferenceASRModel(_filePath!);
+    String? transcription =
+        await context.read<ApiFirebaseService>().inferenceASRModel(_filePath!);
     if (transcription != null) {
       List<TextSpan> highlightedSpans = getHighlightedTextSpans(transcription);
 
@@ -269,12 +270,12 @@ class LessonScreenState extends State<LessonScreen> {
         currentSentenceIndex = 0;
         currentPage += 1;
         // Update the image URL for the new page
-        currentImageUrl = bookData!.content['Page $currentPage']!.image;
+        currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
 
         currentSentences = List<String>.from(
-            bookData!.content['Page $currentPage']!.sentences ?? []);
+            bookData!.content["Page $currentPage"]!.sentences);
         currentSentence = currentSentences[currentSentenceIndex];
-        if (currentPage == bookData!.content.keys.length) {
+        if (currentPage == bookData!.content.length) {
           lastPage = true;
         }
       }
@@ -298,22 +299,24 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = true;
     });
 
-    UserInfo updatedUserData = await bookmark(
-      widget.uid,
-      BookUser(
-        title: widget.bookTitle,
-        bookmark: 'Page $currentPage',
-        readingTime: readingTime,
-        accuracies: accuracies,
-      ),
-      widget.userdata,
-    );
+    await context.read<ApiFirebaseService>().bookmark(
+          widget.uid,
+          BookUser(
+            lastAccessed: DateTime.now(),
+            title: widget.bookTitle,
+            bookmark: 'Page $currentPage',
+            readingTime: readingTime,
+            totalPages: bookData!.content.length,
+            accuracies: accuracies,
+          ),
+          widget.userdata,
+        );
 
     setState(() {
       _sending = false;
     });
 
-    Navigator.pop(context, updatedUserData);
+    Navigator.pop(context, widget.userdata);
   }
 
   Future<void> endLesson(BuildContext context) async {
@@ -328,15 +331,18 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = true;
     });
 
-    Map<String, dynamic> result = await markBookAsCompleted(
-      widget.uid,
-      BookUser(
-          title: widget.bookTitle,
-          bookmark: 'Page $currentPage',
-          readingTime: readingTimeInMinutes,
-          accuracies: accuracies),
-      widget.userdata,
-    );
+    Map<String, dynamic> result =
+        await context.read<ApiFirebaseService>().markBookAsCompleted(
+              widget.uid,
+              BookUser(
+                  lastAccessed: DateTime.now(),
+                  totalPages: bookData!.content.length,
+                  title: widget.bookTitle,
+                  bookmark: 'Page $currentPage',
+                  readingTime: readingTimeInMinutes,
+                  accuracies: accuracies),
+              widget.userdata,
+            );
 
     setState(() {
       _sending = false;
@@ -348,7 +354,7 @@ class LessonScreenState extends State<LessonScreen> {
       'averageAccuracy': result['averageAccuracy'],
     };
 
-    UserInfo updatedUserData = data['userData'];
+    Users updatedUserData = data['userData'];
     int earnedXp = data['earnedXp'];
     double averageAccuracy = data['averageAccuracy'];
 
@@ -587,7 +593,7 @@ class LessonScreenState extends State<LessonScreen> {
                 backgroundColor: Colors.grey.shade300,
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.black87),
                 value: currentPage /
-                    (bookData!.content.keys.length), // Calculate progress
+                    (bookData!.content.length), // Calculate progress
               )
               /*Text( Another option for progress indicator
               'Page $currentPage/${bookData!['content'].keys.length}, Sentence ${currentSentenceIndex + 1}/${currentSentences.length}',

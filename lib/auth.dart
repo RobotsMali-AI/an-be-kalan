@@ -1,10 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/main.dart';
 import 'package:flutter/material.dart';
+import './models/Users.dart' as users;
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:literacy_app/widgets/customRicheText.dart';
 import 'package:literacy_app/widgets/reusableButton.dart';
+import 'package:provider/provider.dart';
 import 'auth_function.dart';
 import 'widgets/customTextFormField.dart';
 
@@ -36,6 +39,7 @@ class _AuthGateState extends State<AuthGate> {
   AuthMode mode = AuthMode.login;
 
   bool isLoading = false;
+  late ApiFirebaseService apiFirebaseService;
 
   void setIsLoading() {
     setState(() {
@@ -48,7 +52,8 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
-
+    apiFirebaseService =
+        Provider.of<ApiFirebaseService>(context, listen: false);
     authButtons = {
       Buttons.Google: _signInWithGoogle,
     };
@@ -233,6 +238,15 @@ class _AuthGateState extends State<AuthGate> {
             email: emailController.text,
             password: passwordController.text,
           );
+          // final user = Users.Users(
+          //     uid: userAuth.user!.uid,
+          //     xp: 0,
+          //     completedBooks: [],
+          //     favoriteBooks: [],
+          //     inProgressBooks: [],
+          //     totalReadingTime: 0,
+          //     xpLog: []);
+          //await apiFirebaseService.saveUserData(userAuth.user!.uid, user);
         } on FirebaseAuthException catch (e) {
           setState(() {
             error = '${e.message}';
@@ -250,10 +264,19 @@ class _AuthGateState extends State<AuthGate> {
         }
       } else if (mode == AuthMode.register) {
         try {
-          await auth.createUserWithEmailAndPassword(
+          final userAuth = await auth.createUserWithEmailAndPassword(
             email: emailController.text,
             password: passwordController.text,
           );
+          final user = users.Users(
+              uid: userAuth.user!.uid,
+              xp: 0,
+              completedBooks: [],
+              favoriteBooks: [],
+              inProgressBooks: [],
+              totalReadingTime: 0,
+              xpLog: []);
+          await apiFirebaseService.saveUserData(userAuth.user!.uid, user);
         } on FirebaseAuthException catch (e) {
           setState(() {
             error = '${e.message}';

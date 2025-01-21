@@ -1,23 +1,31 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class BookUser {
   String title;
   String bookmark;
   int readingTime;
   List<double> accuracies;
+  DateTime lastAccessed;
+  int totalPages;
 
   BookUser({
     required this.title,
     required this.bookmark,
     required this.readingTime,
     required this.accuracies,
+    required this.lastAccessed,
+    required this.totalPages,
   });
 
-  factory BookUser.fromSnapshot(Map<String, dynamic> json) {
+  factory BookUser.fromSnapshot(Map<String, dynamic> data) {
+    Timestamp timestamp = data['lastAccessed'];
     return BookUser(
-      title: json['title'] ?? '',
-      bookmark: json['bookmark'] ?? 'Page 1',
-      readingTime: json['readingTime'] ?? 0,
-      accuracies: List<double>.from(
-          json['accuracies']?.map((accuracy) => accuracy.toDouble()) ?? []),
+      title: data['title'],
+      bookmark: data['bookmark'],
+      readingTime: data['readingTime'],
+      accuracies: List<double>.from(data['accuracies']),
+      lastAccessed: timestamp.toDate(),
+      totalPages: data['totalPages'],
     );
   }
 
@@ -27,6 +35,8 @@ class BookUser {
       'bookmark': bookmark,
       'readingTime': readingTime,
       'accuracies': accuracies,
+      'lastAccessed': lastAccessed,
+      'totalPages': totalPages,
     };
   }
 }

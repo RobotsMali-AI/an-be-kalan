@@ -4,8 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:literacy_app/models/UserInfo.dart';
+import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
 import 'package:http/http.dart' as http;
@@ -14,11 +13,12 @@ import 'package:literacy_app/constant.dart'
 
 class ApiFirebaseService with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  UserInfo? userInfo;
+  Users? userInfo;
+  List<Book> books = [];
   Book? book;
 
   /// Function to save user data as a Firebase database collection
-  Future<void> saveUserData(String uid, UserInfo userData) async {
+  Future<void> saveUserData(String uid, Users userData) async {
     await _firestore
         .collection('users')
         .doc(uid)
@@ -30,7 +30,7 @@ class ApiFirebaseService with ChangeNotifier {
   Future<void> getUserData(String uid) async {
     DocumentSnapshot doc = await _firestore.collection('users').doc(uid).get();
     userInfo = doc.exists
-        ? UserInfo.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)
+        ? Users.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)
         : createUserData(uid);
     notifyListeners();
   }
@@ -42,9 +42,14 @@ class ApiFirebaseService with ChangeNotifier {
   }
 
   /// Function that creates and save empty user data dictionary for new user
-  UserInfo createUserData(String uid) {
-    UserInfo userData =
-        UserInfo(completedBooks: [], inProgressBooks: [], xp: 0);
+  Users createUserData(String uid) {
+    Users userData = Users(
+        completedBooks: [],
+        favoriteBooks: [],
+        xpLog: [],
+        totalReadingTime: 0,
+        inProgressBooks: [],
+        xp: 0);
 
     // Save user data to Firestore
     saveUserData(uid, userData); // Ensure it's saved before returning
@@ -52,25 +57,29 @@ class ApiFirebaseService with ChangeNotifier {
     return userData;
   }
 
-  Future<void> bookmark(String uid, BookUser book, UserInfo userData) async {
+  Future<void> bookmark(String uid, BookUser readBook, Users userData) async {
     // Check if the book is already bookmarked
-    final bookmarkedIndex =
-        userData.inProgressBooks.indexWhere((book) => book.title == book.title);
+    final bookmarkedIndex = userData.inProgressBooks
+        .indexWhere((book) => book.title == readBook.title);
+
+    print(bookmarkedIndex);
 
     if (bookmarkedIndex != -1) {
       // Update the existing bookmark
-      userData.inProgressBooks[bookmarkedIndex].bookmark = book.bookmark;
+      userData.inProgressBooks[bookmarkedIndex].bookmark = readBook.bookmark;
       userData.inProgressBooks[bookmarkedIndex].readingTime =
-          book.readingTime; // Increment reading time
+          readBook.readingTime; // Increment reading time
       userData.inProgressBooks[bookmarkedIndex].accuracies =
-          book.accuracies; // Update accuracies
+          readBook.accuracies; // Update accuracies
     } else {
       // Create new bookmark
       BookUser bookMarking = BookUser(
-          title: book.title,
-          bookmark: book.bookmark,
-          readingTime: book.readingTime,
-          accuracies: book.accuracies);
+          totalPages: readBook.totalPages,
+          lastAccessed: DateTime.now(),
+          title: readBook.title,
+          bookmark: readBook.bookmark,
+          readingTime: readBook.readingTime,
+          accuracies: readBook.accuracies);
       // Add a new bookmark
       userData.inProgressBooks.add(bookMarking);
     }
@@ -84,7 +93,7 @@ class ApiFirebaseService with ChangeNotifier {
   Future<Map<String, dynamic>> markBookAsCompleted(
     String uid,
     BookUser book,
-    UserInfo userData,
+    Users userData,
   ) async {
     // Check if the book is already bookmarked
     final bookmarkedIndex =
@@ -137,43 +146,62 @@ class ApiFirebaseService with ChangeNotifier {
   Future<String?> inferenceASRModel(String filePath) async {
     final apiUrl = Uri.parse(asrModelApiUri);
 
-    // Check if the file is .m4a or .wav
+    // Validate file format
     if (!filePath.endsWith('.m4a') && !filePath.endsWith('.wav')) {
+      print('Unsupported file format: $filePath');
       return null;
     }
 
-    // Read the file
-    final file = File(filePath);
-    final fileBytes = await file.readAsBytes();
-
-    // Set headers
-    final headers = {
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $asrModelApiToken',
-      'Content-Type': 'audio/wav',
-    };
-
     try {
-      // Send the POST request
-      final response =
-          await http.post(apiUrl, headers: headers, body: fileBytes);
+      final audioFile = File(filePath);
 
-      // Check the response status
+      // Prepare headers
+      final headers = {
+        "x-api-key": asrModelApiToken,
+      };
+
+      // Query parameters
+      final queryParams = {'translate_to_french': 'false'};
+      final apiUriWithParams = apiUrl.replace(queryParameters: queryParams);
+
+      // Prepare multipart file
+      final file = http.MultipartFile.fromBytes(
+        'file',
+        await audioFile.readAsBytes(),
+        filename: filePath.split('/').last,
+      );
+
+      // Create request
+      final request = http.MultipartRequest('POST', apiUriWithParams)
+        ..headers.addAll(headers)
+        ..files.add(file);
+
+      final response = await request.send();
+
+      // Handle response
       if (response.statusCode == 200) {
-        final decodedString = utf8.decode(response.bodyBytes);
-        final Map<String, dynamic> data = jsonDecode(decodedString);
-        return data["text"];
+        final responseBody = await response.stream.bytesToString();
+        final decodedData = jsonDecode(responseBody);
+
+        if (decodedData is List && decodedData.isNotEmpty) {
+          final audioData = decodedData[0] as Map<String, dynamic>;
+          return audioData["text"] as String?;
+        } else {
+          print('Unexpected response format: $decodedData');
+          return null;
+        }
       } else if (response.statusCode == 503) {
+        print('Service unavailable. Retrying...');
         await Future.delayed(const Duration(seconds: 5));
-        notifyListeners();
         return inferenceASRModel(filePath);
       } else {
-        notifyListeners();
+        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
         return null;
       }
-    } catch (e) {
-      notifyListeners();
-      null;
+    } catch (e, stackTrace) {
+      print('Exception occurred: $e');
+      print(stackTrace);
+      return null;
     }
   }
 
@@ -184,17 +212,30 @@ class ApiFirebaseService with ChangeNotifier {
   ///
   /// Returns a `Map<String, dynamic>?` containing the book details
   /// if the book is successfully retrieved, or `null` otherwise.
-  Future<void> getBook(String title) async {
-    String jsonString = await rootBundle.loadString('assets/books/books.json');
 
-    // Decode the JSON string into a list of maps
-    final List<dynamic> booksList = jsonDecode(jsonString);
+  Future<void> getAllBooks() async {
+    // if (FirebaseAuth.instance.currentUser == null) {
+    //   print(
+    //       'User is not authenticated------------------------------------------');
+    //   return;
+    // }
+    books = [];
+    final data = await _firestore.collection('books').get();
+    data.docs.forEach((element) {
+      books.add(Book.fromJson(element));
+    });
+    notifyListeners();
+  }
 
+  Future<Book?> getBook(String title) async {
     // Find the book with the matching title
-    for (var book in booksList) {
-      if (book['title'].trim() == title.trim()) {
-        book = Book.fromJson(book);
+    for (var elementBook in books) {
+      if (elementBook.title.trim() == title.trim()) {
+        book = elementBook;
+        //notifyListeners();
+        return elementBook;
       }
     }
+    return null;
   }
 }

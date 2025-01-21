@@ -59,6 +59,9 @@ dependencies:
   path_provider: ^2.1.4
   sqflite: ^2.4.1
   provider: ^6.1.2
+  flutter_floating_bottom_bar: ^1.2.1+1
+  crystal_navigation_bar: ^1.0.2
+  sembast: ^3.8.1+1
 
 dev_dependencies:
   flutter_test:

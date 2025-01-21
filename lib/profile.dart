@@ -5,8 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/backend_code/user.dart' show deleteUserData;
+import 'package:provider/provider.dart';
 
 const placeholderImage =
     'https://drive.google.com/uc?export=download&id=1_egpUE2P2KJ3WVQ44iCT0ux6f_KdJVdO';
@@ -48,11 +50,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void _onNameChanged() {
     setState(() {
-      showSaveButton = controller.text != widget.user.displayName && controller.text.isNotEmpty;
+      showSaveButton = controller.text != widget.user.displayName &&
+          controller.text.isNotEmpty;
     });
   }
 
-  List get userProviders => widget.user.providerData.map((e) => e.providerId).toList();
+  List get userProviders =>
+      widget.user.providerData.map((e) => e.providerId).toList();
 
   Future updateDisplayName() async {
     await widget.user.updateDisplayName(controller.text);
@@ -118,7 +122,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
     if (confirm ?? false) {
       try {
-        await deleteUserData(widget.user.uid);
+        await context
+            .read<ApiFirebaseService>()
+            .deleteUserData(widget.user.uid);
         await widget.user.delete();
         Navigator.of(context).pop(); // Navigate to previous screen
       } catch (e) {
@@ -131,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _signOut() async {
     if (widget.user.isAnonymous) {
-      await deleteUserData(widget.user.uid);
+      await context.read<ApiFirebaseService>().deleteUserData(widget.user.uid);
       await widget.user.delete(); // Delete anonymous account
     }
     await auth.signOut();
@@ -158,7 +164,10 @@ class _ProfilePageState extends State<ProfilePage> {
             style: const TextStyle(fontSize: 20, color: Colors.white),
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white,),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -219,18 +228,20 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: 10),
                       TextField(
-                          textAlign: TextAlign.center,
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            alignLabelWithHint: true,
-                            label: Center(
-                              child: Text('Click to add a display name'),
-                            ),
+                        textAlign: TextAlign.center,
+                        controller: controller,
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          alignLabelWithHint: true,
+                          label: Center(
+                            child: Text('Click to add a display name'),
                           ),
                         ),
-                      Text('${widget.xp} XP', ),
+                      ),
+                      Text(
+                        '${widget.xp} XP',
+                      ),
                       const SizedBox(height: 5),
                       Text(widget.user.email ?? 'user@anonymous.none'),
                       const SizedBox(height: 10),
@@ -255,7 +266,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         },
                         child: const Text('Verify Email'),
                       ),
-                      const Divider(thickness: 1.0,),
+                      const Divider(
+                        thickness: 1.0,
+                      ),
                       const SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () {
@@ -299,9 +312,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: !showSaveButton
                     ? SizedBox(key: UniqueKey())
                     : TextButton(
-                  onPressed: isLoading ? null : updateDisplayName,
-                  child: const Text('Save changes'),
-                ),
+                        onPressed: isLoading ? null : updateDisplayName,
+                        child: const Text('Save changes'),
+                      ),
               ),
             ),
           ],

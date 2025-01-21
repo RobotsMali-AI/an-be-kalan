@@ -1,29 +1,47 @@
-import 'package:literacy_app/models/pageContent.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:literacy_app/models/page.dart';
 
 class Book {
-  final String title;
-  final Map<String, PageContent> content;
+  final dynamic title;
+  final String cover;
+  final Map<String, Page> content; // Adjusted type to match Firestore structure
 
   Book({
     required this.title,
+    required this.cover,
     required this.content,
   });
 
-  factory Book.fromJson(Map<String, dynamic> json) {
+  factory Book.fromJson(DocumentSnapshot<Map<String, dynamic>> json) {
+    final data = json.data()!;
     return Book(
-      title: json['title'] ?? '',
-      content: (json['content'] as Map<String, dynamic>?)?.map(
-              (key, value) => MapEntry(key, PageContent.fromJson(value))) ??
-          {},
+      cover: data['cover'] ?? '',
+      title: data['title'] ?? '',
+      content: (data['content'] as Map<String, dynamic>).map(
+        (key, value) =>
+            MapEntry(key, Page.fromSnapshot(value as Map<String, dynamic>)),
+      ),
     );
   }
 
-  
+  factory Book.fromSemb(Map<String, dynamic> json) {
+    return Book(
+      cover: json['cover'] ?? '',
+      title: json['title'] ?? '',
+      content: (json['content'] as Map<String, dynamic>).map(
+        (key, value) =>
+            MapEntry(key, Page.fromSnapshot(value as Map<String, dynamic>)),
+      ),
+    );
+  }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toSnapshot() {
     return {
       'title': title,
-      'content': content.map((key, value) => MapEntry(key, value.toJson())),
+      'cover': cover,
+      'content': content.map(
+        (key, page) => MapEntry(key, page.toSnapshot()),
+      ),
     };
   }
 }
