@@ -1,12 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/backend_code/semb_database.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
 import 'package:literacy_app/widgets/floatingHintButton.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:path_provider/path_provider.dart'; // For getting the temporary directory
 import 'package:path/path.dart' as path;
 
@@ -16,11 +18,14 @@ class LessonScreen extends StatefulWidget {
   final String uid;
   final Users userdata;
   final String bookTitle;
+  Book? book;
+  bool isOffLine;
 
-  const LessonScreen({
+  LessonScreen({
     required this.uid,
     required this.userdata,
     required this.bookTitle,
+    required this.isOffLine,
     Key? key,
   }) : super(key: key);
 
@@ -97,8 +102,9 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> setupLesson() async {
-    Book? response =
-        await context.read<ApiFirebaseService>().getBook(widget.bookTitle);
+    Book? response = !widget.isOffLine
+        ? await context.read<ApiFirebaseService>().getBook(widget.bookTitle)
+        : await context.read<DatabaseHelper>().getBook(widget.bookTitle);
     if (response != null) {
       setState(() {
         bookData = response;
@@ -547,12 +553,19 @@ class LessonScreenState extends State<LessonScreen> {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const SizedBox(height: 20),
-                  Image.network(
-                    currentImageUrl,
-                    fit: BoxFit.contain,
-                    width: MediaQuery.of(context).size.width * 1.0,
-                    height: MediaQuery.of(context).size.height * 0.38,
-                  ),
+                  widget.isOffLine == false
+                      ? Image.network(
+                          currentImageUrl,
+                          fit: BoxFit.contain,
+                          width: MediaQuery.of(context).size.width * 1.0,
+                          height: MediaQuery.of(context).size.height * 0.38,
+                        )
+                      : Image.memory(
+                          base64Decode(currentImageUrl),
+                          fit: BoxFit.contain,
+                          width: MediaQuery.of(context).size.width * 1.0,
+                          height: MediaQuery.of(context).size.height * 0.38,
+                        ),
                   const SizedBox(height: 20),
                   RichText(
                     text: TextSpan(

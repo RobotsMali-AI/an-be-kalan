@@ -5,7 +5,7 @@ class BookUser {
   String bookmark;
   int readingTime;
   List<double> accuracies;
-  DateTime lastAccessed;
+  dynamic lastAccessed;
   int totalPages;
 
   BookUser({
@@ -18,13 +18,27 @@ class BookUser {
   });
 
   factory BookUser.fromSnapshot(Map<String, dynamic> data) {
-    Timestamp timestamp = data['lastAccessed'];
+    final date = data['lastAccessed'].runtimeType == String
+        ? DateTime.tryParse(data['lastAccessed'])
+        : data['lastAccessed'].toDate();
     return BookUser(
       title: data['title'],
       bookmark: data['bookmark'],
       readingTime: data['readingTime'],
       accuracies: List<double>.from(data['accuracies']),
-      lastAccessed: timestamp.toDate(),
+      lastAccessed: date,
+      totalPages: data['totalPages'],
+    );
+  }
+
+  factory BookUser.fromSemb(Map<String, dynamic> data) {
+    String timestamp = data['lastAccessed'].toString();
+    return BookUser(
+      title: data['title'],
+      bookmark: data['bookmark'],
+      readingTime: data['readingTime'],
+      accuracies: List<double>.from(data['accuracies']),
+      lastAccessed: timestamp,
       totalPages: data['totalPages'],
     );
   }
@@ -36,6 +50,18 @@ class BookUser {
       'readingTime': readingTime,
       'accuracies': accuracies,
       'lastAccessed': lastAccessed,
+      'totalPages': totalPages,
+    };
+  }
+
+  Map<String, dynamic> toSemb() {
+    String last = lastAccessed.toString();
+    return {
+      'title': title,
+      'bookmark': bookmark,
+      'readingTime': readingTime,
+      'accuracies': accuracies,
+      'lastAccessed': last,
       'totalPages': totalPages,
     };
   }

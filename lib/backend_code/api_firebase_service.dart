@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:literacy_app/backend_code/semb_database.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
@@ -14,6 +15,7 @@ import 'package:literacy_app/constant.dart'
 class ApiFirebaseService with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Users? userInfo;
+  DatabaseHelper helper = DatabaseHelper();
   List<Book> books = [];
   Book? book;
 
@@ -23,6 +25,8 @@ class ApiFirebaseService with ChangeNotifier {
         .collection('users')
         .doc(uid)
         .set(userData.toFirestore(), SetOptions(merge: true));
+    userData.uid = uid;
+    await helper.insertUser(userData);
     notifyListeners();
   }
 
@@ -32,12 +36,15 @@ class ApiFirebaseService with ChangeNotifier {
     userInfo = doc.exists
         ? Users.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>)
         : createUserData(uid);
+    //final b = helper.getUser(uid);
+    //print(b);
     notifyListeners();
   }
 
   /// Deleting a User data from the collection
   Future<void> deleteUserData(String uid) async {
     await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+    //await helper.
     notifyListeners();
   }
 
@@ -126,6 +133,14 @@ class ApiFirebaseService with ChangeNotifier {
       'averageAccuracy': averageAccuracy,
       'earnedXp': earnedXp,
     };
+  }
+
+  Future<void> addBookToSembest(Book b, Users userData) async {
+    if (!userData.downloadBooks!.contains(b.title)) {
+      userData.downloadBooks!.add(b.title);
+    }
+    await saveUserData(userData.uid!, userData);
+    await helper.insertBook(b);
   }
 
   /// Sends an audio file to the ASR model for inference
@@ -224,6 +239,9 @@ class ApiFirebaseService with ChangeNotifier {
     data.docs.forEach((element) {
       books.add(Book.fromJson(element));
     });
+
+    // final b = await helper.getBooks();
+    // print(b);
     notifyListeners();
   }
 

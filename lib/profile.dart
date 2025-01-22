@@ -7,16 +7,17 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/main.dart' show auth;
-import 'package:literacy_app/backend_code/user.dart' show deleteUserData;
+import 'package:literacy_app/models/Users.dart';
 import 'package:provider/provider.dart';
 
 const placeholderImage =
     'https://drive.google.com/uc?export=download&id=1_egpUE2P2KJ3WVQ44iCT0ux6f_KdJVdO';
 
 class ProfilePage extends StatefulWidget {
-  final int xp;
+  final Users userData;
   final User user;
-  const ProfilePage({super.key, required this.user, required this.xp});
+
+  const ProfilePage({super.key, required this.user, required this.userData});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -28,11 +29,15 @@ class _ProfilePageState extends State<ProfilePage> {
   bool showSaveButton = false;
   bool isLoading = false;
 
+  // Mock data for stats
+  final int totalExperience = 1250;
+  final String totalReadingTime = "25h 30m";
+  final int totalBooksCompleted = 42;
+
   @override
   void initState() {
     controller = TextEditingController(text: widget.user.displayName);
     controller.addListener(_onNameChanged);
-
     super.initState();
   }
 
@@ -54,9 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
           controller.text.isNotEmpty;
     });
   }
-
-  List get userProviders =>
-      widget.user.providerData.map((e) => e.providerId).toList();
 
   Future updateDisplayName() async {
     await widget.user.updateDisplayName(controller.text);
@@ -99,46 +101,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _deleteAccount() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure you want to delete your account? This action is irreversible.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm ?? false) {
-      try {
-        await context
-            .read<ApiFirebaseService>()
-            .deleteUserData(widget.user.uid);
-        await widget.user.delete();
-        Navigator.of(context).pop(); // Navigate to previous screen
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete account: $e')),
-        );
-      }
-    }
-  }
-
   Future<void> _signOut() async {
     if (widget.user.isAnonymous) {
       await context.read<ApiFirebaseService>().deleteUserData(widget.user.uid);
-      await widget.user.delete(); // Delete anonymous account
+      await widget.user.delete();
     }
     await auth.signOut();
     await GoogleSignIn().signOut();
@@ -152,170 +118,171 @@ class _ProfilePageState extends State<ProfilePage> {
       random.nextInt(256),
       random.nextInt(256),
       random.nextInt(256),
-      0.4, // Light overlay
+      0.1, // Light overlay
     );
 
-    return GestureDetector(
-      onTap: FocusScope.of(context).unfocus,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'My Profile',
-            style: const TextStyle(fontSize: 20, color: Colors.white),
-          ),
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          backgroundColor: Colors.black,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'My Profile',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        body: Stack(
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: GestureDetector(
+        onTap: FocusScope.of(context).unfocus,
+        child: Stack(
           children: [
-            Center(
-              child: SizedBox(
-                width: 400,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            maxRadius: 60,
-                            backgroundImage: NetworkImage(
-                              widget.user.photoURL ?? placeholderImage,
-                            ),
-                          ),
-                          Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  Colors.transparent,
-                                  randomColor,
-                                ],
-                                stops: const [0.7, 1.0],
-                              ),
-                            ),
-                          ),
-                          Positioned.directional(
-                            textDirection: Directionality.of(context),
-                            end: 0,
-                            bottom: 0,
-                            child: Material(
-                              clipBehavior: Clip.antiAlias,
-                              color: Theme.of(context).colorScheme.secondary,
-                              borderRadius: BorderRadius.circular(40),
-                              child: InkWell(
-                                onTap: _uploadProfilePicture,
-                                radius: 50,
-                                child: const SizedBox(
-                                  width: 35,
-                                  height: 35,
-                                  child: Icon(Icons.camera_alt),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+            Positioned.fill(
+              child: Container(
+                color: Colors.grey.shade100,
+              ),
+            ),
+            Column(
+              children: [
+                const SizedBox(height: 20),
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundImage: NetworkImage(
+                        widget.user.photoURL ?? placeholderImage,
                       ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        textAlign: TextAlign.center,
-                        controller: controller,
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          floatingLabelBehavior: FloatingLabelBehavior.never,
-                          alignLabelWithHint: true,
-                          label: Center(
-                            child: Text('Click to add a display name'),
+                    ),
+                    Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [Colors.transparent, randomColor],
+                          stops: const [0.7, 1.0],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 8,
+                      bottom: 8,
+                      child: Material(
+                        color: Colors.grey.shade300,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          onTap: _uploadProfilePicture,
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child:
+                                Icon(Icons.camera_alt, color: Colors.black54),
                           ),
                         ),
                       ),
-                      Text(
-                        '${widget.xp} XP',
-                      ),
-                      const SizedBox(height: 5),
-                      Text(widget.user.email ?? 'user@anonymous.none'),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (userProviders.contains('password'))
-                            const Icon(Icons.mail),
-                          if (userProviders.contains('google.com'))
-                            SizedBox(
-                              width: 24,
-                              child: Image.network(
-                                'https://upload.wikimedia.org/wikipedia/commons/0/09/IOS_Google_icon.png',
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () {
-                          widget.user.sendEmailVerification();
-                        },
-                        child: const Text('Verify Email'),
-                      ),
-                      const Divider(
-                        thickness: 1.0,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          _signOut();
-                        },
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Sign Out'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple.shade100,
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          _deleteAccount();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                        ),
-                        child: const Text('Delete Account'),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  textAlign: TextAlign.center,
+                  controller: controller,
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
+                  decoration: const InputDecoration(
+                    hintText: "Enter your display name",
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
                   ),
                 ),
-              ),
-            ),
-            Positioned.directional(
-              textDirection: Directionality.of(context),
-              end: 40,
-              top: 40,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: !showSaveButton
-                    ? SizedBox(key: UniqueKey())
-                    : TextButton(
-                        onPressed: isLoading ? null : updateDisplayName,
-                        child: const Text('Save changes'),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          _buildStatCard(
+                            title: "Experience",
+                            value: "${widget.userData.xp} XP",
+                            icon: Icons.star,
+                            backgroundColor: Colors.blue.shade100,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildStatCard(
+                            title: "Total Reading Time",
+                            value: widget.userData.totalReadingTime.toString(),
+                            icon: Icons.timer,
+                            backgroundColor: Colors.green.shade100,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildStatCard(
+                            title: "Books Completed",
+                            value: "${widget.userData.completedBooks.length}",
+                            icon: Icons.book,
+                            backgroundColor: Colors.orange.shade100,
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton.icon(
+                            onPressed: _signOut,
+                            icon: const Icon(Icons.logout),
+                            label: const Text('Sign Out'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.redAccent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-              ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color backgroundColor,
+  }) {
+    return Card(
+      color: backgroundColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(icon, color: Colors.black54),
+            ),
+            const SizedBox(width: 15),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
+import 'package:provider/provider.dart';
 
 class BookWidgetView extends StatelessWidget {
   const BookWidgetView({
@@ -9,9 +12,10 @@ class BookWidgetView extends StatelessWidget {
     required this.isCompleted,
     required this.isInProgress,
     required this.isDownloaded,
+    required this.user,
     this.bookUser,
   });
-
+  final Users user;
   final Book book;
   final bool isCompleted;
   final bool isInProgress;
@@ -37,9 +41,9 @@ class BookWidgetView extends StatelessWidget {
           height: 150,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black,
                 blurRadius: 6,
                 offset: Offset(0, 3),
               ),
@@ -83,7 +87,7 @@ class BookWidgetView extends StatelessWidget {
                           padding: const EdgeInsets.only(left: 8),
                           child: LinearProgressIndicator(
                             value: progress,
-                            backgroundColor: Colors.grey.withOpacity(0.3),
+                            backgroundColor: Colors.grey[300],
                             color: Colors.green,
                             minHeight: 6,
                           ),
@@ -99,7 +103,9 @@ class BookWidgetView extends StatelessWidget {
                   child: IconButton(
                     onPressed: () {
                       // Handle download logic
-                      print("Downloading ${book.title}");
+                      context
+                          .read<ApiFirebaseService>()
+                          .addBookToSembest(book, user);
                     },
                     icon: const Icon(Icons.download),
                     style: ElevatedButton.styleFrom(

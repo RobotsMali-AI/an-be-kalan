@@ -57,6 +57,7 @@ class CustomTextFormFieldWidget extends StatelessWidget {
           } else {
             return errorText;
           }
+          return null;
           //value != null && value.isNotEmpty ? null : errorText,
         });
   }

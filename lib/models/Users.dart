@@ -49,10 +49,10 @@ class Users {
     return Users(
       downloadBooks: json["downloadsBooks"] ?? [],
       uid: json["uid"],
-      birth_date: json['birth_date'],
+      birth_date: DateTime.tryParse(json['birth_date']),
       completedBooks: json['completedBooks'] ?? [],
       inProgressBooks: (json['inProgressBooks'] as List)
-          .map((book) => BookUser.fromSnapshot(book))
+          .map((book) => BookUser.fromSemb(book))
           .toList(),
       favoriteBooks: json['favoriteBooks'] ?? [],
       xpLog: (json['xpLog'] as List)
@@ -66,6 +66,7 @@ class Users {
   // Convert Users object to Firestore map
   Map<String, dynamic> toFirestore() {
     return {
+      'uid': uid,
       'completedBooks': completedBooks,
       'downloadsBooks': downloadBooks,
       'inProgressBooks':
@@ -75,6 +76,21 @@ class Users {
       'xp': xp,
       'totalReadingTime': totalReadingTime,
       'birth_date': birth_date,
+    };
+  }
+
+  Map<String, dynamic> toSemb() {
+    String date = birth_date.toString();
+    return {
+      'uid': uid,
+      'completedBooks': completedBooks,
+      'downloadsBooks': downloadBooks,
+      'inProgressBooks': inProgressBooks.map((book) => book.toSemb()).toList(),
+      'favoriteBooks': favoriteBooks,
+      'xpLog': xpLog.map((log) => log.toSnapshot()).toList(),
+      'xp': xp,
+      'totalReadingTime': totalReadingTime,
+      'birth_date': date,
     };
   }
 }

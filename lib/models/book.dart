@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:literacy_app/imageToBase64.dart';
 import 'package:literacy_app/models/page.dart';
 
 class Book {
-  final dynamic title;
-  final String cover;
+  final String title;
+  final dynamic cover;
   final Map<String, Page> content; // Adjusted type to match Firestore structure
 
   Book({
@@ -35,13 +36,17 @@ class Book {
     );
   }
 
-  Map<String, dynamic> toSnapshot() {
+  Future<Map<String, dynamic>> toSnapshot() async {
+    final contentSnapshot =
+        await Future.wait(content.entries.map((entry) async {
+      final pageSnapshot = await entry.value.toSnapshot();
+      return MapEntry(entry.key, pageSnapshot);
+    }));
+    final imageBytes = await imageUrlToBase64(cover);
     return {
       'title': title,
-      'cover': cover,
-      'content': content.map(
-        (key, page) => MapEntry(key, page.toSnapshot()),
-      ),
+      'cover': imageBytes,
+      'content': Map.fromEntries(contentSnapshot),
     };
   }
 }

@@ -1,3 +1,5 @@
+import 'package:literacy_app/imageToBase64.dart';
+
 class Page {
   final dynamic imageUrl;
   final List<String> sentences;
@@ -14,9 +16,9 @@ class Page {
     );
   }
 
-  Map<String, dynamic> toSnapshot() {
+  Future<Map<String, dynamic>> toSnapshot() async {
     return {
-      'image': imageUrl,
+      'image': await imageUrlToBase64(imageUrl),
       'sentences': sentences,
     };
   }
