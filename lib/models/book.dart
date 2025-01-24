@@ -6,12 +6,13 @@ class Book {
   final String title;
   final dynamic cover;
   final Map<String, Page> content; // Adjusted type to match Firestore structure
+  String? uuid;
 
-  Book({
-    required this.title,
-    required this.cover,
-    required this.content,
-  });
+  Book(
+      {required this.title,
+      required this.cover,
+      required this.content,
+      this.uuid});
 
   factory Book.fromJson(DocumentSnapshot<Map<String, dynamic>> json) {
     final data = json.data()!;
@@ -27,6 +28,7 @@ class Book {
 
   factory Book.fromSemb(Map<String, dynamic> json) {
     return Book(
+      uuid: json['uuid'] ?? "",
       cover: json['cover'] ?? '',
       title: json['title'] ?? '',
       content: (json['content'] as Map<String, dynamic>).map(
@@ -44,6 +46,7 @@ class Book {
     }));
     final imageBytes = await imageUrlToBase64(cover);
     return {
+      'uuid': uuid,
       'title': title,
       'cover': imageBytes,
       'content': Map.fromEntries(contentSnapshot),

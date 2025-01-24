@@ -21,12 +21,14 @@ class DownloadBookPageWidget extends StatefulWidget {
 
 class _BookPageWidgetState extends State<DownloadBookPageWidget> {
   bool isLoading = true;
+  List<Book> books = [];
   Future<void> initUserData() async {
     try {
       setState(() {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           context.read<DatabaseHelper>().getUser(widget.user.uid);
           context.read<DatabaseHelper>().getBooks();
+          books = context.read<DatabaseHelper>().books;
         });
         isLoading = false;
       });
@@ -57,6 +59,7 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
   Widget build(BuildContext context) {
     return Consumer<DatabaseHelper>(builder: (context, database, _) {
       database.getUser(widget.user.uid);
+
       // database.getBooks();
       if (isLoading) {
         database.getBooks();
@@ -68,7 +71,23 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
         database.getUser(widget.user.uid);
         return CircleAvatar();
       }
-      List<Book> books = database.books;
+      void searchBook(String query) {
+        setState(() {
+          if (query.isEmpty) {
+            // If the query is empty, reset to the original book list from the database
+            books = context.read<DatabaseHelper>().books;
+          } else {
+            // Filter books based on the query
+            books = context
+                .read<DatabaseHelper>()
+                .books
+                .where((book) =>
+                    book.title.toLowerCase().contains(query.toLowerCase()))
+                .toList();
+          }
+        });
+      }
+
       Users userData = database.userData!;
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -92,6 +111,7 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
                   children: [
                     Expanded(
                       child: TextField(
+                        onChanged: searchBook,
                         decoration: InputDecoration(
                           hintText: 'Gafe dɔ ɲini',
                           fillColor: Colors.white,

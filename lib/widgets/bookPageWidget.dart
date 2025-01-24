@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/lesson_screen.dart';
 import 'package:literacy_app/models/Users.dart';
+import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
 import 'package:literacy_app/widgets/bookWidgetView.dart';
 
@@ -22,6 +23,30 @@ class BookPageWidget extends StatefulWidget {
 }
 
 class _BookPageWidgetState extends State<BookPageWidget> {
+  final TextEditingController _bookSearchController = TextEditingController();
+  List<Book> books = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    books = widget.apiFirebaseService.books;
+  }
+
+  void searchBook(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        // If the query is empty, show all books
+        books = widget.apiFirebaseService.books;
+      } else {
+        // Filter books based on the query
+        books = widget.apiFirebaseService.books
+            .where((book) =>
+                book.title.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -46,6 +71,8 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                 children: [
                   Expanded(
                     child: TextField(
+                      onChanged: searchBook,
+                      controller: _bookSearchController,
                       decoration: InputDecoration(
                         hintText: 'Gafe dɔ ɲini',
                         fillColor: Colors.white,
@@ -87,9 +114,9 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                 mainAxisSpacing: 20,
                 childAspectRatio: 1,
               ),
-              itemCount: widget.apiFirebaseService.books.length,
+              itemCount: books.length,
               itemBuilder: (context, index) {
-                final book = widget.apiFirebaseService.books[index];
+                final book = books[index];
                 final isInProgress = widget.userData.inProgressBooks
                     .any((b) => b.title == book.title);
                 final isCompleted =

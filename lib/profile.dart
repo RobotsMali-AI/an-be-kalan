@@ -85,19 +85,26 @@ class _ProfilePageState extends State<ProfilePage> {
         final downloadURL = await ref.getDownloadURL();
 
         await widget.user.updatePhotoURL(downloadURL);
+        if (!mounted) return;
         setState(() {
           photoURL = downloadURL;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile picture updated')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile picture updated')),
+          );
+        }
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to upload picture')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to upload picture')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setIsLoading();
+        }
       }
-
-      setIsLoading();
     }
   }
 
@@ -108,7 +115,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     await auth.signOut();
     await GoogleSignIn().signOut();
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override

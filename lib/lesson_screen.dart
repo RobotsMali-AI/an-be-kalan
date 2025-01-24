@@ -305,6 +305,8 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = true;
     });
 
+    await context.read<DatabaseHelper>();
+
     await context.read<ApiFirebaseService>().bookmark(
           widget.uid,
           BookUser(
@@ -515,7 +517,7 @@ class LessonScreenState extends State<LessonScreen> {
     if (_loading) {
       return const Center(
         child: CircularProgressIndicator(),
-      ); // Show loading spinner for a few milliseconds before bookData load
+      ); // Show loading spinner for a few milliseconds before bookData loads
     }
     return Scaffold(
       appBar: AppBar(
@@ -550,21 +552,40 @@ class LessonScreenState extends State<LessonScreen> {
           SingleChildScrollView(
             child: Center(
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   const SizedBox(height: 20),
+                  // Image with loading indicator
                   widget.isOffLine == false
-                      ? Image.network(
-                          currentImageUrl,
-                          fit: BoxFit.contain,
-                          width: MediaQuery.of(context).size.width * 1.0,
-                          height: MediaQuery.of(context).size.height * 0.38,
+                      ? Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.network(
+                              currentImageUrl,
+                              fit: BoxFit.contain,
+                              width: MediaQuery.of(context).size.width * 1.0,
+                              height: MediaQuery.of(context).size.height * 0.38,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const SizedBox(
+                                  width: 50,
+                                  height: 50,
+                                  child: CircularProgressIndicator(),
+                                );
+                              },
+                            ),
+                          ],
                         )
-                      : Image.memory(
-                          base64Decode(currentImageUrl),
-                          fit: BoxFit.contain,
-                          width: MediaQuery.of(context).size.width * 1.0,
-                          height: MediaQuery.of(context).size.height * 0.38,
+                      : Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Image.memory(
+                              base64Decode(currentImageUrl),
+                              fit: BoxFit.contain,
+                              width: MediaQuery.of(context).size.width * 1.0,
+                              height: MediaQuery.of(context).size.height * 0.38,
+                            ),
+                          ],
                         ),
                   const SizedBox(height: 20),
                   RichText(
@@ -598,21 +619,17 @@ class LessonScreenState extends State<LessonScreen> {
             ),
           ),
           Positioned(
-              bottom: 0,
-              left: 20,
-              width: 50,
-              height: 50,
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.grey.shade300,
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.black87),
-                value: currentPage /
-                    (bookData!.content.length), // Calculate progress
-              )
-              /*Text( Another option for progress indicator
-              'Page $currentPage/${bookData!['content'].keys.length}, Sentence ${currentSentenceIndex + 1}/${currentSentences.length}',
-              style: const TextStyle(fontSize: 16),
-            ),*/
-              ),
+            bottom: 0,
+            left: 20,
+            width: 50,
+            height: 50,
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.grey.shade300,
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.black87),
+              value: currentPage /
+                  (bookData!.content.length), // Calculate progress
+            ),
+          ),
           Positioned(
             bottom: 0,
             right: 20,

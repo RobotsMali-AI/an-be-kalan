@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/foundation.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
@@ -131,19 +133,21 @@ class DatabaseHelper extends ChangeNotifier {
   //       records.map((snapshot) => Users.fromSemb(snapshot.value)).toList());
   // }
 
-  Future<void> getUser(String uid) async {
+  Future<bool> getUser(String uid) async {
     final db = await database;
-    _usersStore.find(db).then((records) => records
-            .map((snapshot) => Users.fromSemb(snapshot.value))
-            .toList()
-            .forEach((user) {
-          if (user.uid == uid) {
-            userData = user;
-          }
-        }));
+    List<Users> data = await _usersStore.find(db).then((records) =>
+        records.map((snapshot) => Users.fromSemb(snapshot.value)).toList());
+    print(data);
+    for (var user in data) {
+      if (user.uid == uid) {
+        userData = user;
+        return true;
+      }
+    }
+    return false;
   }
 
-  Future<Users?> updateUser(int id, Map<String, dynamic> user) async {
+  Future<Users?> updateUser(Map<String, dynamic> user) async {
     final db = await database;
     _usersStore.update(db, user);
     //final updated = await _usersStore.record(id).update(db, user);
@@ -225,7 +229,7 @@ class DatabaseHelper extends ChangeNotifier {
       userData.inProgressBooks.add(bookMarking);
     }
     // Save new userData to firebase
-    await updateUser(0, userData.toSemb());
+    await updateUser(userData.toSemb());
     // Return the latest version of userData
     userData = userData;
     notifyListeners();

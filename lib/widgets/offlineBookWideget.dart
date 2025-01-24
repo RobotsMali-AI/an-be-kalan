@@ -1,13 +1,10 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
-import 'package:provider/provider.dart';
 
 class OffBookWidgetView extends StatelessWidget {
   const OffBookWidgetView({
@@ -19,13 +16,13 @@ class OffBookWidgetView extends StatelessWidget {
     required this.user,
     this.bookUser,
   });
+
   final Users user;
   final Book book;
   final bool isCompleted;
   final bool isInProgress;
   final bool isDownloaded;
   final BookUser? bookUser;
-  // Example: Decoding and displaying the image
 
   @override
   Widget build(BuildContext context) {
@@ -38,96 +35,131 @@ class OffBookWidgetView extends StatelessWidget {
           : 0;
       progress = currentPage / bookUser!.totalPages;
     }
-    // try {
-    //   Uint8List imageBytes = base64Decode(book.cover);
-    //   print("Decoded successfully, bytes: ${imageBytes.length}");
-    // } catch (e) {
-    //   print("Error decoding Base64: $e");
-    // }
-    return Stack(children: [
-      // Book Cover
-      Container(
-        height: 150,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black,
-              blurRadius: 6,
-              offset: Offset(0, 3),
-            ),
-          ],
-          image: DecorationImage(
-            image: MemoryImage(base64Decode(book.cover)),
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-      // Status and Progress Overlay
-      Container(
-        height: 150,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Status Labels
-                  Row(
-                    children: [
-                      if (isCompleted)
-                        const StatusLabel(text: "Finis", color: Colors.green),
-                      if (isInProgress)
-                        const StatusLabel(
-                            text: "Encours", color: Colors.orange),
-                      if (!isCompleted && !isInProgress)
-                        const StatusLabel(
-                            text: "Non commencer", color: Colors.blueGrey),
-                    ],
+
+    final decodedImage = base64Decode(book.cover);
+
+    return Stack(
+      children: [
+        // Book Cover
+        FutureBuilder(
+          future: precacheImage(MemoryImage(decodedImage), context),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Show a loading spinner while the image is loading
+              return Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[300],
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              // Show an error icon if the image fails to load
+              return Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[300],
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.error,
+                    color: Colors.red,
+                    size: 40,
                   ),
-                  // Progress Bar
-                  if (isInProgress)
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          backgroundColor: Colors.grey[300],
-                          color: Colors.green,
-                          minHeight: 6,
+                ),
+              );
+            } else {
+              // Show the actual image once it's loaded
+              return Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                  image: DecorationImage(
+                    image: MemoryImage(decodedImage),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+        // Status and Progress Overlay
+        Container(
+          height: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Status Labels
+                    Row(
+                      children: [
+                        if (isCompleted)
+                          const StatusLabel(text: "Fini", color: Colors.green),
+                        if (isInProgress)
+                          const StatusLabel(
+                              text: "En cours", color: Colors.orange),
+                        if (!isCompleted && !isInProgress)
+                          const StatusLabel(
+                              text: "Non commencé", color: Colors.blueGrey),
+                      ],
+                    ),
+                    // Progress Bar (Visible only if in progress)
+                    if (isInProgress)
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            backgroundColor: Colors.grey[300],
+                            color: Colors.green,
+                            minHeight: 6,
+                          ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
-      ),
-      // Book Title
-      Positioned(
-        bottom: 8,
-        left: 8,
-        right: 8,
-        child: Text(
-          book.title,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            shadows: [
-              Shadow(color: Colors.black, blurRadius: 4),
             ],
           ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
         ),
-      ),
-    ]);
+        // Book Title
+        Positioned(
+          bottom: 8,
+          left: 8,
+          right: 8,
+          child: Text(
+            book.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              shadows: [
+                Shadow(color: Colors.black, blurRadius: 4),
+              ],
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
   }
 }
 

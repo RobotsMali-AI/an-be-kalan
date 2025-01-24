@@ -36,23 +36,59 @@ class BookWidgetView extends StatelessWidget {
 
     return Stack(
       children: [
-        // Book Cover
-        Container(
-          height: 150,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black,
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
-            image: DecorationImage(
-              image: NetworkImage(book.cover),
-              fit: BoxFit.cover,
-            ),
-          ),
+        // Book Cover with Loading Indicator
+        FutureBuilder(
+          future: precacheImage(NetworkImage(book.cover), context),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Show a loading spinner while the image is loading
+              return Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[300],
+                ),
+                child: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              // Show an error icon if the image fails to load
+              return Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[300],
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.error,
+                    color: Colors.red,
+                    size: 40,
+                  ),
+                ),
+              );
+            } else {
+              // Show the actual image once it's loaded
+              return Container(
+                height: 150,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                  image: DecorationImage(
+                    image: NetworkImage(book.cover),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }
+          },
         ),
         // Status and Progress Overlay
         Container(

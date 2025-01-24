@@ -26,7 +26,6 @@ class ApiFirebaseService with ChangeNotifier {
         .doc(uid)
         .set(userData.toFirestore(), SetOptions(merge: true));
     userData.uid = uid;
-    await helper.insertUser(userData);
     notifyListeners();
   }
 
@@ -59,6 +58,7 @@ class ApiFirebaseService with ChangeNotifier {
         xp: 0);
 
     // Save user data to Firestore
+    helper.insertUser(userData);
     saveUserData(uid, userData); // Ensure it's saved before returning
     notifyListeners();
     return userData;
@@ -90,6 +90,7 @@ class ApiFirebaseService with ChangeNotifier {
       // Add a new bookmark
       userData.inProgressBooks.add(bookMarking);
     }
+    await helper.updateUser(userData.toSemb());
     // Save new userData to firebase
     await saveUserData(uid, userData);
     // Return the latest version of userData
@@ -126,6 +127,7 @@ class ApiFirebaseService with ChangeNotifier {
 
     // Save the updated userData (assuming you have a function to save it)
     await saveUserData(uid, userData);
+    await helper.updateUser(userData.toSemb());
     notifyListeners();
     // Return updated userData, total reading time, and average accuracy
     return {
