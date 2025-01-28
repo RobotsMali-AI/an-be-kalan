@@ -8,7 +8,13 @@ import Firebase
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
-      FirebaseApp.configure()
+    if FirebaseApp.app() == nil {
+        FirebaseApp.app()?.delete { success in
+          if success {
+            FirebaseApp.configure()
+          }
+      }          
+    }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

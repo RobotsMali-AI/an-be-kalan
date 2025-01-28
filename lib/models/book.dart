@@ -6,7 +6,7 @@ class Book {
   final String title;
   final dynamic cover;
   final Map<String, Page> content; // Adjusted type to match Firestore structure
-  String? uuid;
+  List<String>? uuid;
 
   Book(
       {required this.title,
@@ -28,7 +28,7 @@ class Book {
 
   factory Book.fromSemb(Map<String, dynamic> json) {
     return Book(
-      uuid: json['uuid'] ?? "",
+      uuid: json['uuid'] ?? [],
       cover: json['cover'] ?? '',
       title: json['title'] ?? '',
       content: (json['content'] as Map<String, dynamic>).map(

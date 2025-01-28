@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-
 import 'package:literacy_app/auth.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
