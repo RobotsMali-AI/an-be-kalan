@@ -64,18 +64,22 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
       if (isLoading) {
         database.getBooks();
         database.getUser(widget.user.uid);
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       }
       if (database.userData == null) {
         database.getBooks();
         database.getUser(widget.user.uid);
-        return CircleAvatar();
+        return const CircleAvatar();
       }
       void searchBook(String query) {
         setState(() {
           if (query.isEmpty) {
             // If the query is empty, reset to the original book list from the database
-            books = context.read<DatabaseHelper>().books;
+            books = context
+                .read<DatabaseHelper>()
+                .books
+                .where((element) => element.uuid!.contains(widget.user.uid))
+                .toList();
           } else {
             // Filter books based on the query
             books = context

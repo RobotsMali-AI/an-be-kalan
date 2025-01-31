@@ -11,6 +11,7 @@ import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart'; // For getting the temporary directory
 import 'package:path/path.dart' as path;
+import 'package:audio_session/audio_session.dart';
 
 import 'models/Users.dart'; // For manipulating file paths
 
@@ -71,6 +72,7 @@ class LessonScreenState extends State<LessonScreen> {
   void initState() {
     super.initState();
     setupLesson();
+    setupAudioSession();
 
     // Set loop mode to off
     _audioPlayer.setLoopMode(LoopMode.off);
@@ -153,21 +155,32 @@ class LessonScreenState extends State<LessonScreen> {
     startTime = DateTime.now();
   }
 
+  Future<void> setupAudioSession() async {
+    final session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration(
+      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+      avAudioSessionMode: AVAudioSessionMode.defaultMode,
+      avAudioSessionCategoryOptions:
+          AVAudioSessionCategoryOptions.allowBluetooth |
+              AVAudioSessionCategoryOptions.defaultToSpeaker,
+    ));
+    await session.setActive(true);
+  }
+
   Future<void> startRecording() async {
     if (await _audioRecorder.hasPermission()) {
-      // Get the temporary directory of the device
       final directory = await getTemporaryDirectory();
-      // Create a unique file path with the .wav extension
       _filePath = path.join(
-        directory.path,
-        '${DateTime.now().millisecondsSinceEpoch}.wav',
-      );
+          directory.path, '${DateTime.now().millisecondsSinceEpoch}.m4a');
+
+      // Ensure audio session is properly configured for iOS
       await _audioRecorder.start(
         path: _filePath,
         encoder: AudioEncoder.wav,
         bitRate: 128000,
         samplingRate: 44100,
       );
+
       setState(() {
         isRecording = true;
         hasRecording = false;
@@ -175,6 +188,8 @@ class LessonScreenState extends State<LessonScreen> {
           hasTranscription = false;
         }
       });
+    } else {
+      print("Microphone permission denied");
     }
   }
 

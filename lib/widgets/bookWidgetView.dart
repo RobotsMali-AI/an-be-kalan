@@ -27,11 +27,13 @@ class BookWidgetView extends StatelessWidget {
     // Calculate progress as a percentage
     double progress = 0;
     if (bookUser != null && bookUser!.totalPages > 0) {
+      final totalPage = bookUser!.totalPages;
       final bookmarkMatch = RegExp(r'\d+').firstMatch(bookUser!.bookmark);
+      print(bookmarkMatch);
       final currentPage = bookmarkMatch != null
           ? int.tryParse(bookmarkMatch.group(0)!) ?? 0
           : 0;
-      progress = currentPage / bookUser!.totalPages;
+      progress = currentPage / totalPage;
     }
 
     return Stack(

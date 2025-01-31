@@ -1,4 +1,5 @@
 import 'dart:developer' show log;
+import 'package:collection/collection.dart';
 import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
@@ -92,7 +93,23 @@ class _HomePageState extends State<HomePage> {
           conext.read<DatabaseHelper>().insertUser(userData);
           conext.read<DatabaseHelper>().getUser(userData.uid!);
         }
+        final downloadedBooks = conext
+            .read<DatabaseHelper>()
+            .books
+            .map((book) => book.title)
+            .toSet();
 
+        for (var bookTitle in userData.downloadBooks ?? []) {
+          if (!downloadedBooks.contains(bookTitle)) {
+            final book = context
+                .read<ApiFirebaseService>()
+                .books
+                .firstWhereOrNull((b) => b.title == bookTitle);
+            if (book != null) {
+              conext.read<DatabaseHelper>().insertBook(book, userData.uid!);
+            }
+          }
+        }
         if (_selectedTabIndex == 0) {
           return BookPageWidget(
               apiFirebaseService: apiFirebaseService,

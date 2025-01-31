@@ -4,6 +4,14 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Nous avons besoin de l'accès à la bibliothèque musicale.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need access to your microphone for recording</string>
+	<key>NSAudioSessionCategory</key>
+	<string>AVAudioSessionCategoryPlayAndRecord</string>
+	<key>NSAudioSessionMode</key>
+	<string>AVAudioSessionModeDefault</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

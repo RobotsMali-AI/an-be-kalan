@@ -4,8 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
-import 'package:literacy_app/models/page.dart';
-import 'package:literacy_app/models/xpLog.dart';
 import 'package:sembast/sembast_io.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -35,31 +33,35 @@ class DatabaseHelper extends ChangeNotifier {
 
   // Define stores for each class
   final _booksStore = intMapStoreFactory.store('books');
-  final _pagesStore = intMapStoreFactory.store('pages');
   final _usersStore = intMapStoreFactory.store('users');
-  final _xpLogsStore = intMapStoreFactory.store('xpLogs');
-  final _bookUsersStore = intMapStoreFactory.store('bookUsers');
 
-  // Book operations
-  // Future<int> insertBook(Book book) async {
-  //   final db = await database;
-  //   Map<String, dynamic> save = await book.toSnapshot();
-  //   final id = await _booksStore.add(db, save);
-  //   notifyListeners();
-  //   return id;
-  // }
-
-  Future<int> insertBook(Book book) async {
+  Future<int?> insertBook(Book book, String uid) async {
     final db = await database;
 
-    // Wait for the Future to resolve
-    final Map<String, dynamic> save = await book.toSnapshot();
+    // Check if a book with the same title already exists
+    final existingBookSnapshot = await _booksStore.findFirst(db,
+        finder: Finder(filter: Filter.equals('title', book.title)));
 
-    // Pass the resolved map to the store
-    final id = await _booksStore.add(db, save);
+    if (existingBookSnapshot != null) {
+      // If the book already exists, update the UUID list if needed
+      Book existingBook = Book.fromSemb(existingBookSnapshot.value);
 
-    notifyListeners();
-    return id;
+      if (!existingBook.uuid!.contains(uid)) {
+        existingBook.uuid!.add(uid);
+        await _booksStore
+            .record(existingBookSnapshot.key)
+            .update(db, await existingBook.toSnapshot());
+        notifyListeners();
+      }
+
+      return existingBookSnapshot.key; // Return the existing book ID
+    } else {
+      // If the book does not exist, insert it
+      book.uuid = [uid];
+      final id = await _booksStore.add(db, await book.toSnapshot());
+      notifyListeners();
+      return id;
+    }
   }
 
   Future<void> getBooks() async {
@@ -82,42 +84,12 @@ class DatabaseHelper extends ChangeNotifier {
     return null;
   }
 
-  // Future<Book?> updateBook(int id, Map<String, dynamic> book) async {
-  //   final db = await database;
-  //   final updated = await _booksStore.record(id).update(db, book);
-  //   notifyListeners();
-  //   return updated != null ? Book.fromSemb(updated) : null;
-  // }
-
   Future<int?> deleteBook(int id) async {
     final db = await database;
     final count = await _booksStore.record(id).delete(db);
     notifyListeners();
     return count;
   }
-
-  // Page operations
-  Future<int> insertPage(Page page) async {
-    final db = await database;
-    Map<String, dynamic> save = await page.toSnapshot();
-    final id = await _pagesStore.add(db, save);
-    notifyListeners();
-    return id;
-  }
-
-  Future<List<Page>> getPages(String bookTitle) async {
-    final db = await database;
-    final finder = Finder(filter: Filter.equals('bookTitle', bookTitle));
-    return await _pagesStore.find(db, finder: finder).then((records) =>
-        records.map((snapshot) => Page.fromSnapshot(snapshot.value)).toList());
-  }
-
-  // Future<Page?> updatePage(int id, Map<String, dynamic> page) async {
-  //   final db = await database;
-  //   final updated = await _pagesStore.record(id).update(db, page);
-  //   notifyListeners();
-  //   return updated != null ? Page.fromSnapshot(updated) : null;
-  // }
 
   // User operations
   Future<int> insertUser(Users user) async {
@@ -126,12 +98,6 @@ class DatabaseHelper extends ChangeNotifier {
     notifyListeners();
     return id;
   }
-
-  // Future<List<Users>> getUsers() async {
-  //   final db = await database;
-  //   return await _usersStore.find(db).then((records) =>
-  //       records.map((snapshot) => Users.fromSemb(snapshot.value)).toList());
-  // }
 
   Future<bool> getUser(String uid) async {
     final db = await database;
@@ -153,53 +119,6 @@ class DatabaseHelper extends ChangeNotifier {
     //final updated = await _usersStore.record(id).update(db, user);
     notifyListeners();
     return Users.fromSemb(user);
-  }
-
-  // BookUser operations
-  Future<int> insertBookUser(BookUser bookUser) async {
-    final db = await database;
-    final id = await _bookUsersStore.add(db, bookUser.toSemb());
-    notifyListeners();
-    return id;
-  }
-
-  Future<List<BookUser>> getBookUsers(String userId) async {
-    final db = await database;
-    final finder = Finder(filter: Filter.equals('userId', userId));
-    return await _bookUsersStore.find(db, finder: finder).then((records) =>
-        records
-            .map((snapshot) => BookUser.fromSnapshot(snapshot.value))
-            .toList());
-  }
-
-  Future<BookUser?> updateBookUser(
-      int id, Map<String, dynamic> bookUser) async {
-    final db = await database;
-    final updated = await _bookUsersStore.record(id).update(db, bookUser);
-    notifyListeners();
-    return updated != null ? BookUser.fromSnapshot(updated) : null;
-  }
-
-  // XPLog operations
-  Future<int> insertXPLog(XPLog xpLog) async {
-    final db = await database;
-    final id = await _xpLogsStore.add(db, xpLog.toSnapshot());
-    notifyListeners();
-    return id;
-  }
-
-  Future<List<XPLog>> getXPLogs(String userId) async {
-    final db = await database;
-    final finder = Finder(filter: Filter.equals('userId', userId));
-    return await _xpLogsStore.find(db, finder: finder).then((records) =>
-        records.map((snapshot) => XPLog.fromSnapshot(snapshot.value)).toList());
-  }
-
-  Future<XPLog?> updateXPLog(int id, Map<String, dynamic> xpLog) async {
-    final db = await database;
-    final updated = await _xpLogsStore.record(id).update(db, xpLog);
-    notifyListeners();
-    return updated != null ? XPLog.fromSnapshot(updated) : null;
   }
 
   Future<void> bookmark(String uid, BookUser readBook, Users userData) async {

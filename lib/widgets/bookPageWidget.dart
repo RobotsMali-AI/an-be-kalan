@@ -27,7 +27,6 @@ class _BookPageWidgetState extends State<BookPageWidget> {
   List<Book> books = [];
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     books = widget.apiFirebaseService.books;
   }

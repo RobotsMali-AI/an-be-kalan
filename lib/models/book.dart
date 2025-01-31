@@ -28,7 +28,7 @@ class Book {
 
   factory Book.fromSemb(Map<String, dynamic> json) {
     return Book(
-      uuid: json['uuid'] ?? [],
+      uuid: (json['uuid'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
       cover: json['cover'] ?? '',
       title: json['title'] ?? '',
       content: (json['content'] as Map<String, dynamic>).map(

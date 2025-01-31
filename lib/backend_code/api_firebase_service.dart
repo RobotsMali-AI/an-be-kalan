@@ -142,7 +142,7 @@ class ApiFirebaseService with ChangeNotifier {
       userData.downloadBooks!.add(b.title);
     }
     await saveUserData(userData.uid!, userData);
-    await helper.insertBook(b);
+    await helper.insertBook(b, userData.uid!);
   }
 
   /// Sends an audio file to the ASR model for inference

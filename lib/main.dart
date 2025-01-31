@@ -21,7 +21,6 @@ late final FirebaseAuth auth;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   app = await Firebase.initializeApp(
-    name: "Bambara Literacy App",
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseAppCheck.instance.activate(
@@ -38,7 +37,7 @@ Future<void> main() async {
     // 3. App Attest provider
     // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
   );
-  auth = FirebaseAuth.instanceFor(app: app);
+  auth = FirebaseAuth.instance;
 
   if (shouldUseFirebaseEmulator) {
     await auth.useAuthEmulator('localhost', 9099);
