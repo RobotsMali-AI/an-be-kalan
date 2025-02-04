@@ -9,8 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/widgets/bookPageWidget.dart';
 import 'package:literacy_app/widgets/downloadBookPageWidget.dart';
+import 'package:literacy_app/widgets/translate_page_widget.dart';
 import 'package:provider/provider.dart';
-
 import 'models/Users.dart';
 
 class HomePage extends StatefulWidget {
@@ -119,6 +119,8 @@ class _HomePageState extends State<HomePage> {
           return DownloadBookPageWidget(
               user: user!); // Placeholder for identical page
         } else if (_selectedTabIndex == 2) {
+          return const TranslationPage();
+        } else if (_selectedTabIndex == 3) {
           return const Center(
             child: Text("Page Not Implemented"),
           );
@@ -140,16 +142,19 @@ class _HomePageState extends State<HomePage> {
           },
           items: [
             CrystalNavigationBarItem(
-              icon: Icons.home,
-            ),
-            CrystalNavigationBarItem(
               icon: Icons.book,
             ),
             CrystalNavigationBarItem(
-              icon: Icons.games,
+              icon: Icons.download,
             ),
             CrystalNavigationBarItem(
-              icon: Icons.more_horiz,
+              icon: Icons.translate,
+            ),
+            CrystalNavigationBarItem(
+              icon: Icons.gamepad,
+            ),
+            CrystalNavigationBarItem(
+              icon: Icons.person,
             ),
           ],
         ),
