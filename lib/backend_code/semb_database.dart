@@ -45,13 +45,14 @@ class DatabaseHelper extends ChangeNotifier {
     if (existingBookSnapshot != null) {
       // If the book already exists, update the UUID list if needed
       Book existingBook = Book.fromSemb(existingBookSnapshot.value);
-
-      if (!existingBook.uuid!.contains(uid)) {
-        existingBook.uuid!.add(uid);
-        await _booksStore
-            .record(existingBookSnapshot.key)
-            .update(db, await existingBook.toSnapshot());
-        notifyListeners();
+      if (existingBook.uuid != null) {
+        if (!existingBook.uuid!.contains(uid)) {
+          existingBook.uuid!.add(uid);
+          await _booksStore
+              .record(existingBookSnapshot.key)
+              .update(db, await existingBook.toSnapshot());
+          notifyListeners();
+        }
       }
 
       return existingBookSnapshot.key; // Return the existing book ID

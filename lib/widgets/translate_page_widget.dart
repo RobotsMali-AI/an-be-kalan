@@ -20,6 +20,7 @@ class _TranslationPageState extends State<TranslationPage> {
     "Ã²": "ɔ",
     "Ã¸": "ɛ",
     "Ã": "ŋ",
+    "¨": "e"
   };
 
   String _decodeBambaraText(String input) {
@@ -52,6 +53,7 @@ class _TranslationPageState extends State<TranslationPage> {
         final decodedResponse = jsonDecode(response.body);
         setState(() {
           _translatedText = _decodeBambaraText(decodedResponse['text']);
+          print(_translatedText);
         });
       } else {
         _showErrorSnackbar('Translation failed: ${response.statusCode}');
@@ -139,6 +141,7 @@ class _TranslationPageState extends State<TranslationPage> {
   Widget _buildLanguageDropdown(String value, bool isSource) {
     return Expanded(
       child: DropdownButtonFormField<String>(
+        isExpanded: true,
         value: value,
         decoration: InputDecoration(
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
