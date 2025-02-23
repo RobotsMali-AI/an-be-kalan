@@ -7,6 +7,7 @@ import 'package:literacy_app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/widgets/bookPageWidget.dart';
+import 'package:literacy_app/widgets/page_accueil_Nkalan.dart';
 import 'package:literacy_app/widgets/translate_page_widget.dart';
 import 'package:provider/provider.dart';
 import 'models/Users.dart';
@@ -75,7 +76,6 @@ class _HomePageState extends State<HomePage> {
         child: CircularProgressIndicator(),
       );
     }
-
     return Scaffold(
       backgroundColor: Colors.white,
       extendBody: true,
@@ -123,9 +123,7 @@ class _HomePageState extends State<HomePage> {
         else if (_selectedTabIndex == 1) {
           return const TranslationPage();
         } else if (_selectedTabIndex == 2) {
-          return const Center(
-            child: Text("Page Not Implemented"),
-          );
+          return const AcceilNkalan();
         } else {
           return ProfilePage(user: user!, userData: userData);
         }
