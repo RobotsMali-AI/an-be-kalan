@@ -12,6 +12,7 @@ import 'package:literacy_app/widgets/downloadBookPageWidget.dart';
 import 'package:literacy_app/widgets/translate_page_widget.dart';
 import 'package:provider/provider.dart';
 import 'models/Users.dart';
+import 'package:literacy_app/widgets/acceilNkalan.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -75,7 +76,6 @@ class _HomePageState extends State<HomePage> {
         child: CircularProgressIndicator(),
       );
     }
-
     return Scaffold(
       backgroundColor: Colors.white,
       extendBody: true,
@@ -121,9 +121,7 @@ class _HomePageState extends State<HomePage> {
         } else if (_selectedTabIndex == 2) {
           return const TranslationPage();
         } else if (_selectedTabIndex == 3) {
-          return const Center(
-            child: Text("Page Not Implemented"),
-          );
+          return const AcceilNkalan();
         } else {
           return ProfilePage(user: user!, userData: userData);
         }
