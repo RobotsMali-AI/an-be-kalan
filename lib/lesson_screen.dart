@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
@@ -189,8 +190,47 @@ class LessonScreenState extends State<LessonScreen> {
         }
       });
     } else {
-      print("Microphone permission denied");
+      const SnackBar(content: Text("Vous n'avez pas access au microphone"));
     }
+  }
+
+  Future<void> partialUpdate(
+      Users user, BookUser updatedBookUser, String uid) async {
+    // 1. Load the old BookUser for this book from Firestore (or local user object)
+    final oldBookUser = user.inProgressBooks.firstWhere(
+      (b) => b.title == updatedBookUser.title,
+      orElse: () => updatedBookUser, // fallback if not found
+    );
+
+    // 2. Calculate new sums
+    final newAccSum =
+        updatedBookUser.accuracies.fold<double>(0, (p, c) => p + c);
+    final newReadingTime = updatedBookUser.readingTime;
+
+    // 3. Calculate the difference from what was already credited
+    final xpDelta = newAccSum - (oldBookUser.creditedXp ?? 0);
+    final readingTimeDelta =
+        newReadingTime - (oldBookUser.creditedReadingTime ?? 0);
+
+    // If xpDelta or readingTimeDelta are negative or zero, skip
+    if (xpDelta > 0) {
+      user.xp += xpDelta.toInt(); // or .round(), depends on your logic
+    }
+    if (readingTimeDelta > 0) {
+      user.totalReadingTime += readingTimeDelta.toInt();
+    }
+
+    // 4. Update the BookUser’s credited fields
+    updatedBookUser.creditedXp = newAccSum;
+    updatedBookUser.creditedReadingTime = newReadingTime;
+
+    // 5. Store everything back to Firestore
+    //    Overwrite inProgressBooks entry with the updatedBookUser
+    //    Also store the updated user.xp and user.totalReadingTime
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .update(user.toFirestore());
   }
 
   Future<void> stopRecording() async {
@@ -300,6 +340,16 @@ class LessonScreenState extends State<LessonScreen> {
           lastPage = true;
         }
       }
+      partialUpdate(
+          widget.userdata,
+          BookUser(
+              lastAccessed: DateTime.now(),
+              totalPages: bookData!.content.length,
+              title: widget.bookTitle,
+              bookmark: 'Page $currentPage',
+              readingTime: readingTime,
+              accuracies: accuracies),
+          widget.uid);
       hasTranscription = false;
       hasRecording = false;
       isPlaying = false;
@@ -320,8 +370,6 @@ class LessonScreenState extends State<LessonScreen> {
       _sending = true;
     });
 
-    await context.read<DatabaseHelper>();
-
     await context.read<ApiFirebaseService>().bookmark(
           widget.uid,
           BookUser(
@@ -334,6 +382,17 @@ class LessonScreenState extends State<LessonScreen> {
           ),
           widget.userdata,
         );
+
+    // partialUpdate(
+    //     widget.userdata,
+    //     BookUser(
+    //         lastAccessed: DateTime.now(),
+    //         totalPages: bookData!.content.length,
+    //         title: widget.bookTitle,
+    //         bookmark: 'Page $currentPage',
+    //         readingTime: readingTime,
+    //         accuracies: accuracies),
+    //     widget.uid);
 
     setState(() {
       _sending = false;
@@ -366,6 +425,17 @@ class LessonScreenState extends State<LessonScreen> {
                   accuracies: accuracies),
               widget.userdata,
             );
+
+    partialUpdate(
+        widget.userdata,
+        BookUser(
+            lastAccessed: DateTime.now(),
+            totalPages: bookData!.content.length,
+            title: widget.bookTitle,
+            bookmark: 'Page $currentPage',
+            readingTime: readingTimeInMinutes,
+            accuracies: accuracies),
+        widget.uid);
 
     setState(() {
       _sending = false;

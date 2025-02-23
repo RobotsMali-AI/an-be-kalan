@@ -5,9 +5,13 @@ class BookUser {
   List<double> accuracies;
   dynamic lastAccessed;
   int totalPages;
+  double? creditedXp;
+  int? creditedReadingTime;
 
   BookUser({
     required this.title,
+    this.creditedReadingTime,
+    this.creditedXp,
     required this.bookmark,
     required this.readingTime,
     required this.accuracies,
@@ -21,6 +25,8 @@ class BookUser {
         : data['lastAccessed'].toDate();
     return BookUser(
       title: data['title'],
+      creditedReadingTime: data["creditedReadingTime"] ?? 0,
+      creditedXp: data['creditedXp'] ?? 0,
       bookmark: data['bookmark'],
       readingTime: data['readingTime'],
       accuracies: List<double>.from(data['accuracies']),
@@ -32,6 +38,8 @@ class BookUser {
   factory BookUser.fromSemb(Map<String, dynamic> data) {
     String timestamp = data['lastAccessed'].toString();
     return BookUser(
+      creditedReadingTime: data["creditedReadingTime"] ?? 0,
+      creditedXp: data['creditedXp'] ?? 0,
       title: data['title'],
       bookmark: data['bookmark'],
       readingTime: data['readingTime'],
@@ -43,6 +51,8 @@ class BookUser {
 
   Map<String, dynamic> toSnapshot() {
     return {
+      "creditedReadingTime": creditedReadingTime,
+      'creditedXp': creditedXp,
       'title': title,
       'bookmark': bookmark,
       'readingTime': readingTime,
@@ -55,6 +65,8 @@ class BookUser {
   Map<String, dynamic> toSemb() {
     String last = lastAccessed.toString();
     return {
+      "creditedReadingTime": creditedReadingTime,
+      'creditedXp': creditedXp,
       'title': title,
       'bookmark': bookmark,
       'readingTime': readingTime,

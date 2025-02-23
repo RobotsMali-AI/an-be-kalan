@@ -5,6 +5,7 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:literacy_app/auth.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
+import 'package:literacy_app/backend_code/transccribe.dart';
 import 'package:literacy_app/firebase_options.dart';
 import 'package:literacy_app/home.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +49,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
       ChangeNotifierProvider(create: (_) => DatabaseHelper())
     ],
-    child: const LiteracyAppEntry(),
+    child: LiteracyAppEntry(),
   ));
   //runApp();
 }
@@ -57,10 +58,11 @@ Future<void> main() async {
 ///
 /// Returns a [MaterialApp].
 class LiteracyAppEntry extends StatelessWidget {
-  const LiteracyAppEntry({Key? key}) : super(key: key);
-
+  LiteracyAppEntry({Key? key}) : super(key: key);
+  // SpeechToText speech = SpeechToText();
   @override
   Widget build(BuildContext context) {
+    // speech.processAudio();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'An be Kalan',

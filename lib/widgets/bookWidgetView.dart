@@ -29,7 +29,6 @@ class BookWidgetView extends StatelessWidget {
     if (bookUser != null && bookUser!.totalPages > 0) {
       final totalPage = bookUser!.totalPages;
       final bookmarkMatch = RegExp(r'\d+').firstMatch(bookUser!.bookmark);
-      print(bookmarkMatch);
       final currentPage = bookmarkMatch != null
           ? int.tryParse(bookmarkMatch.group(0)!) ?? 0
           : 0;
@@ -135,23 +134,23 @@ class BookWidgetView extends StatelessWidget {
                 ),
               ),
               // Download Button
-              if (!isDownloaded)
-                Padding(
-                  padding: const EdgeInsets.all(6),
-                  child: IconButton(
-                    onPressed: () {
-                      // Handle download logic
-                      context
-                          .read<ApiFirebaseService>()
-                          .addBookToSembest(book, user);
-                    },
-                    icon: const Icon(Icons.download),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.blue, // Button color
-                      backgroundColor: Colors.white, // Text color
-                    ),
-                  ),
-                ),
+              // if (!isDownloaded)
+              //   Padding(
+              //     padding: const EdgeInsets.all(6),
+              //     child: IconButton(
+              //       onPressed: () {
+              //         // Handle download logic
+              //         context
+              //             .read<ApiFirebaseService>()
+              //             .addBookToSembest(book, user);
+              //       },
+              //       icon: const Icon(Icons.download),
+              //       style: ElevatedButton.styleFrom(
+              //         foregroundColor: Colors.blue, // Button color
+              //         backgroundColor: Colors.white, // Text color
+              //       ),
+              //     ),
+              //   ),
             ],
           ),
         ),

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +9,6 @@ import 'package:literacy_app/backend_code/semb_database.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
-import 'package:http/http.dart' as http;
-import 'package:literacy_app/constant.dart'
-    show asrModelApiUri, asrModelApiToken;
 
 class ApiFirebaseService with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -45,6 +43,36 @@ class ApiFirebaseService with ChangeNotifier {
     await FirebaseFirestore.instance.collection('users').doc(uid).delete();
     //await helper.
     notifyListeners();
+  }
+
+  Future<Map<String, dynamic>> transcribeAudio(File audioFile) async {
+    DocumentSnapshot<Map<String, dynamic>> serve =
+        await _firestore.collection('api').doc("SmKsDBpP7jBAKeEtckCD").get();
+    final serverUrl = serve.data()!['key'];
+    final uri = Uri.parse(serverUrl);
+    final request = http.MultipartRequest('POST', uri);
+
+    // Attach the audio file to the request under the key 'audio'
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'audio',
+        audioFile.path,
+        contentType: MediaType('audio', 'wav'),
+      ),
+    );
+
+    // Send the request
+    final response = await request.send();
+
+    // Parse the streamed response
+    if (response.statusCode == 200) {
+      final respStr = await response.stream.bytesToString();
+      return jsonDecode(respStr);
+    } else {
+      return {
+        "error": "Request failed with status code ${response.statusCode}"
+      };
+    }
   }
 
   /// Function that creates and save empty user data dictionary for new user
@@ -160,61 +188,20 @@ class ApiFirebaseService with ChangeNotifier {
   ///   Future<String?>: The transcribed text from the ASR model if successful, or
   ///   `null` if the request fails or the file format is unsupported.
   ///
+
   Future<String?> inferenceASRModel(String filePath) async {
-    final apiUrl = Uri.parse(asrModelApiUri);
+    // final apiUrl = Uri.parse(asrModelApiUri);
 
     // Validate file format
     if (!filePath.endsWith('.m4a') && !filePath.endsWith('.wav')) {
       print('Unsupported file format: $filePath');
       return null;
     }
-
     try {
       final audioFile = File(filePath);
 
-      // Prepare headers
-      final headers = {
-        "x-api-key": asrModelApiToken,
-      };
-
-      // Query parameters
-      final queryParams = {'translate_to_french': 'false'};
-      final apiUriWithParams = apiUrl.replace(queryParameters: queryParams);
-
-      // Prepare multipart file
-      final file = http.MultipartFile.fromBytes(
-        'file',
-        await audioFile.readAsBytes(),
-        filename: filePath.split('/').last,
-      );
-
-      // Create request
-      final request = http.MultipartRequest('POST', apiUriWithParams)
-        ..headers.addAll(headers)
-        ..files.add(file);
-
-      final response = await request.send();
-
-      // Handle response
-      if (response.statusCode == 200) {
-        final responseBody = await response.stream.bytesToString();
-        final decodedData = jsonDecode(responseBody);
-
-        if (decodedData is List && decodedData.isNotEmpty) {
-          final audioData = decodedData[0] as Map<String, dynamic>;
-          return audioData["text"] as String?;
-        } else {
-          print('Unexpected response format: $decodedData');
-          return null;
-        }
-      } else if (response.statusCode == 503) {
-        print('Service unavailable. Retrying...');
-        await Future.delayed(const Duration(seconds: 5));
-        return inferenceASRModel(filePath);
-      } else {
-        print('Error: ${response.statusCode} - ${response.reasonPhrase}');
-        return null;
-      }
+      final transcribe = await transcribeAudio(audioFile);
+      return transcribe["transcription"];
     } catch (e, stackTrace) {
       print('Exception occurred: $e');
       print(stackTrace);

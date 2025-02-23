@@ -128,8 +128,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                 for (var element in widget.userData.inProgressBooks) {
                   if (book.title == element.title) {
                     bookUser = element;
-                  } else {
-                    bookUser = null;
+                    break;
                   }
                 }
 

@@ -66,7 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
       showSaveButton = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Name updated')),
+      const SnackBar(content: Text('I togo yele mala')),
     );
   }
 
@@ -192,6 +192,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 10),
                 TextField(
+                  onEditingComplete: updateDisplayName,
                   textAlign: TextAlign.center,
                   controller: controller,
                   style: const TextStyle(color: Colors.black, fontSize: 18),

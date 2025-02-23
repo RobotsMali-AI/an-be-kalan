@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/foundation.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
@@ -104,7 +102,6 @@ class DatabaseHelper extends ChangeNotifier {
     final db = await database;
     List<Users> data = await _usersStore.find(db).then((records) =>
         records.map((snapshot) => Users.fromSemb(snapshot.value)).toList());
-    print(data);
     for (var user in data) {
       if (user.uid == uid) {
         userData = user;
@@ -126,8 +123,6 @@ class DatabaseHelper extends ChangeNotifier {
     // Check if the book is already bookmarked
     final bookmarkedIndex = userData.inProgressBooks
         .indexWhere((book) => book.title == readBook.title);
-
-    print(bookmarkedIndex);
 
     if (bookmarkedIndex != -1) {
       // Update the existing bookmark

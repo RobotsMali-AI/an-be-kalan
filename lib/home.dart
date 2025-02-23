@@ -1,5 +1,4 @@
 import 'dart:developer' show log;
-import 'package:collection/collection.dart';
 import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
@@ -8,7 +7,6 @@ import 'package:literacy_app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/widgets/bookPageWidget.dart';
-import 'package:literacy_app/widgets/downloadBookPageWidget.dart';
 import 'package:literacy_app/widgets/translate_page_widget.dart';
 import 'package:provider/provider.dart';
 import 'models/Users.dart';
@@ -25,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   User? user;
   bool isLoading = true;
   bool verification = false;
+  // final Speech = SpeechToText();
   Future<void> initUserData() async {
     try {
       if (user != null) {
@@ -70,6 +69,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    //trasncribe();
     if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -93,34 +93,36 @@ class _HomePageState extends State<HomePage> {
           conext.read<DatabaseHelper>().insertUser(userData);
           conext.read<DatabaseHelper>().getUser(userData.uid!);
         }
-        final downloadedBooks = conext
-            .read<DatabaseHelper>()
-            .books
-            .map((book) => book.title)
-            .toSet();
+        // final downloadedBooks = conext
+        //     .read<DatabaseHelper>()
+        //     .books
+        //     .map((book) => book.title)
+        //     .toSet();
 
-        for (var bookTitle in userData.downloadBooks ?? []) {
-          if (!downloadedBooks.contains(bookTitle)) {
-            final book = context
-                .read<ApiFirebaseService>()
-                .books
-                .firstWhereOrNull((b) => b.title == bookTitle);
-            if (book != null) {
-              conext.read<DatabaseHelper>().insertBook(book, userData.uid!);
-            }
-          }
-        }
+        // for (var bookTitle in userData.downloadBooks ?? []) {
+        //   if (!downloadedBooks.contains(bookTitle)) {
+        //     final book = context
+        //         .read<ApiFirebaseService>()
+        //         .books
+        //         .firstWhereOrNull((b) => b.title == bookTitle);
+        //     if (book != null) {
+        //       conext.read<DatabaseHelper>().insertBook(book, userData.uid!);
+        //     }
+        //   }
+        // }
         if (_selectedTabIndex == 0) {
           return BookPageWidget(
               apiFirebaseService: apiFirebaseService,
               userData: userData,
               user: user!);
-        } else if (_selectedTabIndex == 1) {
-          return DownloadBookPageWidget(
-              user: user!); // Placeholder for identical page
-        } else if (_selectedTabIndex == 2) {
+        }
+        // else if (_selectedTabIndex == 1) {
+        //   return DownloadBookPageWidget(
+        //       user: user!); // Placeholder for identical page
+        // }
+        else if (_selectedTabIndex == 1) {
           return const TranslationPage();
-        } else if (_selectedTabIndex == 3) {
+        } else if (_selectedTabIndex == 2) {
           return const Center(
             child: Text("Page Not Implemented"),
           );
@@ -134,7 +136,7 @@ class _HomePageState extends State<HomePage> {
           currentIndex: _selectedTabIndex,
           selectedItemColor: Colors.yellowAccent,
           unselectedItemColor: Colors.white,
-          backgroundColor: Colors.purpleAccent,
+          backgroundColor: Colors.black,
           onTap: (index) {
             setState(() {
               _selectedTabIndex = index;
@@ -143,9 +145,6 @@ class _HomePageState extends State<HomePage> {
           items: [
             CrystalNavigationBarItem(
               icon: Icons.book,
-            ),
-            CrystalNavigationBarItem(
-              icon: Icons.download,
             ),
             CrystalNavigationBarItem(
               icon: Icons.translate,
