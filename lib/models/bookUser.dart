@@ -26,10 +26,12 @@ class BookUser {
     return BookUser(
       title: data['title'],
       creditedReadingTime: data["creditedReadingTime"] ?? 0,
-      creditedXp: data['creditedXp'] ?? 0,
+      creditedXp: double.tryParse(data['creditedXp'].toString()) ?? 0.0,
       bookmark: data['bookmark'],
       readingTime: data['readingTime'],
-      accuracies: List<double>.from(data['accuracies']),
+      accuracies: List<double>.from((data['accuracies'] as List)
+          .map((element) => double.tryParse(element.toString()))
+          .toList()),
       lastAccessed: date,
       totalPages: data['totalPages'],
     );

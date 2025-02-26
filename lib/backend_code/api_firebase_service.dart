@@ -137,7 +137,7 @@ class ApiFirebaseService with ChangeNotifier {
 
     if (bookmarkedIndex != -1) {
       // Remove the bookmark
-      userData.inProgressBooks.removeAt(bookmarkedIndex);
+      userData.inProgressBooks.removeWhere((test) => test.title == book.title);
     }
 
     // Add the book to completed books if not already present
@@ -225,9 +225,9 @@ class ApiFirebaseService with ChangeNotifier {
     // }
     books = [];
     final data = await _firestore.collection('books').get();
-    data.docs.forEach((element) {
+    for (var element in data.docs) {
       books.add(Book.fromJson(element));
-    });
+    }
 
     // final b = await helper.getBooks();
     // print(b);

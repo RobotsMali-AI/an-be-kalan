@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/widgets/bookPageWidget.dart';
 import 'package:literacy_app/widgets/page_accueil_Nkalan.dart';
+import 'package:literacy_app/widgets/page_lettre_Nkalan.dart';
 import 'package:literacy_app/widgets/translate_page_widget.dart';
 import 'package:provider/provider.dart';
 import 'models/Users.dart';
@@ -116,14 +117,13 @@ class _HomePageState extends State<HomePage> {
               userData: userData,
               user: user!);
         }
-        // else if (_selectedTabIndex == 1) {
-        //   return DownloadBookPageWidget(
-        //       user: user!); // Placeholder for identical page
+        //  else if (_selectedTabIndex == 1) {
+        //   return const GameLevelPage(); // Placeholder for identical page
         // }
         else if (_selectedTabIndex == 1) {
           return const TranslationPage();
         } else if (_selectedTabIndex == 2) {
-          return const AcceilNkalan();
+          return AcceuilNkalan();
         } else {
           return ProfilePage(user: user!, userData: userData);
         }
@@ -153,6 +153,9 @@ class _HomePageState extends State<HomePage> {
             CrystalNavigationBarItem(
               icon: Icons.person,
             ),
+            // CrystalNavigationBarItem(
+            //   icon: Icons.person,
+            // ),
           ],
         ),
       ),

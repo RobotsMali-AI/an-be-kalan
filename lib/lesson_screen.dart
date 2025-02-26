@@ -7,6 +7,8 @@ import 'package:literacy_app/backend_code/semb_database.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
 import 'package:literacy_app/widgets/floatingHintButton.dart';
+import 'package:literacy_app/widgets/multiple_choose_question.dart';
+import 'package:literacy_app/widgets/true_or_false_page.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
 import 'package:just_audio/just_audio.dart';
@@ -383,23 +385,129 @@ class LessonScreenState extends State<LessonScreen> {
           widget.userdata,
         );
 
-    // partialUpdate(
-    //     widget.userdata,
-    //     BookUser(
-    //         lastAccessed: DateTime.now(),
-    //         totalPages: bookData!.content.length,
-    //         title: widget.bookTitle,
-    //         bookmark: 'Page $currentPage',
-    //         readingTime: readingTime,
-    //         accuracies: accuracies),
-    //     widget.uid);
-
     setState(() {
       _sending = false;
     });
 
     Navigator.pop(context, widget.userdata);
   }
+
+  // Future<void> endLesson(BuildContext context) async {
+  //   // Calculate duration
+  //   Duration duration = DateTime.now().difference(startTime!);
+  //   readingTime += duration.inSeconds;
+  //   double readTime = readingTime / 60;
+  //   int readingTimeInMinutes = readTime.toInt();
+
+  //   // Set loading status to show progress Indicator
+  //   setState(() {
+  //     _sending = true;
+  //   });
+
+  //   Map<String, dynamic> result =
+  //       await context.read<ApiFirebaseService>().markBookAsCompleted(
+  //             widget.uid,
+  //             BookUser(
+  //                 lastAccessed: DateTime.now(),
+  //                 totalPages: bookData!.content.length,
+  //                 title: widget.bookTitle,
+  //                 bookmark: 'Page $currentPage',
+  //                 readingTime: readingTimeInMinutes,
+  //                 accuracies: accuracies),
+  //             widget.userdata,
+  //           );
+
+  //   partialUpdate(
+  //       widget.userdata,
+  //       BookUser(
+  //           lastAccessed: DateTime.now(),
+  //           totalPages: bookData!.content.length,
+  //           title: widget.bookTitle,
+  //           bookmark: 'Page $currentPage',
+  //           readingTime: readingTimeInMinutes,
+  //           accuracies: accuracies),
+  //       widget.uid);
+
+  //   setState(() {
+  //     _sending = false;
+  //   });
+
+  //   Map<String, dynamic> data = {
+  //     'userData': result['userData'],
+  //     'earnedXp': result['earnedXp'],
+  //     'averageAccuracy': result['averageAccuracy'],
+  //   };
+
+  //   Users updatedUserData = data['userData'];
+  //   int earnedXp = data['earnedXp'];
+  //   double averageAccuracy = data['averageAccuracy'];
+
+  //   // Calculate total word count of the book
+  //   int totalBookWordCount = bookData!.content.values
+  //       .expand((pageContent) => pageContent.sentences)
+  //       .map((sentence) => sentence.split(' ').length)
+  //       .reduce((sum, count) => sum + count);
+  //   // Calculate reading speed
+  //   String wordPerMin =
+  //       (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2);
+  //   // Calculate average accuracy
+  //   String averageAcc = (averageAccuracy * 100).toStringAsFixed(2);
+
+  //   // Show a dialog to congratulate the user
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: const Text('Congratulations!'),
+  //         content: Text(
+  //             'You gained $earnedXp XP from this lesson. The book was completed in ${readingTimeInMinutes.toStringAsFixed(2)} minutes, '
+  //             'with an average reading speed of $wordPerMin words per minute and an average accuracy of $averageAcc%'),
+  //         actions: <Widget>[
+  //           TextButton(
+  //             onPressed: () {
+  //               // Close the dialog and return to HomeScreen
+  //               Navigator.pop(context); // This closes the dialog
+  //               if (bookData!.evaluation != null) {
+  //                 if (bookData!.evaluation!.multiple.isNotEmpty) {
+  //                   showDialog(
+  //                       context: context,
+  //                       builder: (context) {
+  //                         return MultipleChoiceQuestionPage(
+  //                             questions: bookData!.evaluation!.multiple,
+  //                             title: "Question");
+  //                       });
+  //                   // Navigator.push(
+  //                   //     context,
+  //                   //     MaterialPageRoute(
+  //                   //         builder: (context) => ));
+  //                 }
+  //                 if (bookData!.evaluation!.trueorfalse.isNotEmpty) {
+  //                   showDialog(
+  //                       context: context,
+  //                       builder: (context) => TrueFalseQuestionPage(
+  //                             questions: bookData!.evaluation!.trueorfalse,
+  //                           ));
+  //                   // Navigator.push(
+  //                   //     context,
+  //                   //     MaterialPageRoute(
+  //                   //         builder: (context) => TrueFalseQuestionPage(
+  //                   //               questions: bookData!.evaluation!.trueorfalse,
+  //                   //             )));
+  //                 }
+  //               }
+  //               Navigator.pop(context, updatedUserData); // This pops the screen
+  //             },
+  //             child: const Icon(
+  //               Icons.home,
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> endLesson(BuildContext context) async {
     // Calculate duration
@@ -408,10 +516,7 @@ class LessonScreenState extends State<LessonScreen> {
     double readTime = readingTime / 60;
     int readingTimeInMinutes = readTime.toInt();
 
-    // Set loading status to show progress Indicator
-    setState(() {
-      _sending = true;
-    });
+    setState(() => _sending = true);
 
     Map<String, dynamic> result =
         await context.read<ApiFirebaseService>().markBookAsCompleted(
@@ -437,57 +542,73 @@ class LessonScreenState extends State<LessonScreen> {
             accuracies: accuracies),
         widget.uid);
 
-    setState(() {
-      _sending = false;
-    });
+    setState(() => _sending = false);
 
-    Map<String, dynamic> data = {
-      'userData': result['userData'],
-      'earnedXp': result['earnedXp'],
-      'averageAccuracy': result['averageAccuracy'],
-    };
+    final Users updatedUserData = result['userData'];
+    final int earnedXp = result['earnedXp'];
+    final double averageAccuracy = result['averageAccuracy'];
 
-    Users updatedUserData = data['userData'];
-    int earnedXp = data['earnedXp'];
-    double averageAccuracy = data['averageAccuracy'];
-
-    // Calculate total word count of the book
+    // Calculate metrics
     int totalBookWordCount = bookData!.content.values
         .expand((pageContent) => pageContent.sentences)
         .map((sentence) => sentence.split(' ').length)
         .reduce((sum, count) => sum + count);
-    // Calculate reading speed
     String wordPerMin =
         (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2);
-    // Calculate average accuracy
     String averageAcc = (averageAccuracy * 100).toStringAsFixed(2);
 
-    // Show a dialog to congratulate the user
-    showDialog(
+    // Show completion dialog
+    await showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Congratulations!'),
-          content: Text(
-              'You gained $earnedXp XP from this lesson. The book was completed in ${readingTimeInMinutes.toStringAsFixed(2)} minutes, '
-              'with an average reading speed of $wordPerMin words per minute and an average accuracy of $averageAcc%'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                // Close the dialog and return to HomeScreen
-                Navigator.pop(context); // This closes the dialog
-                Navigator.pop(context, updatedUserData); // This pops the screen
-              },
-              child: const Icon(
-                Icons.home,
-                color: Colors.black,
-              ),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: const Text('Congratulations!'),
+        content: Text('You gained $earnedXp XP from this lesson.\n\n'
+            'Completed in ${readingTimeInMinutes.toStringAsFixed(2)} minutes\n'
+            'Reading speed: $wordPerMin words/min\n'
+            'Accuracy: $averageAcc%'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('CONTINUE'),
+          ),
+        ],
+      ),
     );
+
+    // Handle question flow
+    final hasMultiple = bookData!.evaluation?.multiple.isNotEmpty ?? false;
+    final hasTrueFalse = bookData!.evaluation?.trueorfalse.isNotEmpty ?? false;
+
+    if (hasMultiple || hasTrueFalse) {
+      // Start with multiple choice questions if available
+      if (hasMultiple) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => MultipleChoiceQuestionPage(
+              questions: bookData!.evaluation!.multiple,
+              title: widget.bookTitle,
+            ),
+          ),
+        );
+      }
+
+      // Then show true/false questions if available
+      if (hasTrueFalse) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => TrueFalseQuestionPage(
+              questions: bookData!.evaluation!.trueorfalse,
+            ),
+          ),
+        );
+      }
+    }
+
+    // Finally return to previous screen with updated data
+    Navigator.pop(context, updatedUserData);
   }
 
   @override
