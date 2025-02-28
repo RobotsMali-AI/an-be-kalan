@@ -18,30 +18,16 @@
 //     {
 //       'word': 'CHICKEN',
 //       'partial': 'CHI___N',
-//       'image': 'assets/chicken.jpg',
+//       'image': 'assets/chicken.jpg', // Black-and-white image
 //       'audio': 'sounds/chicken.mp3',
 //       'hint': 'Farm animal that lays eggs'
 //     },
 //     {
 //       'word': 'CAT',
 //       'partial': 'C_T',
-//       'image': 'assets/chicken.jpg',
-//       'audio': 'sounds/chicken.mp3',
-//       'hint': 'animal that mioule'
-//     },
-//     {
-//       'word': 'CHICKEN',
-//       'partial': 'CHI___N',
-//       'image': 'assets/chicken.jpg',
-//       'audio': 'sounds/chicken.mp3',
-//       'hint': 'Farm animal that lays eggs'
-//     },
-//     {
-//       'word': 'CHICKEN',
-//       'partial': 'CHI___N',
-//       'image': 'assets/chicken.jpg',
-//       'audio': 'sounds/chicken.mp3',
-//       'hint': 'Farm animal that lays eggs'
+//       'image': 'assets/cat.jpg', // Black-and-white image
+//       'audio': 'sounds/cat.mp3',
+//       'hint': 'Animal that meows'
 //     },
 //     // Add more words...
 //   ];
@@ -50,13 +36,39 @@
 //   String userInput = '';
 //   bool _isCorrect = false;
 //   bool _showCelebration = false;
+//   bool _showHint = false;
 
-//   void checkWord() {
-//     final currentWord = words[currentIndex];
-//     final partial = currentWord['partial'];
-//     final fullWord = currentWord['word'];
+//   // Generate a smaller keyboard with correct letters + distractors
+//   List<String> _generateKeyboardLetters() {
+//     final word = words[currentIndex]['word'] as String;
+//     final partial = words[currentIndex]['partial'] as String;
+//     List<String> missing = [
+//       for (int i = 0; i < word.length; i++)
+//         if (partial[i] == '_') word[i]
+//     ];
+//     final distractors = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+//         .split('')
+//         .where((c) => !missing.contains(c))
+//         .toList()
+//       ..shuffle();
+//     return (missing + distractors.take(5).toList()).toSet().toList()..shuffle();
+//   }
 
-//     // Calculate expected input length
+//   void _addLetter(String letter) {
+//     final maxLength =
+//         words[currentIndex]['partial'].replaceAll(RegExp(r'[^_]'), '').length;
+//     if (userInput.length < maxLength) {
+//       setState(() {
+//         userInput += letter;
+//         _audioPlayer
+//             .play(AssetSource('sounds/click.mp3')); // Sound for letter tap
+//       });
+//     }
+//   }
+
+//   void _checkWord() {
+//     final word = words[currentIndex]['word'];
+//     final partial = words[currentIndex]['partial'];
 //     final expectedLength = partial.replaceAll(RegExp(r'[^_]'), '').length;
 
 //     if (userInput.length != expectedLength) {
@@ -64,10 +76,8 @@
 //       return;
 //     }
 
-//     // Reconstruct the full word from partial and user input
 //     final reconstructed = _reconstructWord(partial, userInput);
-
-//     if (reconstructed == fullWord) {
+//     if (reconstructed == word) {
 //       _handleCorrectAnswer();
 //     } else {
 //       _handleWrongAnswer();
@@ -77,18 +87,13 @@
 //   String _reconstructWord(String partial, String input) {
 //     final inputChars = input.toUpperCase().split('');
 //     int inputIndex = 0;
-//     final result = <String>[];
-
-//     for (final char in partial.split('')) {
-//       if (char == '_' && inputIndex < inputChars.length) {
-//         result.add(inputChars[inputIndex]);
-//         inputIndex++;
-//       } else {
-//         result.add(char);
+//     final result = partial.split('').map((char) {
+//       if (char == '_') {
+//         return inputIndex < inputChars.length ? inputChars[inputIndex++] : '_';
 //       }
-//     }
-
-//     return result.join();
+//       return char;
+//     }).join();
+//     return result;
 //   }
 
 //   void _handleCorrectAnswer() async {
@@ -96,16 +101,6 @@
 //     _confettiController.play();
 //     _playAudio(words[currentIndex]['audio']);
 //     await Future.delayed(const Duration(seconds: 2));
-
-//     if (currentIndex < words.length - 1) {
-//       setState(() {
-//         userInput = '';
-//         currentIndex++;
-//         _isCorrect = false;
-//       });
-//     } else {
-//       setState(() => _showCelebration = true);
-//     }
 //   }
 
 //   void _handleWrongAnswer() async {
@@ -117,36 +112,125 @@
 //     await _audioPlayer.play(AssetSource(path));
 //   }
 
+//   void _nextWord() {
+//     if (currentIndex < words.length - 1) {
+//       setState(() {
+//         currentIndex++;
+//         userInput = '';
+//         _isCorrect = false;
+//         _showHint = false;
+//       });
+//     } else {
+//       setState(() => _showCelebration = true);
+//     }
+//   }
+
+//   // Build the word display with individual slots
+//   Widget _buildWordDisplay() {
+//     final partial = words[currentIndex]['partial'];
+//     final word = words[currentIndex]['word'];
+//     final chars = partial.split('');
+//     final inputChars = userInput.split('');
+//     int inputIndex = 0;
+
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: chars.map<Widget>((char) {
+//         if (char == '_') {
+//           final inputChar =
+//               inputIndex < inputChars.length ? inputChars[inputIndex] : '';
+//           final isCorrect = inputChar.isNotEmpty &&
+//               inputChar == word[inputIndex + partial.indexOf('_')];
+//           inputIndex++;
+//           return _buildLetterSlot(inputChar, isCorrect: isCorrect);
+//         }
+//         return _buildLetterSlot(char, isCorrect: true);
+//       }).toList(),
+//     );
+//   }
+
+//   Widget _buildLetterSlot(String char, {bool isCorrect = false}) {
+//     return AnimatedContainer(
+//       duration: const Duration(milliseconds: 200),
+//       width: 40,
+//       height: 40,
+//       margin: const EdgeInsets.all(4),
+//       decoration: BoxDecoration(
+//         color: char.isEmpty ? Colors.grey[200] : Colors.white,
+//         border: Border.all(color: Colors.black),
+//         boxShadow:
+//             isCorrect ? [BoxShadow(color: Colors.black26, blurRadius: 4)] : [],
+//       ),
+//       child: Center(
+//         child: Text(
+//           char,
+//           style: TextStyle(
+//             fontSize: 24,
+//             fontWeight: isCorrect ? FontWeight.bold : FontWeight.normal,
+//             color: Colors.black,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+
+//   Widget _buildKeyboard() {
+//     final letters = _generateKeyboardLetters();
+//     return GridView.count(
+//       shrinkWrap: true,
+//       crossAxisCount: 5,
+//       childAspectRatio: 1.2,
+//       children: letters.map((char) {
+//         return Padding(
+//           padding: const EdgeInsets.all(4.0),
+//           child: GestureDetector(
+//             onTap: () => _addLetter(char),
+//             child: AnimatedContainer(
+//               duration: const Duration(milliseconds: 100),
+//               decoration: BoxDecoration(
+//                 color: Colors.white,
+//                 border: Border.all(color: Colors.black),
+//                 borderRadius: BorderRadius.circular(10),
+//               ),
+//               child: Center(
+//                 child: Text(char,
+//                     style: const TextStyle(fontSize: 20, color: Colors.black)),
+//               ),
+//             ),
+//           ),
+//         );
+//       }).toList(),
+//     );
+//   }
+
 //   Widget _buildCelebration() {
 //     return Stack(
 //       children: [
-//         Positioned.fill(
-//           child: Container(
-//             color: Colors.black,
-//             child: Center(
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 children: [
-//                   Lottie.asset('assets/animations/celebration.json',
-//                       width: 300, repeat: false),
-//                   const Text('Amazing Work!',
-//                       style: TextStyle(
-//                           fontSize: 32,
-//                           color: Colors.white,
-//                           fontWeight: FontWeight.bold)),
-//                   const SizedBox(height: 20),
-//                   ElevatedButton.icon(
-//                     icon: const Icon(Icons.celebration),
-//                     label: const Text('Finish!'),
-//                     onPressed: () => Navigator.pop(context),
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.amber,
-//                       padding: const EdgeInsets.symmetric(
-//                           horizontal: 30, vertical: 15),
-//                     ),
-//                   ),
-//                 ],
-//               ),
+//         Container(
+//           color: Colors.black,
+//           child: Center(
+//             child: Column(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 Lottie.asset('assets/animations/celebration.json',
+//                     width: 300, repeat: false), // Grayscale animation
+//                 const Text(
+//                   'You’re Awesome!',
+//                   style: TextStyle(
+//                       fontSize: 32,
+//                       color: Colors.white,
+//                       fontWeight: FontWeight.bold),
+//                 ),
+//                 const SizedBox(height: 20),
+//                 ElevatedButton.icon(
+//                   icon: const Icon(Icons.check, color: Colors.black),
+//                   label: const Text('Finish!',
+//                       style: TextStyle(color: Colors.black)),
+//                   onPressed: () => Navigator.pop(context),
+//                   style:
+//                       ElevatedButton.styleFrom(backgroundColor: Colors.white),
+//                 ),
+//               ],
 //             ),
 //           ),
 //         ),
@@ -155,52 +239,17 @@
 //           child: ConfettiWidget(
 //             confettiController: _confettiController,
 //             blastDirectionality: BlastDirectionality.explosive,
-//             colors: const [
-//               Colors.green,
-//               Colors.blue,
-//               Colors.pink,
-//               Colors.orange
-//             ],
+//             colors: const [Colors.black, Colors.grey, Colors.white],
 //           ),
 //         ),
 //       ],
 //     );
 //   }
 
-//   Widget _buildKeyboard() {
-//     final currentPartial = words[currentIndex]['partial'];
-//     final maxInputLength =
-//         currentPartial.replaceAll(RegExp(r'[^_]'), '').length;
-
-//     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-//     return GridView.count(
-//       shrinkWrap: true,
-//       crossAxisCount: 6,
-//       children: letters.split('').map((char) {
-//         return Padding(
-//           padding: const EdgeInsets.all(2.0),
-//           child: ElevatedButton(
-//             style: ElevatedButton.styleFrom(
-//               backgroundColor: userInput.length >= maxInputLength
-//                   ? Colors.grey
-//                   : Colors.blue[100],
-//             ),
-//             onPressed: userInput.length >= maxInputLength
-//                 ? null
-//                 : () => setState(() => userInput += char),
-//             child: Center(child: Text(char)),
-//           ),
-//         );
-//       }).toList(),
-//     );
-//   }
-
 //   @override
 //   Widget build(BuildContext context) {
 //     if (_showCelebration) {
-//       return Scaffold(
-//         body: _buildCelebration(),
-//       );
+//       return Scaffold(body: _buildCelebration());
 //     }
 
 //     return Scaffold(
@@ -213,83 +262,92 @@
 //           onPressed: () => Navigator.pop(context),
 //         ),
 //         actions: [
-//           Text(
-//             'Niveau ${currentIndex + 1}/${words.length}',
-//             style: const TextStyle(color: Colors.white),
-//           )
+//           Padding(
+//             padding: const EdgeInsets.all(8.0),
+//             child: Text('Level ${currentIndex + 1}/${words.length}',
+//                 style: const TextStyle(color: Colors.white)),
+//           ),
 //         ],
 //       ),
 //       body: Container(
-//         decoration: const BoxDecoration(
-//             gradient: LinearGradient(
-//                 begin: Alignment.topCenter,
-//                 end: Alignment.bottomCenter,
-//                 colors: [Colors.white, Colors.white])),
-//         child: Padding(
-//           padding: const EdgeInsets.all(16.0),
-//           child: Column(
-//             children: [
-//               AnimatedSwitcher(
-//                 duration: const Duration(milliseconds: 500),
-//                 child: _isCorrect
-//                     ? Lottie.asset('assets/animations/success.json',
-//                         width: 150, repeat: false)
-//                     : Image.asset(words[currentIndex]['image'], height: 180),
-//               ),
-//               const SizedBox(height: 10),
-//               Text(words[currentIndex]['hint'],
-//                   style: const TextStyle(fontSize: 18, color: Colors.black)),
-//               const SizedBox(height: 10),
-//               Text(words[currentIndex]['partial'],
-//                   style: const TextStyle(
-//                       fontSize: 22,
-//                       color: Colors.black,
-//                       fontWeight: FontWeight.bold)),
-//               const SizedBox(height: 10),
-//               Container(
-//                 padding: const EdgeInsets.all(10),
+//         color: Colors.grey[100],
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           children: [
+//             AnimatedSwitcher(
+//               duration: const Duration(milliseconds: 500),
+//               child: _isCorrect
+//                   ? Lottie.asset('assets/animations/success.json',
+//                       width: 150, repeat: false, key: UniqueKey())
+//                   : Image.asset(words[currentIndex]['image'],
+//                       height: 180, key: UniqueKey()),
+//             ),
+//             const SizedBox(height: 16),
+//             GestureDetector(
+//               onTap: () => setState(() => _showHint = !_showHint),
+//               child: Container(
+//                 padding: const EdgeInsets.all(8),
 //                 decoration: BoxDecoration(
-//                     color: Colors.black,
-//                     borderRadius: BorderRadius.circular(15)),
-//                 child: Text(userInput,
-//                     style: const TextStyle(
-//                         fontSize: 22,
-//                         fontWeight: FontWeight.bold,
-//                         color: Colors.white)),
+//                   border: Border.all(color: Colors.black),
+//                   borderRadius: BorderRadius.circular(10),
+//                 ),
+//                 child: Row(
+//                   mainAxisSize: MainAxisSize.min,
+//                   children: [
+//                     const Icon(Icons.lightbulb_outline, color: Colors.black),
+//                     const SizedBox(width: 8),
+//                     Text(
+//                         _showHint
+//                             ? words[currentIndex]['hint']
+//                             : 'Tap for Hint',
+//                         style:
+//                             const TextStyle(fontSize: 18, color: Colors.black)),
+//                   ],
+//                 ),
 //               ),
-//               const SizedBox(height: 10),
-//               Expanded(child: _buildKeyboard()),
-//               Row(
-//                 children: [
+//             ),
+//             const SizedBox(height: 16),
+//             _buildWordDisplay(),
+//             const SizedBox(height: 16),
+//             Expanded(child: _buildKeyboard()),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 ElevatedButton(
+//                   onPressed: () => setState(() => userInput =
+//                       userInput.isNotEmpty
+//                           ? userInput.substring(0, userInput.length - 1)
+//                           : ''),
+//                   style: ElevatedButton.styleFrom(
+//                       backgroundColor: Colors.white,
+//                       foregroundColor: Colors.black),
+//                   child: const Text('Delete'),
+//                 ),
+//                 IconButton(
+//                   icon: const Icon(Icons.volume_up,
+//                       color: Colors.black, size: 30),
+//                   onPressed: () => _playAudio(words[currentIndex]['audio']),
+//                 ),
+//                 if (_isCorrect)
 //                   ElevatedButton(
-//                     onPressed: () => setState(() {
-//                       if (userInput.isNotEmpty) {
-//                         userInput =
-//                             userInput.substring(0, userInput.length - 1);
-//                       }
-//                     }),
-//                     child: const Text('Delete'),
+//                     onPressed: _nextWord,
+//                     style: ElevatedButton.styleFrom(
+//                         backgroundColor: Colors.white,
+//                         foregroundColor: Colors.black),
+//                     child: const Text('Next'),
 //                   ),
-//                   const Spacer(),
-//                   IconButton(
-//                     icon: const Icon(Icons.volume_up,
-//                         color: Colors.black, size: 30),
-//                     onPressed: () => _playAudio(words[currentIndex]['audio']),
-//                   ),
-//                   const Spacer(
-//                     flex: 2,
-//                   )
-//                 ],
-//               )
-//             ],
-//           ),
+//               ],
+//             ),
+//           ],
 //         ),
 //       ),
-//       floatingActionButton: FloatingActionButton(
-//         backgroundColor: Colors.amber,
-//         child: const Icon(Icons.check),
-//         onPressed: checkWord,
-//       ),
+//       floatingActionButton: !_isCorrect
+//           ? FloatingActionButton(
+//               backgroundColor: Colors.white,
+//               child: const Icon(Icons.check, color: Colors.black),
+//               onPressed: _checkWord,
+//             )
+//           : null,
 //     );
 //   }
 
@@ -301,6 +359,7 @@
 //   }
 // }
 
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:lottie/lottie.dart';
@@ -317,34 +376,71 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   final ConfettiController _confettiController =
       ConfettiController(duration: const Duration(seconds: 2));
+  final Random _random = Random();
+
+  // List of words without hardcoded partials
   final List<Map<String, dynamic>> words = [
     {
       'word': 'CHICKEN',
-      'partial': 'CHI___N',
-      'image': 'assets/chicken.jpg', // Black-and-white image
+      'image': 'assets/chicken.jpg',
       'audio': 'sounds/chicken.mp3',
       'hint': 'Farm animal that lays eggs'
     },
     {
       'word': 'CAT',
-      'partial': 'C_T',
-      'image': 'assets/cat.jpg', // Black-and-white image
+      'image': 'assets/cat.jpg',
       'audio': 'sounds/cat.mp3',
       'hint': 'Animal that meows'
     },
-    // Add more words...
+    // Add more unique words here...
   ];
 
+  List<Map<String, dynamic>> gameWords = [];
   int currentIndex = 0;
   String userInput = '';
   bool _isCorrect = false;
   bool _showCelebration = false;
   bool _showHint = false;
 
-  // Generate a smaller keyboard with correct letters + distractors
+  @override
+  void initState() {
+    super.initState();
+    _initializeGame();
+  }
+
+  // Initialize the game by shuffling words and generating partials
+  void _initializeGame() {
+    setState(() {
+      gameWords = List.from(words)..shuffle(_random);
+      for (var word in gameWords) {
+        word['partial'] = _generatePartialWord(word['word']);
+      }
+      currentIndex = 0;
+      userInput = '';
+      _isCorrect = false;
+      _showCelebration = false;
+      _showHint = false;
+    });
+  }
+
+  // Generate a random partial word by hiding some letters
+  String _generatePartialWord(String word) {
+    final length = word.length;
+    final numToHide =
+        (length / 2).ceil(); // Hide approximately half the letters
+    final indicesToHide = <int>{};
+    while (indicesToHide.length < numToHide) {
+      indicesToHide.add(_random.nextInt(length));
+    }
+    return word.split('').asMap().entries.map((entry) {
+      return indicesToHide.contains(entry.key) ? '_' : entry.value;
+    }).join();
+  }
+
+  // Generate keyboard with correct letters + distractors
   List<String> _generateKeyboardLetters() {
-    final word = words[currentIndex]['word'] as String;
-    final partial = words[currentIndex]['partial'] as String;
+    final word = gameWords[currentIndex]['word'] as String;
+    final partial = gameWords[currentIndex]['partial'] as String;
     List<String> missing = [
       for (int i = 0; i < word.length; i++)
         if (partial[i] == '_') word[i]
@@ -353,25 +449,26 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
         .split('')
         .where((c) => !missing.contains(c))
         .toList()
-      ..shuffle();
-    return (missing + distractors.take(5).toList()).toSet().toList()..shuffle();
+      ..shuffle(_random);
+    return (missing + distractors.take(5).toList()).toSet().toList()
+      ..shuffle(_random);
   }
 
   void _addLetter(String letter) {
-    final maxLength =
-        words[currentIndex]['partial'].replaceAll(RegExp(r'[^_]'), '').length;
+    final maxLength = gameWords[currentIndex]['partial']
+        .replaceAll(RegExp(r'[^_]'), '')
+        .length;
     if (userInput.length < maxLength) {
       setState(() {
         userInput += letter;
-        _audioPlayer
-            .play(AssetSource('sounds/click.mp3')); // Sound for letter tap
+        _audioPlayer.play(AssetSource('sounds/click.mp3'));
       });
     }
   }
 
   void _checkWord() {
-    final word = words[currentIndex]['word'];
-    final partial = words[currentIndex]['partial'];
+    final word = gameWords[currentIndex]['word'];
+    final partial = gameWords[currentIndex]['partial'];
     final expectedLength = partial.replaceAll(RegExp(r'[^_]'), '').length;
 
     if (userInput.length != expectedLength) {
@@ -390,19 +487,18 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   String _reconstructWord(String partial, String input) {
     final inputChars = input.toUpperCase().split('');
     int inputIndex = 0;
-    final result = partial.split('').map((char) {
+    return partial.split('').map((char) {
       if (char == '_') {
         return inputIndex < inputChars.length ? inputChars[inputIndex++] : '_';
       }
       return char;
     }).join();
-    return result;
   }
 
   void _handleCorrectAnswer() async {
     setState(() => _isCorrect = true);
     _confettiController.play();
-    _playAudio(words[currentIndex]['audio']);
+    _playAudio(gameWords[currentIndex]['audio']);
     await Future.delayed(const Duration(seconds: 2));
   }
 
@@ -416,7 +512,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   }
 
   void _nextWord() {
-    if (currentIndex < words.length - 1) {
+    if (currentIndex < gameWords.length - 1) {
       setState(() {
         currentIndex++;
         userInput = '';
@@ -428,10 +524,10 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     }
   }
 
-  // Build the word display with individual slots
+  // Build word display with individual slots
   Widget _buildWordDisplay() {
-    final partial = words[currentIndex]['partial'];
-    final word = words[currentIndex]['word'];
+    final partial = gameWords[currentIndex]['partial'];
+    final word = gameWords[currentIndex]['word'];
     final chars = partial.split('');
     final inputChars = userInput.split('');
     int inputIndex = 0;
@@ -461,8 +557,9 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
       decoration: BoxDecoration(
         color: char.isEmpty ? Colors.grey[200] : Colors.white,
         border: Border.all(color: Colors.black),
-        boxShadow:
-            isCorrect ? [BoxShadow(color: Colors.black26, blurRadius: 4)] : [],
+        boxShadow: isCorrect
+            ? [const BoxShadow(color: Colors.black26, blurRadius: 4)]
+            : [],
       ),
       child: Center(
         child: Text(
@@ -516,7 +613,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Lottie.asset('assets/animations/celebration.json',
-                    width: 300, repeat: false), // Grayscale animation
+                    width: 300, repeat: false),
                 const Text(
                   'You’re Awesome!',
                   style: TextStyle(
@@ -567,7 +664,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Level ${currentIndex + 1}/${words.length}',
+            child: Text('Level ${currentIndex + 1}/${gameWords.length}',
                 style: const TextStyle(color: Colors.white)),
           ),
         ],
@@ -582,7 +679,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
               child: _isCorrect
                   ? Lottie.asset('assets/animations/success.json',
                       width: 150, repeat: false, key: UniqueKey())
-                  : Image.asset(words[currentIndex]['image'],
+                  : Image.asset(gameWords[currentIndex]['image'],
                       height: 180, key: UniqueKey()),
             ),
             const SizedBox(height: 16),
@@ -601,7 +698,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                     const SizedBox(width: 8),
                     Text(
                         _showHint
-                            ? words[currentIndex]['hint']
+                            ? gameWords[currentIndex]['hint']
                             : 'Tap for Hint',
                         style:
                             const TextStyle(fontSize: 18, color: Colors.black)),
@@ -629,7 +726,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                 IconButton(
                   icon: const Icon(Icons.volume_up,
                       color: Colors.black, size: 30),
-                  onPressed: () => _playAudio(words[currentIndex]['audio']),
+                  onPressed: () => _playAudio(gameWords[currentIndex]['audio']),
                 ),
                 if (_isCorrect)
                   ElevatedButton(
