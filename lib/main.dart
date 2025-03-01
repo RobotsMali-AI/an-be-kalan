@@ -58,7 +58,7 @@ Future<void> main() async {
 ///
 /// Returns a [MaterialApp].
 class LiteracyAppEntry extends StatelessWidget {
-  LiteracyAppEntry({Key? key}) : super(key: key);
+  const LiteracyAppEntry({Key? key}) : super(key: key);
   // SpeechToText speech = SpeechToText();
   @override
   Widget build(BuildContext context) {

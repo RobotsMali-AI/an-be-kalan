@@ -66,19 +66,19 @@ class AcceuilNkalan extends StatelessWidget {
     // Define the list of games with titles, images, and navigation pages
     final List<Map<String, dynamic>> games = [
       {
-        'title': 'Words Complete',
+        'title': 'Daɲɛw dafali',
         'image':
             'assets/game1.webp', // Replace with actual grayscale image path
         'page': const WordsCompletePage(),
       },
       {
-        'title': 'Choose Correct Spell',
+        'title': 'sɛbɛn coko ɲuma sukandili',
         'image':
             'assets/game2.webp', // Replace with actual grayscale image path
         'page': const ChooseCorrectSpellPage(),
       },
       {
-        'title': 'Choose Context',
+        'title': 'Ja ɲuman sukandili',
         'image':
             'assets/game3.webp', // Replace with actual grayscale image path
         'page': const ChooseContextPage(),
@@ -90,7 +90,7 @@ class AcceuilNkalan extends StatelessWidget {
         backgroundColor: Colors.black,
         title: const Center(
           child: Text(
-            'Game section',
+            'Nkalan',
             style: TextStyle(color: Colors.white),
           ),
         ),

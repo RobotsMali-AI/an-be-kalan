@@ -172,7 +172,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
           child: ConfettiWidget(
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,
-            colors: [Colors.black, Colors.grey, Colors.white],
+            colors: const [Colors.black, Colors.grey, Colors.white],
           ),
         ),
       ],

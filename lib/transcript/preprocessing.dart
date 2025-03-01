@@ -287,14 +287,14 @@ class AudioToMelSpectrogramPreprocessor {
     List<List<double>> fbank =
         List.generate(nMels, (_) => List<double>.filled(nFftBins, 0.0));
     for (int m = 1; m <= nMels; m++) {
-      int f_m_minus = bin[m - 1];
-      int f_m = bin[m];
-      int f_m_plus = bin[m + 1];
-      for (int k = f_m_minus; k < f_m; k++) {
-        fbank[m - 1][k] = (k - f_m_minus) / (f_m - f_m_minus).toDouble();
+      int fMMinus = bin[m - 1];
+      int fM = bin[m];
+      int fMPlus = bin[m + 1];
+      for (int k = fMMinus; k < fM; k++) {
+        fbank[m - 1][k] = (k - fMMinus) / (fM - fMMinus).toDouble();
       }
-      for (int k = f_m; k < f_m_plus; k++) {
-        fbank[m - 1][k] = (f_m_plus - k) / (f_m_plus - f_m).toDouble();
+      for (int k = fM; k < fMPlus; k++) {
+        fbank[m - 1][k] = (fMPlus - k) / (fMPlus - fM).toDouble();
       }
     }
     // Slaney-style normalization: each filter is normalized to have unit area.

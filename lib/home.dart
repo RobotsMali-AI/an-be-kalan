@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
         else if (_selectedTabIndex == 1) {
           return const TranslationPage();
         } else if (_selectedTabIndex == 2) {
-          return AcceuilNkalan();
+          return const AcceuilNkalan();
         } else {
           return ProfilePage(user: user!, userData: userData);
         }

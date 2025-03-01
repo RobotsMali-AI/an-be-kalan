@@ -61,7 +61,7 @@ Future<List<List<double>>> runOnnxModelInference(
   final float32Data = Float32List.fromList(flatData);
 
   // Define the shape of the input tensor
-  final int batchSize = 1;
+  const int batchSize = 1;
   final int melBands = transposedMelSpectrogram.length;
   final int timeSteps = transposedMelSpectrogram[0].length;
   final shape = [
@@ -137,7 +137,7 @@ Future<List<double>> loadWavFile(String filePath) async {
       // In the fmt chunk, bytes 8-9: audio format (PCM = 1)
       final int audioFormat = byteData.getUint16(offset + 8, Endian.little);
       if (audioFormat != 1) {
-        throw FormatException("Only PCM WAV files are supported.");
+        throw const FormatException("Only PCM WAV files are supported.");
       }
       // Sample rate is at offset+12 but is not used here.
       bitsPerSample = byteData.getUint16(offset + 22, Endian.little);
@@ -152,7 +152,7 @@ Future<List<double>> loadWavFile(String filePath) async {
   }
 
   if (dataStart == 0) {
-    throw FormatException("Data chunk not found in WAV file.");
+    throw const FormatException("Data chunk not found in WAV file.");
   }
 
   // Calculate the total number of samples (across all channels).
