@@ -68,19 +68,19 @@ class AcceuilNkalan extends StatelessWidget {
       {
         'title': 'Daɲɛw dafali',
         'image':
-            'assets/game1.webp', // Replace with actual grayscale image path
+            'assets/imJeu3.jpg', // Replace with actual grayscale image path
         'page': const WordsCompletePage(),
       },
       {
         'title': 'sɛbɛn coko ɲuma sukandili',
         'image':
-            'assets/game2.webp', // Replace with actual grayscale image path
+            'assets/imJeu2.jpg', // Replace with actual grayscale image path
         'page': const ChooseCorrectSpellPage(),
       },
       {
         'title': 'Ja ɲuman sukandili',
         'image':
-            'assets/game3.webp', // Replace with actual grayscale image path
+            'assets/imJeu1.jpg', // Replace with actual grayscale image path
         'page': const ChooseContextPage(),
       },
     ];
