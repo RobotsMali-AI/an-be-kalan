@@ -126,17 +126,37 @@ class LessonScreenState extends State<LessonScreen> {
           .map((e) => e as double)
           .toList();
     } else {
-      currentPage = 1;
+      currentPage = 0;
     }
 
-    currentSentences =
-        List<String>.from(bookData!.content["Page $currentPage"]!.sentences);
-    currentSentence = currentSentences.isNotEmpty
-        ? currentSentences[currentSentenceIndex]
-        : '';
-    currentTextSpans = [TextSpan(text: currentSentence)];
-    currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
-    startTime = DateTime.now();
+    // Convert currentPage to a string because keys are like "0", "1", etc.
+    String pageKey = currentPage.toString();
+
+    if (bookData!.content.containsKey(pageKey)) {
+      currentSentences = List<String>.from(
+          bookData!.content[pageKey]!.sentences.map((e) => e.text)).toList();
+      currentSentence = currentSentences.isNotEmpty
+          ? currentSentences[currentSentenceIndex]
+          : '';
+      currentTextSpans = [TextSpan(text: currentSentence)];
+      currentImageUrl = bookData!.content[pageKey]!.imageUrl;
+      startTime = DateTime.now();
+    } else {
+      // Handle the case where the requested page does not exist
+      currentSentences = [];
+      currentSentence = '';
+      currentTextSpans = [TextSpan(text: "Page not found")];
+      currentImageUrl = '';
+    }
+
+    // currentSentences =
+    //     List<String>.from(bookData!.content["Page $currentPage"]!.sentences);
+    // currentSentence = currentSentences.isNotEmpty
+    //     ? currentSentences[currentSentenceIndex]
+    //     : '';
+    // currentTextSpans = [TextSpan(text: currentSentence)];
+    // currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
+    // startTime = DateTime.now();
   }
 
   Future<void> setupAudioSession() async {
@@ -252,23 +272,71 @@ class LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  // List<TextSpan> getHighlightedTextSpans(String transcription) {
+  //   List<String> originalWords = currentSentence.split(' ');
+  //   List<String> transcribedWords = transcription.split(' ');
+  //   int correctWordCount = 0;
+
+  //   List<TextSpan> highlightedSpans = [];
+  //   for (var word in originalWords) {
+  //     bool isCorrect = transcribedWords.contains(word);
+  //     if (isCorrect) correctWordCount++;
+  //     highlightedSpans.add(TextSpan(
+  //       text: '$word ',
+  //       style: TextStyle(
+  //         color: isCorrect ? Colors.green : Colors.red,
+  //       ),
+  //     ));
+  //   }
+  //   accuracies.add(correctWordCount / originalWords.length);
+  //   return highlightedSpans;
+  // }
+
   List<TextSpan> getHighlightedTextSpans(String transcription) {
-    List<String> originalWords = currentSentence.split(' ');
-    List<String> transcribedWords = transcription.split(' ');
-    int correctWordCount = 0;
+    // Keep the original sentence intact for display
+    String originalDisplay = currentSentence;
+    // Modified versions for comparison only
+    String originalCompare =
+        currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+    String transcriptionCompare =
+        transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
 
     List<TextSpan> highlightedSpans = [];
-    for (var word in originalWords) {
-      bool isCorrect = transcribedWords.contains(word);
-      if (isCorrect) correctWordCount++;
-      highlightedSpans.add(TextSpan(
-        text: '$word ',
-        style: TextStyle(
-          color: isCorrect ? Colors.green : Colors.red,
-        ),
-      ));
+    int matching = 0;
+    int compareIndex = 0;
+
+    // Loop through the original sentence (with casing and punctuation)
+    for (int i = 0; i < originalDisplay.length; i++) {
+      String char = originalDisplay[i];
+      bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
+
+      if (isLetterOrSpace) {
+        // Compare using the modified versions
+        bool isCorrect = compareIndex < transcriptionCompare.length &&
+            originalCompare[compareIndex] == transcriptionCompare[compareIndex];
+        if (isCorrect) matching++;
+        highlightedSpans.add(TextSpan(
+          text: char, // Use the original character for display
+          style: TextStyle(
+            color: isCorrect ? Colors.green : Colors.red,
+          ),
+        ));
+        compareIndex++;
+      } else {
+        // Punctuation marks: always red as transcription doesn’t include them
+        highlightedSpans.add(TextSpan(
+          text: char,
+          style: TextStyle(color: Colors.red),
+        ));
+      }
     }
-    accuracies.add(correctWordCount / originalWords.length);
+
+    // Calculate accuracy based on the comparison strings
+    double accuracy =
+        originalCompare.isEmpty ? 0 : matching / originalCompare.length;
+    double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
+    accuracies.add(adjustedAccuracy);
+
     return highlightedSpans;
   }
 
@@ -284,9 +352,10 @@ class LessonScreenState extends State<LessonScreen> {
       } else {
         currentSentenceIndex = 0;
         currentPage += 1;
-        currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
+        currentImageUrl = bookData!.content[currentPage]!.imageUrl;
         currentSentences = List<String>.from(
-            bookData!.content["Page $currentPage"]!.sentences);
+                bookData!.content[currentPage]!.sentences.map((e) => e.text))
+            .toList();
         currentSentence = currentSentences[currentSentenceIndex];
         if (currentPage == bookData!.content.length) lastPage = true;
       }
@@ -296,7 +365,7 @@ class LessonScreenState extends State<LessonScreen> {
               lastAccessed: DateTime.now(),
               totalPages: bookData!.content.length,
               title: widget.bookTitle,
-              bookmark: 'Page $currentPage',
+              bookmark: currentPage.toString(),
               readingTime: readingTime,
               accuracies: accuracies),
           widget.uid);
@@ -317,7 +386,7 @@ class LessonScreenState extends State<LessonScreen> {
           BookUser(
             lastAccessed: DateTime.now(),
             title: widget.bookTitle,
-            bookmark: 'Page $currentPage',
+            bookmark: currentPage.toString(),
             readingTime: readingTime,
             totalPages: bookData!.content.length,
             accuracies: accuracies,
@@ -342,7 +411,7 @@ class LessonScreenState extends State<LessonScreen> {
                   lastAccessed: DateTime.now(),
                   totalPages: bookData!.content.length,
                   title: widget.bookTitle,
-                  bookmark: 'Page $currentPage',
+                  bookmark: currentPage.toString(),
                   readingTime: readingTimeInMinutes,
                   accuracies: accuracies),
               widget.userdata,
@@ -354,7 +423,7 @@ class LessonScreenState extends State<LessonScreen> {
             lastAccessed: DateTime.now(),
             totalPages: bookData!.content.length,
             title: widget.bookTitle,
-            bookmark: 'Page $currentPage',
+            bookmark: currentPage.toString(),
             readingTime: readingTimeInMinutes,
             accuracies: accuracies),
         widget.uid);
@@ -367,7 +436,7 @@ class LessonScreenState extends State<LessonScreen> {
 
     int totalBookWordCount = bookData!.content.values
         .expand((pageContent) => pageContent.sentences)
-        .map((sentence) => sentence.split(' ').length)
+        .map((sentence) => sentence.text.split(' ').length)
         .reduce((sum, count) => sum + count);
     String wordPerMin =
         (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2);
@@ -452,7 +521,7 @@ class LessonScreenState extends State<LessonScreen> {
               IconButton(
                 icon: Icon(
                   isPlaying ? Icons.pause : Icons.play_arrow,
-                  color: Colors.blue,
+                  color: Colors.black,
                   size: 36,
                 ),
                 onPressed: togglePlayback,
@@ -474,10 +543,10 @@ class LessonScreenState extends State<LessonScreen> {
           ),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Colors.blue,
+              activeTrackColor: Colors.black,
               inactiveTrackColor: Colors.blue.shade100,
-              thumbColor: Colors.blue,
-              overlayColor: Colors.blue.withOpacity(0.2),
+              thumbColor: Colors.black,
+              overlayColor: Colors.black.withOpacity(0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
             ),
@@ -515,7 +584,7 @@ class LessonScreenState extends State<LessonScreen> {
         key: const ValueKey('stop'),
         heroTag: 'stopFAB', // Unique tag
         onPressed: stopRecording,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black,
         child: const Icon(Icons.stop, color: Colors.white),
       );
     } else if (hasTranscription) {
@@ -524,7 +593,7 @@ class LessonScreenState extends State<LessonScreen> {
           key: const ValueKey('end'),
           heroTag: 'endFAB', // Unique tag
           onPressed: () => endLesson(context),
-          backgroundColor: Colors.blue,
+          backgroundColor: Colors.black,
           child: const Icon(Icons.check, color: Colors.white),
         );
       } else {
@@ -539,44 +608,11 @@ class LessonScreenState extends State<LessonScreen> {
         key: const ValueKey('mic'),
         heroTag: 'micFAB', // Unique tag
         onPressed: startRecording,
-        backgroundColor: Colors.blue,
+        backgroundColor: Colors.black,
         child: const Icon(Icons.mic, color: Colors.white),
       );
     }
   }
-
-  // Widget buildFAB() {
-  //   if (isRecording) {
-  //     return FloatingActionButton(
-  //       key: const ValueKey('stop'),
-  //       onPressed: stopRecording,
-  //       backgroundColor: Colors.blue,
-  //       child: const Icon(Icons.stop, color: Colors.white),
-  //     );
-  //   } else if (hasTranscription) {
-  //     if (lastPage && currentSentenceIndex == currentSentences.length - 1) {
-  //       return FloatingActionButton(
-  //         key: const ValueKey('end'),
-  //         onPressed: () => endLesson(context),
-  //         backgroundColor: Colors.blue,
-  //         child: const Icon(Icons.check, color: Colors.white),
-  //       );
-  //     } else {
-  //       return FloatingHintButton(
-  //         key: const ValueKey('next'),
-  //         onLongPress: startRecording,
-  //         onPressed: moveToNextSentence,
-  //       );
-  //     }
-  //   } else {
-  //     return FloatingActionButton(
-  //       key: const ValueKey('mic'),
-  //       onPressed: startRecording,
-  //       backgroundColor: Colors.blue,
-  //       child: const Icon(Icons.mic, color: Colors.white),
-  //     );
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -638,11 +674,11 @@ class LessonScreenState extends State<LessonScreen> {
       ),
       // Improved body with gradient background
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.blue.shade50, Colors.white],
+            colors: [Colors.white, Colors.white],
           ),
         ),
         child: Stack(
@@ -689,39 +725,6 @@ class LessonScreenState extends State<LessonScreen> {
                               ),
                       ),
                     ),
-                    // ClipRRect(
-                    //   borderRadius: BorderRadius.circular(12),
-                    //   child: Container(
-                    //     decoration: BoxDecoration(
-                    //       boxShadow: [
-                    //         BoxShadow(
-                    //           color: Colors.black.withOpacity(0.1),
-                    //           blurRadius: 8,
-                    //           offset: const Offset(0, 4),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //     child: widget.isOffLine == false
-                    //         ? FadeInImage(
-                    //             placeholder:
-                    //                 MemoryImage(Uint8List.fromList([])),
-                    //             image: NetworkImage(currentImageUrl),
-                    //             fit: BoxFit.contain,
-                    //             width: MediaQuery.of(context).size.width,
-                    //             height:
-                    //                 MediaQuery.of(context).size.height * 0.38,
-                    //             fadeInDuration:
-                    //                 const Duration(milliseconds: 300),
-                    //           )
-                    //         : Image.memory(
-                    //             base64Decode(currentImageUrl),
-                    //             fit: BoxFit.contain,
-                    //             width: MediaQuery.of(context).size.width,
-                    //             height:
-                    //                 MediaQuery.of(context).size.height * 0.38,
-                    //           ),
-                    //   ),
-                    // ),
                     const SizedBox(height: 20),
                     // Beautiful Text Display
                     Container(
@@ -757,7 +760,7 @@ class LessonScreenState extends State<LessonScreen> {
                     // Stylish Volume Button
                     FloatingActionButton(
                       mini: true,
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.black,
                       tooltip: 'Listen to the sentence',
                       onPressed: () {
                         // Add text-to-speech functionality here
@@ -785,7 +788,7 @@ class LessonScreenState extends State<LessonScreen> {
                     child: CircularProgressIndicator(
                       backgroundColor: Colors.grey.shade300,
                       valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.blue),
+                          const AlwaysStoppedAnimation<Color>(Colors.black),
                       value: currentPage / (bookData!.content.length),
                       strokeWidth: 6,
                     ),
@@ -820,7 +823,7 @@ class LessonScreenState extends State<LessonScreen> {
                 color: Colors.black.withOpacity(0.3),
                 child: const Center(
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                   ),
                 ),
               ),

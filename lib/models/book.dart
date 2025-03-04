@@ -25,10 +25,11 @@ class Book {
           ? null
           : Evaluation.fromMap(data['evaluation']),
       title: data['title'] ?? '',
-      content: (data['content'] as Map<String, dynamic>).map(
-        (key, value) =>
-            MapEntry(key, Page.fromSnapshot(value as Map<String, dynamic>)),
-      ),
+      content: {
+        for (int i = 0; i < (data['content'] as List<dynamic>).length; i++)
+          i.toString():
+              Page.fromSnapshot(data['content'][i] as Map<String, dynamic>)
+      },
     );
   }
 
@@ -38,13 +39,13 @@ class Book {
       cover: json['cover'] ?? '',
       title: json['title'] ?? '',
       evaluation: json['evaluation'],
-      content: (json['content'] as Map<String, dynamic>).map(
-        (key, value) =>
-            MapEntry(key, Page.fromSnapshot(value as Map<String, dynamic>)),
-      ),
+      content: {
+        for (int i = 0; i < (json['content'] as List<dynamic>).length; i++)
+          i.toString():
+              Page.fromSnapshot(json['content'][i] as Map<String, dynamic>)
+      },
     );
   }
-
   Future<Map<String, dynamic>> toSnapshot() async {
     final contentSnapshot =
         await Future.wait(content.entries.map((entry) async {

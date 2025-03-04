@@ -224,7 +224,7 @@ class ApiFirebaseService with ChangeNotifier {
     //   return;
     // }
     books = [];
-    final data = await _firestore.collection('books').get();
+    final data = await _firestore.collection('stories').get();
     for (var element in data.docs) {
       books.add(Book.fromJson(element));
     }

@@ -373,7 +373,7 @@ class _TranslationPageState extends State<TranslationPage> {
           fillColor: Colors.white,
         ),
         items: const [
-          DropdownMenuItem(value: "fra_Latn", child: Text("Faransi 🇫🇷")),
+          DropdownMenuItem(value: "fra_Latn", child: Text("Farancɛ 🇫🇷")),
           DropdownMenuItem(value: "eng_Latn", child: Text("Angilɛ 🇬🇧")),
           DropdownMenuItem(value: "bam_Latn", child: Text("Bamanankan 🇲🇱")),
         ],

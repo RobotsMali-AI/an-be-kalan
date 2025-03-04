@@ -1,8 +1,9 @@
 import 'package:literacy_app/imageToBase64.dart';
+import 'package:literacy_app/models/sentences.dart';
 
 class Page {
   final dynamic imageUrl;
-  final List<String> sentences;
+  final List<Sentence> sentences;
 
   Page({
     required this.imageUrl,
@@ -12,7 +13,10 @@ class Page {
   factory Page.fromSnapshot(Map<String, dynamic> snapshot) {
     return Page(
       imageUrl: snapshot['image'] ?? '',
-      sentences: List<String>.from(snapshot['sentences'] ?? []),
+      sentences: (snapshot['sentences'] as List<dynamic>?)
+              ?.map((s) => Sentence.fromJson(s as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
   }
 

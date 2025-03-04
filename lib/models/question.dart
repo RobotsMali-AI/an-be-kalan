@@ -1,22 +1,22 @@
 class Question {
-  String question;
-  List<String> options;
-  String correct;
+  final String question;
+  final List<String> options;
+  final List<String> correct;
 
   Question(
       {required this.question, required this.options, required this.correct});
 
   factory Question.fromMap(Map<String, dynamic> data) {
     return Question(
-      question: data['question'] as String,
-      options: List<String>.from(data['options']),
-      correct: data['correct'] as String,
+      question: data['questions'] ?? '',
+      options: List<String>.from(data['options'] ?? []),
+      correct: List<String>.from(data['correct'] ?? []),
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'question': question,
+      'questions': question,
       'options': options,
       'correct': correct,
     };

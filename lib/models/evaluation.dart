@@ -1,25 +1,41 @@
+import 'package:literacy_app/models/oneimagemultiplewordsquestion.dart';
+import 'package:literacy_app/models/onewordmultipleimagequestions.dart';
 import 'package:literacy_app/models/question.dart';
 import 'package:literacy_app/models/trueorfalse.dart';
 
 class Evaluation {
-  List<Question> multiple;
-  List<Trueorfalse> trueorfalse;
-  Evaluation({required this.multiple, required this.trueorfalse});
+  final List<Question> multiple;
+  final List<Trueorfalse> trueorfalse;
+  final List<OneImageMultipleWordsQuestion> oneimagemultiplewords;
+  final List<OneWordMultipleImagesQuestion> onewordmultipleimages;
+
+  Evaluation({
+    required this.multiple,
+    required this.trueorfalse,
+    required this.oneimagemultiplewords,
+    required this.onewordmultipleimages,
+  });
 
   factory Evaluation.fromMap(Map<String, dynamic> data) {
     return Evaluation(
-      trueorfalse: (data['trueorfalse'] as List)
-          .map((q) => Trueorfalse.fromJson(q))
-          .toList(),
-      multiple: (data['multiple'] as List)
-          .map((q) => Question.fromMap(q as Map<String, dynamic>))
-          .toList(),
+      multiple: (data['multiple'] as List<dynamic>?)
+              ?.map((q) => Question.fromMap(q as Map<String, dynamic>))
+              .toList() ??
+          [],
+      trueorfalse: (data['trueorfalse'] as List<dynamic>?)
+              ?.map((q) => Trueorfalse.fromJson(q as Map<String, dynamic>))
+              .toList() ??
+          [],
+      oneimagemultiplewords: (data['oneimagemultiplewords'] as List<dynamic>?)
+              ?.map((q) => OneImageMultipleWordsQuestion.fromJson(
+                  q as Map<String, dynamic>))
+              .toList() ??
+          [],
+      onewordmultipleimages: (data['onewordmultipleimages'] as List<dynamic>?)
+              ?.map((q) => OneWordMultipleImagesQuestion.fromJson(
+                  q as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'multiple': multiple.map((q) => q.toMap()).toList(),
-    };
   }
 }
