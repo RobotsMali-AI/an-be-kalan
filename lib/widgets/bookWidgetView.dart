@@ -209,11 +209,9 @@
 // }
 
 import 'package:flutter/material.dart';
-import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
-import 'package:provider/provider.dart';
 
 class BookWidgetView extends StatelessWidget {
   const BookWidgetView({

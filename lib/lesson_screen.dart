@@ -344,9 +344,10 @@ class LessonScreenState extends State<LessonScreen> {
     setState(() {
       currentSentenceIndex += 1;
       if (currentSentenceIndex < currentSentences.length) {
-        currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
+        currentImageUrl = bookData!.content[currentPage]!.imageUrl;
         currentSentences = List<String>.from(
-            bookData!.content["Page $currentPage"]!.sentences);
+                bookData!.content[currentPage]!.sentences.map((e) => e.text))
+            .toList();
         currentSentence = currentSentences[currentSentenceIndex];
         // currentSentence = currentSentences[currentSentenceIndex];
       } else {

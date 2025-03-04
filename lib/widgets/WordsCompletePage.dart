@@ -744,8 +744,8 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
       floatingActionButton: !_isCorrect
           ? FloatingActionButton(
               backgroundColor: Colors.white,
-              child: const Icon(Icons.check, color: Colors.black),
               onPressed: _checkWord,
+              child: const Icon(Icons.check, color: Colors.black),
             )
           : null,
     );
