@@ -79,6 +79,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
           _selectedImage = null;
           _isCorrect = false;
           _showHint = false;
+          // _loadRandomImage();
         });
       } else {
         setState(() => _showCelebration = true);
