@@ -1,6 +1,4 @@
-import 'dart:ffi';
 import 'dart:math' as math;
-import 'dart:typed_data';
 import 'package:fftea/fftea.dart';
 
 // Custom Complex type to replace the one from the old fft package
