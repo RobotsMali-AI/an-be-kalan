@@ -49,7 +49,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
       ChangeNotifierProvider(create: (_) => DatabaseHelper())
     ],
-    child: LiteracyAppEntry(),
+    child: const LiteracyAppEntry(),
   ));
   //runApp();
 }
