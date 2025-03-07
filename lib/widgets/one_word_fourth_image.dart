@@ -3,14 +3,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:audioplayers/audioplayers.dart'; // Replace just_audio with audioplayers for simplicity
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
+import 'dart:math';
+import 'package:flutter/services.dart' show rootBundle;
 
 /// Class to represent a question with its attributes
 class Question {
-  final String title;
-  final String word;
-  final List<Map<String, dynamic>>
-      images; // List of image paths and correctness
-  final String audioPath;
+  String title;
+  String word;
+  List<Map<String, dynamic>> images; // List of image paths and correctness
+  String audioPath;
 
   Question({
     required this.title,
@@ -70,6 +71,50 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
     // Add more questions as needed...
   ];
 
+//********************************************************************* */
+  final List<String> _imageNames = [
+    'ane',
+    'boeuf',
+    'coton', // Ajoutez autant d'images que vous avez
+  ];
+
+  final Question qt = Question(title: "", word: "", images: [], audioPath: "");
+
+// Méthode pour charger une image et sa légende aléatoirement
+  Future<void> _loadRandomImage() async {
+    final random = Random();
+    final randomIndex = random.nextInt(_imageNames.length);
+    final selectedImageName = _imageNames[randomIndex];
+    final randomIndex2 = random.nextInt(_imageNames.length);
+    final selectedImageName2 = _imageNames[randomIndex2];
+    final randomIndex3 = random.nextInt(_imageNames.length);
+    final selectedImageName3 = _imageNames[randomIndex3];
+    final randomIndex4 = random.nextInt(_imageNames.length);
+    final selectedImageName4 = _imageNames[randomIndex4];
+
+    // Chemin de l'image
+    final imagePath = 'assets/nkalanIm/$selectedImageName.jpg';
+
+    // Chemin de la légende
+    final captionPath1 = 'assets/nkalanTx/$selectedImageName.txt';
+
+    // Chemin de l'audio
+    final audioPath = 'assets/sounds/$selectedImageName.mp3';
+
+    // Charger la légende depuis le fichier texte
+    final legendPath = await rootBundle.loadString(captionPath1);
+
+    qt.title = "Ja sugantdi";
+    qt.word = legendPath;
+    qt.images = [
+      {'path': 'assets/nkalanIm/$selectedImageName.jpg', 'correct': true},
+      {'path': 'assets/nkalanIm/$selectedImageName2.jpg', 'correct': false},
+      {'path': 'assets/nkalanIm/$selectedImageName3.jpg', 'correct': false},
+      {'path': 'assets/nkalanIm/$selectedImageName4.jpg', 'correct': false},
+    ];
+    qt.audioPath = audioPath;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -93,7 +138,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   }
 
   void _checkAnswer(String imagePath) async {
-    final currentQuestion = questions[_currentQuestionIndex];
+    final currentQuestion = qt;
     final isCorrect = currentQuestion.images
         .firstWhere((img) => img['path'] == imagePath)['correct'];
 
@@ -107,12 +152,13 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
       _playAudio(currentQuestion.audioPath);
       await Future.delayed(const Duration(seconds: 2));
 
-      if (_currentQuestionIndex < questions.length - 1) {
+      if (_currentQuestionIndex < 11) {
         setState(() {
           _currentQuestionIndex++;
           _selectedImage = null;
           _isCorrect = false;
           _showHint = false;
+          _loadRandomImage();
         });
       } else {
         setState(() => _showCelebration = true);

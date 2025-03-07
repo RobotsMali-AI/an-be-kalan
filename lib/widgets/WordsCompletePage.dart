@@ -381,17 +381,66 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   // List of words without hardcoded partials
   final List<Map<String, dynamic>> words = [
     {
-      'word': 'CHICKEN',
-      'image': 'assets/chicken.jpg',
-      'audio': 'sounds/chicken.mp3',
-      'hint': 'Farm animal that lays eggs'
+      'word': 'cincin',
+      'image': 'assets/nkalanIm/sable.jpg',
+      'audio': 'nkalanSound/sable.mp3',
+      'hint': 'siman bɛ kɛ a la'
     },
     {
-      'word': 'CAT',
-      'image': 'assets/cat.jpg',
-      'audio': 'sounds/cat.mp3',
-      'hint': 'Animal that meows'
+      'word': 'dan',
+      'image': 'assets/nkalanIm/terminaison.jpg',
+      'audio': 'nkalanSound/terminaison.mp3',
+      'hint': 'a tɛ tɛmɛ yen ka'
     },
+    {
+      'word': 'baara',
+      'image': 'assets/nkalanIm/travail.jpg',
+      'audio': 'nkalanSound/travail.mp3',
+      'hint': 'a bɛ kɛ ni fanga ye.'
+    },
+    {
+      'word': 'feere',
+      'image': 'assets/nkalanIm/vente.jpg',
+      'audio': 'nkalanSound/vente.mp3',
+      'hint': 'falen wari la.'
+    },
+    {
+      'word': 'fu',
+      'image': 'assets/nkalanIm/zero.jpg',
+      'audio': 'nkalanSound/zero.mp3',
+      'hint': 'fosi fosi.'
+    },
+    {
+      'word': 'fali',
+      'image': 'assets/nkalanIm/ane.jpg',
+      'audio': 'nkalanSound/ane.mp3',
+      'hint': 'a bɛ bin dun.'
+    },
+    {
+      'word': 'kɔnɔbara',
+      'image': 'assets/nkalanIm/ventre.jpg',
+      'audio': 'nkalanSound/ventre.mp3',
+      'hint': 'dumuni bɛ mara yen.'
+    },
+    {
+      'word': 'araye',
+      'image': 'assets/nkalanIm/rail.jpg',
+      'audio': 'nkalanSound/rail.mp3',
+      'hint': 'tɛrɛn bɛ boli'
+    },
+    {
+      'word': 'araye',
+      'image': 'assets/nkalanIm/rail.jpg',
+      'audio': 'nkalanSound/rail.mp3',
+      'hint': 'tɛrɛn bɛ boli'
+    },
+    {
+      'word': 'bonya',
+      'image': 'assets/nkalanIm/respect.jpg',
+      'audio': 'nkalanSound/respect.mp3',
+      'hint': 'mɔgɔ kɔrɔba ni a kakan'
+    },
+
     // Add more unique words here...
   ];
 

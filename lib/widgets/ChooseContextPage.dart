@@ -313,25 +313,106 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
       ConfettiController(duration: 2.seconds);
   final List<Map<String, dynamic>> contexts = [
     {
-      'word': 'CHICKEN',
+      'word': 'Fali',
       'images': [
-        {'path': 'assets/chicken.jpg', 'correct': true},
-        {'path': 'assets/dog.jpg', 'correct': false},
-        {'path': 'assets/cat.jpg', 'correct': false},
-        {'path': 'assets/cat.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/ane.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/ble.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/arbre.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/baton.jpg', 'correct': false},
       ],
-      'audio': 'sounds/chicken.mp3',
+      'audio': 'nkalanSound/ane.mp3',
     },
     {
-      'word': 'CHICKEN',
+      'word': 'Kalan',
       'images': [
-        {'path': 'assets/chicken.jpg', 'correct': true},
-        {'path': 'assets/dog.jpg', 'correct': false},
-        {'path': 'assets/cat.jpg', 'correct': false},
-        {'path': 'assets/cat.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/bouche.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/beaucoup.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/arbre.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/apprentissage.jpg', 'correct': true},
       ],
-      'audio': 'sounds/chicken.mp3',
+      'audio': 'nkalanSound/apprentissage.mp3',
     },
+    {
+      'word': 'muru',
+      'images': [
+        {'path': 'assets/nkalanIm/lunette.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/couteau.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/citron.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/daba.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/couteau.mp3',
+    },
+    {
+      'word': 'enfant',
+      'images': [
+        {'path': 'assets/nkalanIm/enfant.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/dos.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/ecouteur.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/diable.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/enfant.mp3',
+    },
+    {
+      'word': 'kalanso',
+      'images': [
+        {'path': 'assets/nkalanIm/eau.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/ecole.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/entrainement.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/famille.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/ecole.mp3',
+    },
+    {
+      'word': 'muso',
+      'images': [
+        {'path': 'assets/nkalanIm/facon.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/eleve.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/femme.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/homme.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/femme.mp3',
+    },
+    {
+      'word': 'fatɔ',
+      'images': [
+        {'path': 'assets/nkalanIm/exemple.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/fou.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/fevrier.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/eleve.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/fou.mp3',
+    },
+    {
+      'word': 'fatɔ',
+      'images': [
+        {'path': 'assets/nkalanIm/exemple.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/fou.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/fevrier.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/eleve.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/fou.mp3',
+    },
+    {
+      'word': 'cɛmisɛn',
+      'images': [
+        {'path': 'assets/nkalanIm/griot.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/fou.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/foule.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/garcon.jpg', 'correct': true},
+      ],
+      'audio': 'nkalanSound/garcon.mp3',
+    },
+    {
+      'word': 'jɛkɛ',
+      'images': [
+        {'path': 'assets/nkalanIm/foie.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/poisson.jpg', 'correct': true},
+        {'path': 'assets/nkalanIm/foule.jpg', 'correct': false},
+        {'path': 'assets/nkalanIm/oiseau.jpg', 'correct': false},
+      ],
+      'audio': 'nkalanSound/poisson.mp3',
+    },
+
     // Add more contexts with different words and images in the actual app
   ];
 

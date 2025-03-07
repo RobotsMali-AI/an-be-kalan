@@ -17,12 +17,92 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
       ConfettiController(duration: 2.seconds);
   final List<Map<String, dynamic>> spells = [
     {
-      'word': 'CHICKEN',
-      'options': ['CHICKEN', 'CHIKEN', 'CHICKAN'],
-      'image': 'assets/chicken.jpg',
-      'audio': 'sounds/chicken.mp3',
-      'hint': 'A farm animal that lays eggs.',
-      'partial': 'CHIC' // For word completion hint
+      'word': 'kunkolo',
+      'options': ['kunkolo', 'kankolo', 'kunkɔrɔ'],
+      'image': 'assets/nkalanIm/tete.jpg',
+      'audio': 'sounds/nkalanSound/tete.mp3',
+      'hint': 'farikolo bɛɛ sanfɛ.',
+      'partial': 'kun' // For word completion hint
+    },
+    {
+      'word': 'cɛkisɛ',
+      'options': ['cɛmisɛn', 'cɛkisɛ', 'camancɛ'],
+      'image': 'assets/nkalanIm/tronc.jpg',
+      'audio': 'sounds/nkalanSound/tronc.mp3',
+      'hint': 'Kun ni sen cɛ.',
+      'partial': 'cɛk' // For word completion hint
+    },
+    {
+      'word': 'joli',
+      'options': ['jaba', 'joli', 'fɔli'],
+      'image': 'assets/nkalanIm/sang.jpg',
+      'audio': 'sounds/nkalanSound/sang.mp3',
+      'hint': 'ji bileman cɔri.',
+      'partial': 'jo' // For word completion hint
+    },
+    {
+      'word': 'cakɛda',
+      'options': ['ciden', 'caaman', 'cakɛda'],
+      'image': 'assets/nkalanIm/service.jpg',
+      'audio': 'sounds/nkalanSound/service.mp3',
+      'hint': 'baara ke kɛ yen.',
+      'partial': 'cakɛ' // For word completion hint
+    },
+    {
+      'word': 'kelen',
+      'options': ['kelen', 'kɛlɛ', 'kalan'],
+      'image': 'assets/nkalanIm/un.jpg',
+      'audio': 'sounds/nkalanSound/kalan.mp3',
+      'hint': 'daminɛ.',
+      'partial': 'kel' // For word completion hint
+    },
+    {
+      'word': 'baara',
+      'options': ['barada', 'bamankan', 'baara'],
+      'image': 'assets/nkalanIm/travail.jpg',
+      'audio': 'sounds/nkalanSound/travail.mp3',
+      'hint': 'a bɛ kɛ ni fanga ye.',
+      'partial': 'baa' // For word completion hint
+    },
+    {
+      'word': 'kɔkɔ',
+      'options': ['kɔrɔ', 'kɔkɔ', 'kolo'],
+      'image': 'assets/nkalanIm/sel.jpg',
+      'audio': 'sounds/nkalanSound/sel.mp3',
+      'hint': 'a kadi.',
+      'partial': 'kɔ' // For word completion hint
+    },
+    {
+      'word': 'cɛkɔrɔba',
+      'options': ['jɔyɔrɔ', 'cɛkisɛ', 'cɛkɔrɔba'],
+      'image': 'assets/nkalanIm/vieux.jpg',
+      'audio': 'sounds/nkalanSound/vieux.mp3',
+      'hint': 'san caaman.',
+      'partial': 'cɛkɔr' // For word completion hint
+    },
+    {
+      'word': 'basiki',
+      'options': ['basiki', 'baraji', 'busan'],
+      'image': 'assets/nkalanIm/tranquile.jpg',
+      'a    udio': 'sounds/nkalanSound/tranquile.mp3',
+      'hint': 'ka to yɔrɔkelen.',
+      'partial': 'bas' // For word completion hint
+    },
+    {
+      'word': 'malo',
+      'options': ['malo', 'mana', 'melon'],
+      'image': 'assets/nkalanIm/riz.jpg',
+      'audio': 'sounds/nkalanSound/riz.mp3',
+      'hint': 'kisɛ jɛɛman.',
+      'partial': 'ma' // For word completion hint
+    },
+    {
+      'word': 'kɛnɛya',
+      'options': ['gɛlɛya', 'kɛlɛ', 'kɛnɛya'],
+      'image': 'assets/nkalanIm/sante.jpg',
+      'audio': 'sounds/nkalanSound/sante.mp3',
+      'hint': 'daamu don.',
+      'partial': 'kɛn' // For word completion hint
     },
     // Add more unique words with hints and partial spellings...
   ];
