@@ -1,28 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:audioplayers/audioplayers.dart'; // Replace just_audio with audioplayers for simplicity
+import 'package:audioplayers/audioplayers.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/models/Users.dart';
+import 'package:literacy_app/models/onewordmultipleimagequestions.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
-
-/// Class to represent a question with its attributes
-class Question {
-  final String title;
-  final String word;
-  final List<Map<String, dynamic>>
-      images; // List of image paths and correctness
-  final String audioPath;
-
-  Question({
-    required this.title,
-    required this.word,
-    required this.images,
-    required this.audioPath,
-  });
-}
+import 'package:provider/provider.dart';
 
 class OneWordMultipleImagePage extends StatefulWidget {
-  const OneWordMultipleImagePage({super.key});
-
+  OneWordMultipleImagePage({required this.list, required this.user, super.key});
+  List<OneWordMultipleImagesQuestion> list;
+  Users user;
   @override
   _OneWordMultipleImagePageState createState() =>
       _OneWordMultipleImagePageState();
@@ -40,39 +29,13 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   bool _showHint = false;
   bool _showCelebration = false;
 
-  // List of questions with grayscale images and audio
-  final List<Question> questions = [
-    Question(
-      title: 'Bagaguw Round 1',
-      word: 'BAGAGUW',
-      images: [
-        {
-          'path': 'assets/chicken.jpg',
-          'correct': true
-        }, // Grayscale chicken image
-        {'path': 'assets/dog.jpg', 'correct': false}, // Grayscale dog image
-        {'path': 'assets/cat.jpg', 'correct': false}, // Grayscale cat image
-        {'path': 'assets/cat.jpg', 'correct': false}, // Grayscale rabbit image
-      ],
-      audioPath: 'assets/sounds/chicken.mp3',
-    ),
-    Question(
-      title: 'Bagaguw Round 2',
-      word: 'BAGAGUW',
-      images: [
-        {'path': 'assets/chicken.jpg', 'correct': true},
-        {'path': 'assets/dog.jpg', 'correct': false},
-        {'path': 'assets/cat.jpg', 'correct': false},
-        {'path': 'assets/cat.jpg', 'correct': false},
-      ],
-      audioPath: 'assets/sounds/chicken.mp3',
-    ),
-    // Add more questions as needed...
-  ];
+  // Updated list of questions using the new class with Option objects
+  List<OneWordMultipleImagesQuestion> questions = [];
 
   @override
   void initState() {
     super.initState();
+    questions = widget.list;
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1100),
       vsync: this,
@@ -94,8 +57,12 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
 
   void _checkAnswer(String imagePath) async {
     final currentQuestion = questions[_currentQuestionIndex];
-    final isCorrect = currentQuestion.images
-        .firstWhere((img) => img['path'] == imagePath)['correct'];
+    // Find the selected option
+    final selectedOption = currentQuestion.options.firstWhere(
+      (opt) => opt.image == imagePath,
+      orElse: () => Option(image: '', correct: false),
+    );
+    final isCorrect = selectedOption.correct;
 
     setState(() {
       _selectedImage = imagePath;
@@ -104,9 +71,8 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
 
     if (isCorrect) {
       _confettiController.play();
-      _playAudio(currentQuestion.audioPath);
       await Future.delayed(const Duration(seconds: 2));
-
+      widget.user.xp += 1;
       if (_currentQuestionIndex < questions.length - 1) {
         setState(() {
           _currentQuestionIndex++;
@@ -136,6 +102,9 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   }
 
   Widget _buildCelebration() {
+    context
+        .read<ApiFirebaseService>()
+        .saveUserData(widget.user.uid!, widget.user);
     return Stack(
       children: [
         Container(
@@ -210,7 +179,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
         child: SafeArea(
           child: Column(
             children: [
-              // Header with title and close button
+              // Header with question and close button
               Container(
                 padding: const EdgeInsets.all(16),
                 margin: const EdgeInsets.all(8),
@@ -222,12 +191,11 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      currentQuestion.title,
+                      currentQuestion.question,
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close, color: Colors.white),
@@ -259,27 +227,16 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                 ),
               ),
               const SizedBox(height: 10),
-              // Word display with tap for audio
-              GestureDetector(
-                onTap: () => _playAudio(currentQuestion.audioPath),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    currentQuestion.word,
-                    style: const TextStyle(
+              // Word display
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  currentQuestion.word,
+                  style: const TextStyle(
                       fontSize: 32,
                       color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                      fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(height: 20),
-              // Audio playback button
-              IconButton(
-                icon:
-                    const Icon(Icons.volume_up, color: Colors.black, size: 40),
-                onPressed: () => _playAudio(currentQuestion.audioPath),
               ),
               const SizedBox(height: 20),
               // Hint button
@@ -300,10 +257,11 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: currentQuestion.images.length,
+                  itemCount: currentQuestion.options.length,
                   itemBuilder: (context, index) {
-                    final image = currentQuestion.images[index];
-                    final isSelected = _selectedImage == image['path'];
+                    final option = currentQuestion.options[index];
+                    final isSelected = _selectedImage == option.image;
+                    final isCorrectOption = option.correct;
                     return AnimatedBuilder(
                       animation: _controller,
                       builder: (context, child) {
@@ -319,14 +277,14 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: GestureDetector(
-                          onTap: () => _checkAnswer(image['path']),
+                          onTap: () => _checkAnswer(option.image),
                           child: AnimatedContainer(
                             duration: 300.ms,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: isSelected
-                                    ? (image['correct']
+                                    ? (isCorrectOption
                                         ? Colors.black
                                         : Colors.grey[400]!)
                                     : Colors.transparent,
@@ -344,8 +302,8 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                               borderRadius: BorderRadius.circular(8),
                               child: Stack(
                                 children: [
-                                  Image.asset(
-                                    image['path'],
+                                  Image.network(
+                                    option.image,
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: 200,
@@ -356,7 +314,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                                         color: Colors.black.withOpacity(0.4),
                                         child: Center(
                                           child: Icon(
-                                            image['correct']
+                                            isCorrectOption
                                                 ? Icons.check_circle
                                                 : Icons.cancel,
                                             color: Colors.white,
@@ -365,16 +323,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                                         ),
                                       ),
                                     ),
-                                  Positioned(
-                                    bottom: 8,
-                                    right: 8,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.volume_up,
-                                          color: Colors.black),
-                                      onPressed: () => _playAudio(
-                                          'image_$index'), // Play specific audio for each image
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -392,7 +340,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
               if (_isCorrect)
                 Column(
                   children: [
-                    Lottie.asset('assets/animations/success_bw.json',
+                    Lottie.asset('assets/animations/success.json',
                         width: 150, repeat: false),
                     ElevatedButton(
                       onPressed: _nextQuestion,

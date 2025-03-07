@@ -3,14 +3,12 @@ import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
+import 'package:literacy_app/feedback.dart';
 import 'package:literacy_app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/main.dart' show auth;
-import 'package:literacy_app/widgets/OneImageMultipleWordsPage.dart';
 import 'package:literacy_app/widgets/bookPageWidget.dart';
-import 'package:literacy_app/widgets/one_word_fourth_image.dart';
 import 'package:literacy_app/widgets/page_accueil_Nkalan.dart';
-import 'package:literacy_app/widgets/page_lettre_Nkalan.dart';
 import 'package:literacy_app/widgets/translate_page_widget.dart';
 import 'package:provider/provider.dart';
 import 'models/Users.dart';
@@ -126,6 +124,8 @@ class _HomePageState extends State<HomePage> {
           return const TranslationPage();
         } else if (_selectedTabIndex == 2) {
           return const AcceuilNkalan();
+        } else if (_selectedTabIndex == 3) {
+          return FeedbackScreen();
         } else {
           return ProfilePage(user: user!, userData: userData);
         }
@@ -153,11 +153,11 @@ class _HomePageState extends State<HomePage> {
               icon: Icons.gamepad,
             ),
             CrystalNavigationBarItem(
+              icon: Icons.feedback_outlined,
+            ),
+            CrystalNavigationBarItem(
               icon: Icons.person,
             ),
-            // CrystalNavigationBarItem(
-            //   icon: Icons.person,
-            // ),
           ],
         ),
       ),

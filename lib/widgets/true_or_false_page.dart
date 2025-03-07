@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/trueorfalse.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:provider/provider.dart';
 
 class TrueFalseQuestionPage extends StatefulWidget {
   final List<Trueorfalse> questions;
+  Users user;
 
-  const TrueFalseQuestionPage({required this.questions, super.key});
+  TrueFalseQuestionPage(
+      {required this.questions, required this.user, super.key});
 
   @override
   _TrueFalseQuestionPageState createState() => _TrueFalseQuestionPageState();
@@ -37,6 +42,7 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
       isCorrect =
           answer == (widget.questions[currentIndex].answers ? 'True' : 'False');
       if (isCorrect!) {
+        widget.user.xp += 1;
         _confettiController.play();
       }
     });
@@ -55,6 +61,9 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
   }
 
   void _showCompletionDialog() {
+    context
+        .read<ApiFirebaseService>()
+        .saveUserData(widget.user.uid!, widget.user);
     showDialog(
       context: context,
       builder: (_) => Dialog(

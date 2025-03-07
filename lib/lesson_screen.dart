@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -7,17 +6,20 @@ import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
+import 'package:literacy_app/widgets/OneImageMultipleWordsPage.dart';
 import 'package:literacy_app/widgets/floatingHintButton.dart';
 import 'package:literacy_app/widgets/multiple_choose_question.dart';
+import 'package:literacy_app/widgets/one_word_fourth_image.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:literacy_app/widgets/true_or_false_page.dart';
 import 'package:provider/provider.dart';
 import 'package:record/record.dart';
-import 'package:just_audio/just_audio.dart';
+import 'package:audioplayers/audioplayers.dart'
+    hide AVAudioSessionCategory; // Replace just_audio with audioplayers
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
-import 'package:audio_session/audio_session.dart';
-
 import 'models/Users.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class LessonScreen extends StatefulWidget {
   final String uid;
@@ -41,6 +43,8 @@ class LessonScreen extends StatefulWidget {
 class LessonScreenState extends State<LessonScreen> {
   final Record _audioRecorder = Record();
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _sentencePlayer =
+      AudioPlayer(); // New player for sentence audio
 
   bool isRecording = false;
   bool hasRecording = false;
@@ -59,6 +63,7 @@ class LessonScreenState extends State<LessonScreen> {
   int currentPage = 0;
   int currentSentenceIndex = 0;
   String currentSentence = '';
+  String currentAudio = '';
   List<TextSpan> currentTextSpans = [];
   String currentImageUrl = '';
 
@@ -72,27 +77,33 @@ class LessonScreenState extends State<LessonScreen> {
     super.initState();
     setupLesson();
     setupAudioSession();
-    _audioPlayer.setLoopMode(LoopMode.off);
 
-    _audioPlayer.positionStream.listen((position) {
+    // Configure AudioPlayer
+    _audioPlayer.setReleaseMode(ReleaseMode.stop);
+
+    _audioPlayer.onPositionChanged.listen((Duration position) {
       setState(() {
         _currentPosition = position;
       });
     });
 
-    _audioPlayer.playerStateStream.listen((playerState) async {
-      final processingState = playerState.processingState;
-      if (processingState == ProcessingState.completed) {
-        await _audioPlayer.pause();
+    _audioPlayer.onPlayerStateChanged.listen((PlayerState playerState) {
+      if (playerState == PlayerState.completed) {
         setState(() {
           isPlaying = false;
           _currentPosition = _audioDuration;
         });
       } else if (mounted) {
         setState(() {
-          isPlaying = playerState.playing;
+          isPlaying = playerState == PlayerState.playing;
         });
       }
+    });
+
+    _audioPlayer.onDurationChanged.listen((Duration d) {
+      setState(() {
+        _audioDuration = d;
+      });
     });
   }
 
@@ -117,8 +128,8 @@ class LessonScreenState extends State<LessonScreen> {
       isInProgress = true;
       BookUser bookProgress = widget.userdata.inProgressBooks[bookmarkedIndex];
       String bookMarkAt = bookProgress.bookmark;
-      currentPage = int.parse(bookMarkAt.split(' ')[1]);
-      if (currentPage == bookData!.content.length) {
+      currentPage = int.parse(bookMarkAt);
+      if (currentPage == bookData!.content.length - 1) {
         lastPage = true;
       }
       readingTime = bookProgress.readingTime;
@@ -129,10 +140,12 @@ class LessonScreenState extends State<LessonScreen> {
       currentPage = 0;
     }
 
-    // Convert currentPage to a string because keys are like "0", "1", etc.
     String pageKey = currentPage.toString();
 
     if (bookData!.content.containsKey(pageKey)) {
+      final audio =
+          bookData!.content[pageKey]!.sentences.map((e) => e.audio).toList();
+      currentAudio = audio[currentSentenceIndex];
       currentSentences = List<String>.from(
           bookData!.content[pageKey]!.sentences.map((e) => e.text)).toList();
       currentSentence = currentSentences.isNotEmpty
@@ -142,21 +155,11 @@ class LessonScreenState extends State<LessonScreen> {
       currentImageUrl = bookData!.content[pageKey]!.imageUrl;
       startTime = DateTime.now();
     } else {
-      // Handle the case where the requested page does not exist
       currentSentences = [];
       currentSentence = '';
       currentTextSpans = [TextSpan(text: "Page not found")];
       currentImageUrl = '';
     }
-
-    // currentSentences =
-    //     List<String>.from(bookData!.content["Page $currentPage"]!.sentences);
-    // currentSentence = currentSentences.isNotEmpty
-    //     ? currentSentences[currentSentenceIndex]
-    //     : '';
-    // currentTextSpans = [TextSpan(text: currentSentence)];
-    // currentImageUrl = bookData!.content["Page $currentPage"]!.imageUrl;
-    // startTime = DateTime.now();
   }
 
   Future<void> setupAudioSession() async {
@@ -173,6 +176,7 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> startRecording() async {
     if (await _audioRecorder.hasPermission()) {
+      await _sentencePlayer.pause(); // Pause sentence audio before recording
       final directory = await getTemporaryDirectory();
       _filePath = path.join(
           directory.path, '${DateTime.now().millisecondsSinceEpoch}.m4a');
@@ -190,6 +194,42 @@ class LessonScreenState extends State<LessonScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Vous n'avez pas accès au microphone")));
+    }
+  }
+
+  Future<void> stopRecording() async {
+    _filePath = await _audioRecorder.stop();
+    if (_filePath != null) {
+      setState(() {
+        isRecording = false;
+        hasRecording = true;
+        _currentPosition = Duration.zero;
+        isPlaying = false;
+      });
+      await _audioPlayer.setSource(DeviceFileSource(_filePath!));
+      // Duration will be updated via onDurationChanged
+      sendAudioToASR();
+    }
+  }
+
+  Future<void> togglePlayback() async {
+    if (isPlaying) {
+      await _audioPlayer.pause();
+      setState(() {
+        isPlaying = false;
+      });
+    } else {
+      if (_audioPlayer.state == PlayerState.stopped) {
+        await _audioPlayer.setSource(DeviceFileSource(_filePath!));
+      }
+      if (_currentPosition >= _audioDuration) {
+        _currentPosition = Duration.zero;
+      }
+      await _audioPlayer.seek(_currentPosition);
+      await _audioPlayer.resume();
+      setState(() {
+        isPlaying = true;
+      });
     }
   }
 
@@ -219,43 +259,6 @@ class LessonScreenState extends State<LessonScreen> {
         .update(user.toFirestore());
   }
 
-  Future<void> stopRecording() async {
-    _filePath = await _audioRecorder.stop();
-    if (_filePath != null) {
-      setState(() {
-        isRecording = false;
-        hasRecording = true;
-        _currentPosition = Duration.zero;
-        isPlaying = false;
-      });
-      await _audioPlayer.setFilePath(_filePath!);
-      setState(() {
-        _audioDuration = _audioPlayer.duration ?? Duration.zero;
-      });
-      sendAudioToASR();
-    }
-  }
-
-  Future<void> togglePlayback() async {
-    if (isPlaying) {
-      await _audioPlayer.pause();
-      setState(() {
-        isPlaying = false;
-      });
-    } else {
-      if (_audioPlayer.processingState == ProcessingState.idle) {
-        await _audioPlayer.setFilePath(_filePath!);
-      }
-      if (_audioPlayer.processingState == ProcessingState.completed) {
-        await _audioPlayer.seek(Duration.zero);
-      }
-      await _audioPlayer.play();
-      setState(() {
-        isPlaying = true;
-      });
-    }
-  }
-
   void sendAudioToASR() async {
     setState(() => _sending = true);
     String? transcription =
@@ -272,30 +275,8 @@ class LessonScreenState extends State<LessonScreen> {
     }
   }
 
-  // List<TextSpan> getHighlightedTextSpans(String transcription) {
-  //   List<String> originalWords = currentSentence.split(' ');
-  //   List<String> transcribedWords = transcription.split(' ');
-  //   int correctWordCount = 0;
-
-  //   List<TextSpan> highlightedSpans = [];
-  //   for (var word in originalWords) {
-  //     bool isCorrect = transcribedWords.contains(word);
-  //     if (isCorrect) correctWordCount++;
-  //     highlightedSpans.add(TextSpan(
-  //       text: '$word ',
-  //       style: TextStyle(
-  //         color: isCorrect ? Colors.green : Colors.red,
-  //       ),
-  //     ));
-  //   }
-  //   accuracies.add(correctWordCount / originalWords.length);
-  //   return highlightedSpans;
-  // }
-
   List<TextSpan> getHighlightedTextSpans(String transcription) {
-    // Keep the original sentence intact for display
     String originalDisplay = currentSentence;
-    // Modified versions for comparison only
     String originalCompare =
         currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
     String transcriptionCompare =
@@ -305,25 +286,22 @@ class LessonScreenState extends State<LessonScreen> {
     int matching = 0;
     int compareIndex = 0;
 
-    // Loop through the original sentence (with casing and punctuation)
     for (int i = 0; i < originalDisplay.length; i++) {
       String char = originalDisplay[i];
       bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
 
       if (isLetterOrSpace) {
-        // Compare using the modified versions
         bool isCorrect = compareIndex < transcriptionCompare.length &&
             originalCompare[compareIndex] == transcriptionCompare[compareIndex];
         if (isCorrect) matching++;
         highlightedSpans.add(TextSpan(
-          text: char, // Use the original character for display
+          text: char,
           style: TextStyle(
             color: isCorrect ? Colors.green : Colors.red,
           ),
         ));
         compareIndex++;
       } else {
-        // Punctuation marks: always red as transcription doesn’t include them
         highlightedSpans.add(TextSpan(
           text: char,
           style: TextStyle(color: Colors.red),
@@ -331,7 +309,6 @@ class LessonScreenState extends State<LessonScreen> {
       }
     }
 
-    // Calculate accuracy based on the comparison strings
     double accuracy =
         originalCompare.isEmpty ? 0 : matching / originalCompare.length;
     double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
@@ -344,21 +321,28 @@ class LessonScreenState extends State<LessonScreen> {
     setState(() {
       currentSentenceIndex += 1;
       if (currentSentenceIndex < currentSentences.length) {
-        currentImageUrl = bookData!.content[currentPage]!.imageUrl;
-        currentSentences = List<String>.from(
-                bookData!.content[currentPage]!.sentences.map((e) => e.text))
+        currentImageUrl = bookData!.content[currentPage.toString()]!.imageUrl;
+        final audio = bookData!.content[currentPage.toString()]!.sentences
+            .map((e) => e.audio)
             .toList();
+        currentAudio = audio[currentSentenceIndex];
+        currentSentences = List<String>.from(bookData!
+            .content[currentPage.toString()]!.sentences
+            .map((e) => e.text)).toList();
         currentSentence = currentSentences[currentSentenceIndex];
-        // currentSentence = currentSentences[currentSentenceIndex];
       } else {
         currentSentenceIndex = 0;
         currentPage += 1;
-        currentImageUrl = bookData!.content[currentPage]!.imageUrl;
-        currentSentences = List<String>.from(
-                bookData!.content[currentPage]!.sentences.map((e) => e.text))
+        final audio = bookData!.content[currentPage.toString()]!.sentences
+            .map((e) => e.audio)
             .toList();
+        currentAudio = audio[currentSentenceIndex];
+        currentImageUrl = bookData!.content[currentPage.toString()]!.imageUrl;
+        currentSentences = List<String>.from(bookData!
+            .content[currentPage.toString()]!.sentences
+            .map((e) => e.text)).toList();
         currentSentence = currentSentences[currentSentenceIndex];
-        if (currentPage == bookData!.content.length) lastPage = true;
+        if (currentPage == bookData!.content.length - 1) lastPage = true;
       }
       partialUpdate(
           widget.userdata,
@@ -445,15 +429,45 @@ class LessonScreenState extends State<LessonScreen> {
 
     final hasMultiple = bookData!.evaluation?.multiple.isNotEmpty ?? false;
     final hasTrueFalse = bookData!.evaluation?.trueorfalse.isNotEmpty ?? false;
+    final hasOneImageManyWords =
+        bookData!.evaluation?.oneimagemultiplewords.isNotEmpty ?? false;
+    final hasOneWordManyImages =
+        bookData!.evaluation?.onewordmultipleimages.isNotEmpty ?? false;
 
-    if (hasMultiple || hasTrueFalse) {
+    if (hasMultiple ||
+        hasTrueFalse ||
+        hasOneWordManyImages ||
+        hasOneImageManyWords) {
+      if (hasOneImageManyWords) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OneImageMultipleWordsPage(
+              list: bookData!.evaluation!.oneimagemultiplewords,
+              user: updatedUserData,
+            ),
+          ),
+        );
+      }
       if (hasMultiple) {
         await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => MultipleChoiceQuestionPage(
+              user: updatedUserData,
               questions: bookData!.evaluation!.multiple,
               title: widget.bookTitle,
+            ),
+          ),
+        );
+      }
+      if (hasOneWordManyImages) {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OneWordMultipleImagePage(
+              user: updatedUserData,
+              list: bookData!.evaluation!.onewordmultipleimages,
             ),
           ),
         );
@@ -464,29 +478,102 @@ class LessonScreenState extends State<LessonScreen> {
           MaterialPageRoute(
             builder: (_) => TrueFalseQuestionPage(
               questions: bookData!.evaluation!.trueorfalse,
+              user: updatedUserData,
             ),
           ),
         );
       }
     }
-
+    setState(() {
+      context.read<ApiFirebaseService>().getUserData(widget.uid);
+    });
     await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Congratulations!'),
-        content: Text('You gained $earnedXp XP from this lesson.\n\n'
-            'Completed in ${readingTimeInMinutes.toStringAsFixed(2)} minutes\n'
-            'Reading speed: $wordPerMin words/min\n'
-            'Accuracy: $averageAcc%'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CONTINUE'),
-          ),
-        ],
-      ),
-    );
+        context: context,
+        barrierDismissible: false, // Prevents dismissal by tapping outside
+        builder: (context) => Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              elevation: 8,
+              backgroundColor: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Takes only necessary space
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Title with a celebratory icon
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.star, color: Colors.amber, size: 32),
+                        SizedBox(width: 8),
+                        Text(
+                          'Congratulations!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // Stat rows for XP, time, speed, and accuracy
+                    _buildStatRow(
+                      icon: Icons.monetization_on,
+                      label: 'XP Gained',
+                      value:
+                          '${context.read<ApiFirebaseService>().userInfo!.xp} XP',
+                      color: Colors.green,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatRow(
+                      icon: Icons.timer,
+                      label: 'Time Taken',
+                      value:
+                          '${readingTimeInMinutes.toStringAsFixed(2)} minutes',
+                      color: Colors.blue,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatRow(
+                      icon: Icons.speed,
+                      label: 'Reading Speed',
+                      value: '$wordPerMin words/min',
+                      color: Colors.purple,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildStatRow(
+                      icon: Icons.check_circle,
+                      label: 'Accuracy',
+                      value: '$averageAcc%',
+                      color: Colors.orange,
+                    ),
+                    const SizedBox(height: 24),
+                    // Continue button
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black, // Button background
+                        foregroundColor: Colors.white, // Text/icon color
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'CONTINUE',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ).animate().fadeIn(duration: 300.ms).scale(
+                begin: const Offset(0.8, 0.8),
+                end: Offset(1.0, 1.0)) // Animation
+        );
 
     Navigator.pop(context, updatedUserData);
   }
@@ -495,10 +582,10 @@ class LessonScreenState extends State<LessonScreen> {
   void dispose() {
     _audioRecorder.dispose();
     _audioPlayer.dispose();
+    _sentencePlayer.dispose(); // Dispose of the sentence player
     super.dispose();
   }
 
-  // Updated Audio Section with Custom Styling
   Widget buildAudioSection() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -583,7 +670,7 @@ class LessonScreenState extends State<LessonScreen> {
     if (isRecording) {
       return FloatingActionButton(
         key: const ValueKey('stop'),
-        heroTag: 'stopFAB', // Unique tag
+        heroTag: 'stopFAB',
         onPressed: stopRecording,
         backgroundColor: Colors.black,
         child: const Icon(Icons.stop, color: Colors.white),
@@ -592,7 +679,7 @@ class LessonScreenState extends State<LessonScreen> {
       if (lastPage && currentSentenceIndex == currentSentences.length - 1) {
         return FloatingActionButton(
           key: const ValueKey('end'),
-          heroTag: 'endFAB', // Unique tag
+          heroTag: 'endFAB',
           onPressed: () => endLesson(context),
           backgroundColor: Colors.black,
           child: const Icon(Icons.check, color: Colors.white),
@@ -607,7 +694,7 @@ class LessonScreenState extends State<LessonScreen> {
     } else {
       return FloatingActionButton(
         key: const ValueKey('mic'),
-        heroTag: 'micFAB', // Unique tag
+        heroTag: 'micFAB',
         onPressed: startRecording,
         backgroundColor: Colors.black,
         child: const Icon(Icons.mic, color: Colors.white),
@@ -622,7 +709,6 @@ class LessonScreenState extends State<LessonScreen> {
     }
 
     return Scaffold(
-      // Keep the existing AppBar
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
@@ -673,7 +759,6 @@ class LessonScreenState extends State<LessonScreen> {
           ),
         ],
       ),
-      // Improved body with gradient background
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -691,7 +776,6 @@ class LessonScreenState extends State<LessonScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Polished Image Display
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
@@ -727,7 +811,6 @@ class LessonScreenState extends State<LessonScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Beautiful Text Display
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -758,25 +841,33 @@ class LessonScreenState extends State<LessonScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Stylish Volume Button
                     FloatingActionButton(
                       mini: true,
                       backgroundColor: Colors.black,
                       tooltip: 'Listen to the sentence',
-                      onPressed: () {
-                        // Add text-to-speech functionality here
+                      onPressed: () async {
+                        try {
+                          if (widget.isOffLine) {
+                            await _sentencePlayer
+                                .setSource(DeviceFileSource(currentAudio));
+                          } else {
+                            await _sentencePlayer
+                                .setSource(UrlSource(currentAudio));
+                          }
+                          await _sentencePlayer.play(UrlSource(currentAudio));
+                        } catch (e) {
+                          print('Error playing sentence audio: $e');
+                        }
                       },
                       child: const Icon(Icons.volume_up, color: Colors.white),
                     ),
                     const SizedBox(height: 20),
-                    // Refined Audio Section
                     if (hasRecording) buildAudioSection(),
                     const SizedBox(height: 80),
                   ],
                 ),
               ),
             ),
-            // Enhanced Progress Indicator
             Positioned(
               bottom: 20,
               left: 20,
@@ -805,7 +896,6 @@ class LessonScreenState extends State<LessonScreen> {
                 ],
               ),
             ),
-            // Dynamic FAB with Animation
             Positioned(
               bottom: 20,
               right: 20,
@@ -818,7 +908,6 @@ class LessonScreenState extends State<LessonScreen> {
                 child: buildFAB(),
               ),
             ),
-            // Loading Overlay
             if (_sending)
               Container(
                 color: Colors.black.withOpacity(0.3),
@@ -831,6 +920,40 @@ class LessonScreenState extends State<LessonScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> showCongratulatoryDialog(BuildContext context) async {}
+
+// Helper method to build stat rows
+  Widget _buildStatRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: color, size: 24),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black54,
+          ),
+        ),
+        const Spacer(), // Pushes value to the right
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 }

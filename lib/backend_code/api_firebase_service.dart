@@ -63,7 +63,7 @@ class ApiFirebaseService with ChangeNotifier {
 
     // Send the request
     final response = await request.send();
-
+    print(response);
     // Parse the streamed response
     if (response.statusCode == 200) {
       final respStr = await response.stream.bytesToString();

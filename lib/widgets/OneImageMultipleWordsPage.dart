@@ -1,30 +1,262 @@
+// import 'package:flutter/material.dart';
+// import 'package:audioplayers/audioplayers.dart';
+// import 'package:literacy_app/backend_code/api_firebase_service.dart';
+// import 'package:literacy_app/models/Users.dart';
+// import 'package:literacy_app/models/oneimagemultiplewordsquestion.dart';
+// import 'package:provider/provider.dart';
+
+// class OneImageMultipleWordsPage extends StatefulWidget {
+//   OneImageMultipleWordsPage(
+//       {required this.list, required this.user, super.key});
+//   List<OneImageMultipleWordsQuestion> list;
+//   Users user;
+//   @override
+//   _OneImageMultipleWordsPageState createState() =>
+//       _OneImageMultipleWordsPageState();
+// }
+
+// class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
+//   final AudioPlayer _audioPlayer = AudioPlayer();
+
+//   // Updated levels using OneImageMultipleWordsQuestion
+//   List<OneImageMultipleWordsQuestion> levels = [];
+
+//   // State variables
+//   int currentLevel = 0;
+//   String? selectedOption; // Single selection instead of Set
+//   bool hasChecked = false;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     levels = widget.list;
+//   }
+
+//   // Play audio function (kept for potential future use)
+//   Future<void> _playAudio(String path) async {
+//     await _audioPlayer.play(AssetSource(path));
+//   }
+
+//   // Check selection and handle progression
+//   void _checkSelection() async {
+//     setState(() {
+//       hasChecked = true;
+//     });
+
+//     final currentQuestion = levels[currentLevel];
+//     if (selectedOption == currentQuestion.answer) {
+//       // Correct answer
+//       if (currentLevel < levels.length - 1) {
+//         setState(() {
+//           currentLevel++;
+//           hasChecked = false;
+//           selectedOption = null;
+//         });
+//       } else {
+//         // All levels completed
+//         await context
+//             .read<ApiFirebaseService>()
+//             .saveUserData(widget.user.uid!, widget.user);
+//         showDialog(
+//           context: context,
+//           builder: (context) => AlertDialog(
+//             title: const Text('Congratulations!'),
+//             content: Text(
+//                 'You have completed all levels. and earned ${widget.user.xp}'),
+//             actions: [
+//               TextButton(
+//                 onPressed: () => Navigator.pop(context),
+//                 child: const Text('OK'),
+//               ),
+//             ],
+//           ),
+//         );
+//       }
+//     }
+//     // If incorrect, user can try again or proceed after seeing feedback
+//   }
+
+//   // Determine background color for feedback
+//   Color _getBackgroundColor(String option, String answer) {
+//     if (!hasChecked) {
+//       return Colors.white;
+//     } else {
+//       if (option == answer) {
+//         return Colors.green.withOpacity(0.2); // Correct answer
+//       } else if (option == selectedOption) {
+//         return Colors.red.withOpacity(0.2); // Selected but wrong
+//       } else {
+//         return Colors.white; // No feedback
+//       }
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     final OneImageMultipleWordsQuestion currentQuestion = levels[currentLevel];
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         title: Container(
+//           padding: const EdgeInsets.all(16),
+//           margin: const EdgeInsets.all(8),
+//           decoration: BoxDecoration(
+//             color: Colors.black,
+//             borderRadius: BorderRadius.circular(8),
+//           ),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Text(
+//                 'Level ${currentLevel + 1}',
+//                 style: const TextStyle(
+//                   color: Colors.white,
+//                   fontSize: 20,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//               IconButton(
+//                 icon: const Icon(Icons.close, color: Colors.white),
+//                 onPressed: () => Navigator.pop(context),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//       body: Stack(
+//         children: [
+//           Column(
+//             children: [
+//               // Display the question
+//               Padding(
+//                 padding: const EdgeInsets.all(16.0),
+//                 child: Text(
+//                   currentQuestion.question,
+//                   style: const TextStyle(
+//                     fontSize: 20,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                   textAlign: TextAlign.center,
+//                 ),
+//               ),
+//               // Image
+//               Expanded(
+//                 flex: 2,
+//                 child: Center(
+//                   child: Image.network(
+//                     currentQuestion.image,
+//                     fit: BoxFit.contain,
+//                   ),
+//                 ),
+//               ),
+//               const SizedBox(height: 16),
+//               // Options list
+//               Expanded(
+//                 flex: 3,
+//                 child: ListView.builder(
+//                   itemCount: currentQuestion.options.length,
+//                   itemBuilder: (context, index) {
+//                     final option = currentQuestion.options[index];
+//                     return _buildOptionCard(option, currentQuestion.answer);
+//                   },
+//                 ),
+//               ),
+//             ],
+//           ),
+//           // Check button
+//           Positioned(
+//             bottom: 16,
+//             left: 16,
+//             right: 16,
+//             child: ElevatedButton(
+//               onPressed:
+//                   hasChecked || selectedOption == null ? null : _checkSelection,
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: Colors.black,
+//                 foregroundColor: Colors.white,
+//                 padding: const EdgeInsets.symmetric(vertical: 16),
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(8),
+//                 ),
+//               ),
+//               child: const Text(
+//                 'Check',
+//                 style: TextStyle(fontSize: 18),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   // Build individual option card
+//   Widget _buildOptionCard(String option, String answer) {
+//     final bool isSelected = selectedOption == option;
+//     final Color backgroundColor = _getBackgroundColor(option, answer);
+
+//     return GestureDetector(
+//       onTap: hasChecked
+//           ? null
+//           : () {
+//               setState(() {
+//                 selectedOption = option;
+//                 if (option == answer) {
+//                   widget.user.xp += 1;
+//                 }
+//               });
+//             },
+//       child: Container(
+//         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+//         padding: const EdgeInsets.all(16),
+//         decoration: BoxDecoration(
+//           color: backgroundColor,
+//           border: Border.all(
+//             color: isSelected ? Colors.black : Colors.grey[300]!,
+//             width: isSelected ? 2 : 1,
+//           ),
+//           borderRadius: BorderRadius.circular(8),
+//         ),
+//         child: Row(
+//           children: [
+//             hasChecked
+//                 ? Icon(
+//                     option == answer ? Icons.check : Icons.close,
+//                     color: option == answer ? Colors.green : Colors.red,
+//                   )
+//                 : Icon(
+//                     isSelected
+//                         ? Icons.radio_button_checked
+//                         : Icons.radio_button_unchecked,
+//                     color: isSelected ? Colors.black : Colors.grey,
+//                   ),
+//             const SizedBox(width: 16),
+//             Expanded(
+//               child: Text(
+//                 option,
+//                 style: const TextStyle(fontSize: 18, color: Colors.black),
+//               ),
+//             ),
+//             // No audio button since options lack audio paths
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
-
-// Data class to hold word information
-class Word {
-  final String text;
-  final String audioPath;
-  final bool isCorrect;
-
-  Word({required this.text, required this.audioPath, required this.isCorrect});
-}
-
-// Data class for the page content
-class ImageWordsData {
-  final String imagePath;
-  final String mainAudioPath;
-  final List<Word> words;
-
-  ImageWordsData({
-    required this.imagePath,
-    required this.mainAudioPath,
-    required this.words,
-  });
-}
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/models/Users.dart';
+import 'package:literacy_app/models/oneimagemultiplewordsquestion.dart';
+import 'package:provider/provider.dart';
 
 class OneImageMultipleWordsPage extends StatefulWidget {
-  const OneImageMultipleWordsPage({super.key});
+  OneImageMultipleWordsPage(
+      {required this.list, required this.user, super.key});
+  List<OneImageMultipleWordsQuestion> list;
+  Users user;
 
   @override
   _OneImageMultipleWordsPageState createState() =>
@@ -32,106 +264,89 @@ class OneImageMultipleWordsPage extends StatefulWidget {
 }
 
 class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
-  // Audio player instance
   final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // List of levels
-  final List<ImageWordsData> levels = [
-    ImageWordsData(
-      imagePath: 'assets/chicken.jpg',
-      mainAudioPath: 'sounds/chicken.mp3',
-      words: [
-        Word(text: 'Chicken', audioPath: 'sounds/chicken.mp3', isCorrect: true),
-        Word(text: 'Nest', audioPath: 'sounds/nest.mp3', isCorrect: false),
-        Word(text: 'Dog', audioPath: 'sounds/dog.mp3', isCorrect: false),
-        Word(text: 'Car', audioPath: 'sounds/car.mp3', isCorrect: false),
-      ],
-    ),
-    ImageWordsData(
-      imagePath: 'assets/chicken.jpg',
-      mainAudioPath: 'sounds/chicken.mp3',
-      words: [
-        Word(text: 'Chicken', audioPath: 'sounds/chicken.mp3', isCorrect: true),
-        Word(text: 'Tractor', audioPath: 'sounds/error.mp3', isCorrect: false),
-        Word(text: 'City', audioPath: 'sounds/error.mp3', isCorrect: false),
-        Word(text: 'Beach', audioPath: 'sounds/error.mp3', isCorrect: false),
-      ],
-    ),
-    // Add more levels as needed
-  ];
+  // Updated levels using OneImageMultipleWordsQuestion
+  List<OneImageMultipleWordsQuestion> levels = [];
 
   // State variables
   int currentLevel = 0;
-  Set<String> selectedWords = {};
+  String? selectedOption; // Single selection instead of Set
   bool hasChecked = false;
 
-  // Play audio function
+  @override
+  void initState() {
+    super.initState();
+    levels = widget.list;
+  }
+
+  // Play audio function (kept for potential future use)
   Future<void> _playAudio(String path) async {
     await _audioPlayer.play(AssetSource(path));
   }
 
-  // Check selection and handle level progression
-  void _checkSelection() {
+  // Check selection and handle progression
+  void _checkSelection() async {
     setState(() {
       hasChecked = true;
     });
 
-    final currentData = levels[currentLevel];
-    // Check if all correct words are selected and no incorrect words are selected
-    bool allCorrectSelected = currentData.words
-        .where((word) => word.isCorrect)
-        .every((word) => selectedWords.contains(word.text));
-    bool noIncorrectSelected = currentData.words
-        .where((word) => !word.isCorrect)
-        .every((word) => !selectedWords.contains(word.text));
+    final currentQuestion = levels[currentLevel];
+    if (selectedOption == currentQuestion.answer) {
+      // Increment XP only for correct answers
+      widget.user.xp += 1;
+    }
 
-    if (allCorrectSelected && noIncorrectSelected) {
-      // Correct selection: proceed to next level or show completion
-      if (currentLevel < levels.length - 1) {
-        setState(() {
-          currentLevel++;
-          hasChecked = false;
-          selectedWords.clear();
-        });
-      } else {
-        // All levels completed
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Congratulations!'),
-            content: const Text('You have completed all levels.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-      }
+    // Always proceed to the next question or show completion
+    if (currentLevel < levels.length - 1) {
+      setState(() {
+        currentLevel++;
+        hasChecked = false;
+        selectedOption = null;
+      });
+    } else {
+      // Save user data and show congratulatory dialog at the end
+      await context
+          .read<ApiFirebaseService>()
+          .saveUserData(widget.user.uid!, widget.user);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Congratulations!'),
+          content: Text(
+              'You have completed all levels. You earned ${widget.user.xp} XP!'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+                Navigator.pop(context); // Return to previous screen
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
-  // Determine background color based on selection and correctness
-  Color _getBackgroundColor(Word word) {
+  // Determine background color for feedback
+  Color _getBackgroundColor(String option, String answer) {
     if (!hasChecked) {
       return Colors.white;
     } else {
-      if (word.isCorrect && selectedWords.contains(word.text)) {
-        return Colors.green.withOpacity(0.2); // Correct and selected
-      } else if (!word.isCorrect && selectedWords.contains(word.text)) {
-        return Colors.red.withOpacity(0.2); // Incorrect and selected
-      } else if (word.isCorrect && !selectedWords.contains(word.text)) {
-        return Colors.yellow.withOpacity(0.2); // Correct but unselected
+      if (option == answer) {
+        return Colors.green.withOpacity(0.2); // Correct answer
+      } else if (option == selectedOption) {
+        return Colors.red.withOpacity(0.2); // Selected but wrong
       } else {
-        return Colors.white; // No feedback needed
+        return Colors.white; // No feedback
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final ImageWordsData currentData = levels[currentLevel];
+    final OneImageMultipleWordsQuestion currentQuestion = levels[currentLevel];
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -165,43 +380,37 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
         children: [
           Column(
             children: [
+              // Display the question
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  currentQuestion.question,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
               // Image
               Expanded(
                 flex: 2,
                 child: Center(
-                  child: Image.asset(
-                    currentData.imagePath,
+                  child: Image.network(
+                    currentQuestion.image,
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-              // Main audio button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.volume_up,
-                      color: Colors.purple,
-                      size: 40,
-                    ),
-                    onPressed: () => _playAudio(currentData.mainAudioPath),
-                  ),
-                  const Text(
-                    'Listen to the story',
-                    style: TextStyle(color: Colors.black, fontSize: 16),
-                  ),
-                ],
-              ),
               const SizedBox(height: 16),
-              // Words list
+              // Options list
               Expanded(
                 flex: 3,
                 child: ListView.builder(
-                  itemCount: currentData.words.length,
+                  itemCount: currentQuestion.options.length,
                   itemBuilder: (context, index) {
-                    final word = currentData.words[index];
-                    return _buildWordCard(word);
+                    final option = currentQuestion.options[index];
+                    return _buildOptionCard(option, currentQuestion.answer);
                   },
                 ),
               ),
@@ -213,7 +422,8 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
             left: 16,
             right: 16,
             child: ElevatedButton(
-              onPressed: hasChecked ? null : _checkSelection,
+              onPressed:
+                  hasChecked || selectedOption == null ? null : _checkSelection,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.white,
@@ -233,20 +443,19 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
     );
   }
 
-  // Build individual word card
-  Widget _buildWordCard(Word word) {
-    final bool isSelected = selectedWords.contains(word.text);
-    final Color backgroundColor = _getBackgroundColor(word);
+  // Build individual option card
+  Widget _buildOptionCard(String option, String answer) {
+    final bool isSelected = selectedOption == option;
+    final Color backgroundColor = _getBackgroundColor(option, answer);
 
     return GestureDetector(
       onTap: hasChecked
           ? null
           : () {
               setState(() {
-                if (isSelected) {
-                  selectedWords.remove(word.text);
-                } else {
-                  selectedWords.add(word.text);
+                selectedOption = option;
+                if (option == answer) {
+                  widget.user.xp += 1;
                 }
               });
             },
@@ -265,8 +474,8 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
           children: [
             hasChecked
                 ? Icon(
-                    word.isCorrect ? Icons.check : Icons.close,
-                    color: word.isCorrect ? Colors.green : Colors.red,
+                    option == answer ? Icons.check : Icons.close,
+                    color: option == answer ? Colors.green : Colors.red,
                   )
                 : Icon(
                     isSelected
@@ -277,14 +486,11 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                word.text,
+                option,
                 style: const TextStyle(fontSize: 18, color: Colors.black),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.volume_up, color: Colors.purple),
-              onPressed: () => _playAudio(word.audioPath),
-            ),
+            // No audio button since options lack audio paths
           ],
         ),
       ),
