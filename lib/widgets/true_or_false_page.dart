@@ -120,6 +120,9 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
           children: [
             Column(
               children: [
+                const SizedBox(
+                  height: 50,
+                ),
                 // Header
                 Container(
                   decoration: BoxDecoration(

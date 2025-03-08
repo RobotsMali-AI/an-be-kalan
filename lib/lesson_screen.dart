@@ -508,7 +508,7 @@ class LessonScreenState extends State<LessonScreen> {
                         Icon(Icons.star, color: Colors.amber, size: 32),
                         SizedBox(width: 8),
                         Text(
-                          'Congratulations!',
+                          'Aw ni ce!',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -521,7 +521,7 @@ class LessonScreenState extends State<LessonScreen> {
                     // Stat rows for XP, time, speed, and accuracy
                     _buildStatRow(
                       icon: Icons.monetization_on,
-                      label: 'XP Gained',
+                      label: 'XP Sɔrɔla',
                       value:
                           '${context.read<ApiFirebaseService>().userInfo!.xp} XP',
                       color: Colors.green,
@@ -529,7 +529,7 @@ class LessonScreenState extends State<LessonScreen> {
                     const SizedBox(height: 12),
                     _buildStatRow(
                       icon: Icons.timer,
-                      label: 'Time Taken',
+                      label: 'Waati min Taara',
                       value:
                           '${readingTimeInMinutes.toStringAsFixed(2)} minutes',
                       color: Colors.blue,
@@ -537,14 +537,14 @@ class LessonScreenState extends State<LessonScreen> {
                     const SizedBox(height: 12),
                     _buildStatRow(
                       icon: Icons.speed,
-                      label: 'Reading Speed',
-                      value: '$wordPerMin words/min',
+                      label: 'Kalan teliya',
+                      value: '$wordPerMin daɲɛw/minitiw',
                       color: Colors.purple,
                     ),
                     const SizedBox(height: 12),
                     _buildStatRow(
                       icon: Icons.check_circle,
-                      label: 'Accuracy',
+                      label: 'Faranfasiya',
                       value: '$averageAcc%',
                       color: Colors.orange,
                     ),
@@ -562,7 +562,7 @@ class LessonScreenState extends State<LessonScreen> {
                         ),
                       ),
                       child: const Text(
-                        'CONTINUE',
+                        'KA TAA FƐ',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),

@@ -180,6 +180,9 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
         child: SafeArea(
           child: Column(
             children: [
+              const SizedBox(
+                height: 50,
+              ),
               // Header with question and close button
               Container(
                 padding: const EdgeInsets.all(16),
