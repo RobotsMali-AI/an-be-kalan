@@ -26,7 +26,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   int _currentQuestionIndex = 0;
   String? _selectedImage;
   bool _isCorrect = false;
-  bool _showHint = false;
   bool _showCelebration = false;
 
   // Updated list of questions using the new class with Option objects
@@ -78,7 +77,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
           _currentQuestionIndex++;
           _selectedImage = null;
           _isCorrect = false;
-          _showHint = false;
           // _loadRandomImage();
         });
       } else {
@@ -95,7 +93,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
         _currentQuestionIndex++;
         _selectedImage = null;
         _isCorrect = false;
-        _showHint = false;
       });
     } else {
       setState(() => _showCelebration = true);
@@ -215,22 +212,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                 backgroundColor: Colors.grey[200],
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
               ),
-              const SizedBox(height: 16),
-              // Instruction text
-              // const Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: 16),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       Icon(Icons.touch_app, color: Colors.black),
-              //       SizedBox(width: 10),
-              //       Text(
-              //         'Ja bɛnnen digi',
-              //         style: TextStyle(fontSize: 18, color: Colors.black),
-              //       ),
-              //     ],
-              //   ),
-              // ),
               const SizedBox(height: 10),
               // Word display
               Padding(
@@ -243,20 +224,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                       fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 20),
-              // Hint button
-              // IconButton(
-              //   icon: const Icon(Icons.lightbulb, color: Colors.black),
-              //   onPressed: () => setState(() => _showHint = !_showHint),
-              // ),
-              // if (_showHint)
-              //   const Padding(
-              //     padding: EdgeInsets.all(16),
-              //     child: Text(
-              //       'Hint: Look for the animal associated with eggs on a farm.',
-              //       style: TextStyle(color: Colors.black, fontSize: 16),
-              //     ),
-              //   ),
               const SizedBox(height: 20),
               // ListView for images
               Expanded(

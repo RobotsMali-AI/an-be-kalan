@@ -239,15 +239,6 @@ class _AuthGateState extends State<AuthGate> {
             email: emailController.text,
             password: passwordController.text,
           );
-          // final user = Users.Users(
-          //     uid: userAuth.user!.uid,
-          //     xp: 0,
-          //     completedBooks: [],
-          //     favoriteBooks: [],
-          //     inProgressBooks: [],
-          //     totalReadingTime: 0,
-          //     xpLog: []);
-          //await apiFirebaseService.saveUserData(userAuth.user!.uid, user);
         } on FirebaseAuthException catch (e) {
           setState(() {
             error = '${e.message}';

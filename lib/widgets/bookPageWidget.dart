@@ -144,9 +144,9 @@ class _BookPageWidgetState extends State<BookPageWidget> {
               width: double.infinity,
               color: Colors.red[100],
               padding: const EdgeInsets.all(8),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Icon(
                     Icons.cloud_off,
                     color: Colors.purple,
