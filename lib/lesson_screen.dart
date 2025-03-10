@@ -418,55 +418,6 @@ class LessonScreenState extends State<LessonScreen> {
 
     return highlightedSpans;
   }
-  // List<TextSpan> getHighlightedTextSpans(String transcription) {
-  //   String originalDisplay = currentSentence;
-  //   // Normalize by lowercasing and removing punctuation.
-  //   String originalCompare =
-  //       currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
-  //   String transcriptionCompare =
-  //       transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
-
-  //   // Compute alignment and edit distance.
-  //   Map<String, dynamic> result =
-  //       computeAlignmentAndDistance(originalCompare, transcriptionCompare);
-  //   List<String> alignment = result["alignment"];
-  //   int editDistance = result["editDistance"];
-
-  //   List<TextSpan> highlightedSpans = [];
-  //   int alignmentIndex = 0;
-  //   int matchingCount = 0;
-  //   // Walk through the original display text.
-  //   for (int i = 0; i < originalDisplay.length; i++) {
-  //     String char = originalDisplay[i];
-  //     bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
-  //     if (isLetterOrSpace) {
-  //       // Get the next operation from the alignment list.
-  //       String op = alignment[alignmentIndex];
-  //       alignmentIndex++;
-  //       bool isCorrect = (op == "match");
-  //       if (isCorrect) matchingCount++;
-  //       highlightedSpans.add(TextSpan(
-  //         text: char,
-  //         style: TextStyle(color: isCorrect ? Colors.green : Colors.red),
-  //       ));
-  //     } else {
-  //       // For punctuation, simply do not highlight.
-  //       highlightedSpans.add(TextSpan(
-  //         text: char,
-  //         style: TextStyle(color: Colors.red),
-  //       ));
-  //     }
-  //   }
-
-  //   int total = originalCompare.length;
-  //   // Compute CER-based accuracy: accuracy = 1 - (editDistance / total), but not below 0.
-  //   double accuracy = total == 0 ? 0 : max(0, 1 - (editDistance / total));
-  //   // Boost accuracy by 1.15 and cap at 1.0.
-  //   double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
-  //   accuracies.add(adjustedAccuracy);
-
-  //   return highlightedSpans;
-  // }
 
   void moveToNextSentence() {
     setState(() {
