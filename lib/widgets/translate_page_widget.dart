@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_translate_api/google_translate_api.dart';
 
 class TranslationPage extends StatefulWidget {
@@ -23,20 +22,19 @@ class _TranslationPageState extends State<TranslationPage> {
     setState(() => _isTranslating = true);
 
     try {
-      final file = File('file.txt'); // Ensure the correct file path
       String apiKey = "";
-      if (await file.exists()) {
-        apiKey = await file.readAsString(); // Read the file as a string
-        // Display the API key
-      } else {
-        SnackBar(content: Text('File not found'));
+      try {
+        apiKey = await rootBundle.loadString('assets/secret.txt');
+      } catch (e) {
+        _showErrorSnackbar('Failed to load API key: $e');
+        return;
       }
       final googleTranslate = GoogleTranslate(apiKey);
       final translation = await googleTranslate.translate(
         text: _textController.text,
-        sourceLang: _sourceLanguage, // Specify the source language
+        sourceLang: _sourceLanguage,
         targetLang: _targetLanguage,
-      ); // Output: Hello
+      );
       setState(() {
         _translatedText = translation;
       });
