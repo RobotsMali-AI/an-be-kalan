@@ -1,0 +1,152 @@
+[
+    {
+      "word": "Fali",
+      "images": [
+        {"path": "assets/nkalanIm/ane.jpg", "correct": true},
+        {"path": "assets/nkalanIm/ble.jpg", "correct": false},
+        {"path": "assets/nkalanIm/arbre.jpg", "correct": false},
+        {"path": "assets/nkalanIm/baton.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/ane.mp3"
+    },
+    {
+      "word": "Kalan",
+      "images": [
+        {"path": "assets/nkalanIm/bouche.jpg", "correct": false},
+        {"path": "assets/nkalanIm/beaucoup.jpg", "correct": false},
+        {"path": "assets/nkalanIm/arbre.jpg", "correct": false},
+        {"path": "assets/nkalanIm/apprentissage.jpg", "correct": true}
+      ],
+      "audio": "nkalanSound/apprentissage.mp3"
+    },
+    {
+      "word": "muru",
+      "images": [
+        {"path": "assets/nkalanIm/lunette.jpg", "correct": false},
+        {"path": "assets/nkalanIm/couteau.jpg", "correct": true},
+        {"path": "assets/nkalanIm/citron.jpg", "correct": false},
+        {"path": "assets/nkalanIm/daba.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/couteau.mp3"
+    },
+    {
+      "word": "demisɛn",
+      "images": [
+        {"path": "assets/nkalanIm/enfant.jpg", "correct": true},
+        {"path": "assets/nkalanIm/dos.jpg", "correct": false},
+        {"path": "assets/nkalanIm/ecouteur.jpg", "correct": false},
+        {"path": "assets/nkalanIm/diable.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/enfant.mp3"
+    },
+    {
+      "word": "kalanso",
+      "images": [
+        {"path": "assets/nkalanIm/eau.jpg", "correct": false},
+        {"path": "assets/nkalanIm/ecole.jpg", "correct": true},
+        {"path": "assets/nkalanIm/entrainement.jpg", "correct": false},
+        {"path": "assets/nkalanIm/famille.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/ecole.mp3"
+    },
+    {
+      "word": "muso",
+      "images": [
+        {"path": "assets/nkalanIm/facon.jpg", "correct": false},
+        {"path": "assets/nkalanIm/eleve.jpg", "correct": false},
+        {"path": "assets/nkalanIm/femme.jpg", "correct": true},
+        {"path": "assets/nkalanIm/homme.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/femme.mp3"
+    },
+    {
+      "word": "fatɔ",
+      "images": [
+        {"path": "assets/nkalanIm/exemple.jpg", "correct": false},
+        {"path": "assets/nkalanIm/fou.jpg", "correct": true},
+        {"path": "assets/nkalanIm/fevrier.jpg", "correct": false},
+        {"path": "assets/nkalanIm/eleve.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/fou.mp3"
+    },
+    {
+      "word": "cɛmisɛn",
+      "images": [
+        {"path": "assets/nkalanIm/griot.jpg", "correct": false},
+        {"path": "assets/nkalanIm/fou.jpg", "correct": false},
+        {"path": "assets/nkalanIm/foule.jpg", "correct": false},
+        {"path": "assets/nkalanIm/garcon.jpg", "correct": true}
+      ],
+      "audio": "nkalanSound/garcon.mp3"
+    },
+    {
+      "word": "jɛkɛ",
+      "images": [
+        {"path": "assets/nkalanIm/foie.jpg", "correct": false},
+        {"path": "assets/nkalanIm/poisson.jpg", "correct": true},
+        {"path": "assets/nkalanIm/foule.jpg", "correct": false},
+        {"path": "assets/nkalanIm/oiseau.jpg", "correct": false}
+      ],
+      "audio": "nkalanSound/poisson.mp3"
+    },
+    {
+        "word": "jiri",
+        "images": [
+          {"path": "assets/nkalanIm/bateau.jpg", "correct": false},
+          {"path": "assets/nkalanIm/ange.jpg", "correct": false},
+          {"path": "assets/nkalanIm/arbre.jpg", "correct": true},
+          {"path": "assets/nkalanIm/ble.jpg", "correct": false}
+        ],
+        "audio": "nkalanSound/arbre.mp3"
+      },
+      {
+        "word": "jate",
+        "images": [
+          {"path": "assets/nkalanIm/compte.jpg", "correct": true},
+          {"path": "assets/nkalanIm/commerce.jpg", "correct": false},
+          {"path": "assets/nkalanIm/foule.jpg", "correct": false},
+          {"path": "assets/nkalanIm/comprehension.jpg", "correct": false}
+        ],
+        "audio": "nkalanSound/compte.mp3"
+      },
+      {
+        "word": "dusukun",
+        "images": [
+          {"path": "assets/nkalanIm/foie.jpg", "correct": false},
+          {"path": "assets/nkalanIm/cerveau.jpg", "correct": false},
+          {"path": "assets/nkalanIm/citron.jpg", "correct": false},
+          {"path": "assets/nkalanIm/coeur.jpg", "correct": true}
+        ],
+        "audio": "nkalanSound/coeur.mp3"
+      },
+      {
+        "word": "kalanden",
+        "images": [
+          {"path": "assets/nkalanIm/ecoute.jpg", "correct": false},
+          {"path": "assets/nkalanIm/eleve.jpg", "correct": true},
+          {"path": "assets/nkalanIm/enfant.jpg", "correct": false},
+          {"path": "assets/nkalanIm/doux.jpg", "correct": false}
+        ],
+        "audio": "nkalanSound/eleve.mp3"
+      },
+      {
+        "word": "baji",
+        "images": [
+          {"path": "assets/nkalanIm/hadj.jpg", "correct": false},
+          {"path": "assets/nkalanIm/champ.jpg", "correct": false},
+          {"path": "assets/nkalanIm/fleuve.jpg", "correct": true},
+          {"path": "assets/nkalanIm/etoile.jpg", "correct": false}
+        ],
+        "audio": "nkalanSound/fleuve.mp3"
+      },
+      {
+        "word": "gudɔrɔn",
+        "images": [
+          {"path": "assets/nkalanIm/rail.jpg", "correct": false},
+          {"path": "assets/nkalanIm/goudron.jpg", "correct": true},
+          {"path": "assets/nkalanIm/guerre.jpg", "correct": false},
+          {"path": "assets/nkalanIm/habille.jpg", "correct": false}
+        ],
+        "audio": "nkalanSound/goudron.mp3"
+      }
+  ]

@@ -119,6 +119,9 @@ flutter:
     - assets/
     - assets/nkalanIm/
     - assets/nkalanSound/
+    - assets/jsons/questionsChoseContexPage.json
+    - assets/jsons/chooseCorrectSpellPage.json
+    - assets/jsons/wordCompletPage.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
