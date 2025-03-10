@@ -46,12 +46,12 @@ class CustomTextFormFieldWidget extends StatelessWidget {
             if (inputType == TextInputType.emailAddress) {
               final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
               if (!emailRegex.hasMatch(value)) {
-                return 'Please enter a valid email address';
+                return 'Aw ye imɛri ladɛrɛsi sɛbɛn min bɛnnen don';
               }
             } else if (inputType == TextInputType.number) {
               final numberRegex = RegExp(r'^[0-9]+$');
               if (!numberRegex.hasMatch(value)) {
-                return 'Please enter a valid number';
+                return 'Aw ye nimɔrɔ bɛnnen dɔ sɛbɛn';
               }
             }
           } else {

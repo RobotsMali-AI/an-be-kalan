@@ -17,7 +17,8 @@ typedef OAuthSignIn = void Function();
 enum AuthMode { login, register }
 
 extension on AuthMode {
-  String get label => this == AuthMode.login ? 'Sign in' : 'Register';
+  String get label =>
+      this == AuthMode.login ? 'I ka don a kɔnɔ' : 'I tɔgɔ sɛbɛnni';
 }
 
 /// Entrypoint example for various sign-in flows with Firebase.
@@ -105,7 +106,7 @@ class _AuthGateState extends State<AuthGate> {
                                     });
                                   },
                                   child: const Text(
-                                    'dismiss',
+                                    'ka gɛn',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
@@ -121,7 +122,7 @@ class _AuthGateState extends State<AuthGate> {
                               CustomTextFormFieldWidget(
                                 controller: emailController,
                                 hintText: 'Email',
-                                errorText: 'Email is required',
+                                errorText: 'Email de wajibiyalen don',
                                 prefixIcon: Icons.email,
                                 inputType: TextInputType.emailAddress,
                                 autofillHints: const [AutofillHints.email],
@@ -129,8 +130,8 @@ class _AuthGateState extends State<AuthGate> {
                               const SizedBox(height: 20),
                               CustomTextFormFieldWidget(
                                   controller: passwordController,
-                                  hintText: 'Password',
-                                  errorText: 'Password is required',
+                                  hintText: 'Kɔdi',
+                                  errorText: 'Kɔdi de wajibiyalen don',
                                   prefixIcon: Icons.lock,
                                   obscureText: true),
                             ],
@@ -147,7 +148,7 @@ class _AuthGateState extends State<AuthGate> {
                           TextButton(
                             onPressed: () => resetPassword(context),
                             child: const Text(
-                              'Forgot password?',
+                              'I ɲinɛna tɔgɔlasɛbɛn kɔ wa?',
                               style:
                                   TextStyle(color: Colors.blue, fontSize: 16),
                             ),
@@ -180,11 +181,11 @@ class _AuthGateState extends State<AuthGate> {
                           const SizedBox(height: 20),
                           CustomRichetext(
                               text1: mode == AuthMode.login
-                                  ? "Don't have an account? "
-                                  : 'Already have an account? ',
+                                  ? "Yala i tɛ ni jatebɔsɛbɛn ye wa? "
+                                  : 'I ye jatebɔsɛbɛn sɔrɔ kaban wa? ',
                               text2: mode == AuthMode.login
-                                  ? 'Register now'
-                                  : 'Click to login',
+                                  ? 'Aw ye aw tɔgɔ sɛbɛn sisan'
+                                  : 'A digi walisa ka don',
                               onPressed: () {
                                 setState(() {
                                   mode = mode == AuthMode.login
@@ -194,8 +195,8 @@ class _AuthGateState extends State<AuthGate> {
                               }),
                           const SizedBox(height: 10),
                           CustomRichetext(
-                              text1: 'Or ',
-                              text2: 'continue as guest',
+                              text1: 'Walima ',
+                              text2: 'ka t’a fɛ i n’a fɔ dunan',
                               onPressed: _anonymousAuth),
                           const SizedBox(height: 20),
                         ],

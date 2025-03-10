@@ -312,13 +312,14 @@ class BookWidgetView extends StatelessWidget {
                     Row(
                       children: [
                         if (isCompleted)
-                          const StatusLabel(text: "Finis", color: Colors.green),
+                          const StatusLabel(
+                              text: "A bana", color: Colors.green),
                         if (isInProgress)
                           const StatusLabel(
-                              text: "Encours", color: Colors.orange),
+                              text: "A bɛ sen na", color: Colors.orange),
                         if (!isCompleted && !isInProgress)
                           const StatusLabel(
-                              text: "Non commencer", color: Colors.blueGrey),
+                              text: "A ma daminɛ folo", color: Colors.blueGrey),
                       ],
                     ),
                     if (isInProgress)

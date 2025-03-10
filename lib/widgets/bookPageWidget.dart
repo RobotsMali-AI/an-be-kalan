@@ -12,11 +12,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 // ignore: must_be_immutable
 class BookPageWidget extends StatefulWidget {
-  BookPageWidget(
-      {super.key,
-      required this.apiFirebaseService,
-      required this.userData,
-      required this.user});
+  BookPageWidget({
+    super.key,
+    required this.apiFirebaseService,
+    required this.userData,
+    required this.user,
+  });
   ApiFirebaseService apiFirebaseService;
   Users userData;
   User user;
@@ -29,13 +30,17 @@ class _BookPageWidgetState extends State<BookPageWidget> {
   final TextEditingController _bookSearchController = TextEditingController();
   late Connectivity _connectivity;
   bool _isConnected = true;
-  List<Book> books = [];
+  List<Book> allBooks = [];
+  List<Book> displayedBooks = [];
   late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  late Future<List<Book>> booksFuture;
 
   @override
   void initState() {
     super.initState();
-    books = widget.apiFirebaseService.books;
+    // Initialize the future to fetch books
+    booksFuture =
+        widget.apiFirebaseService.getBooks(); // Ensure this method exists
     _connectivity = Connectivity();
 
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen(
@@ -47,7 +52,6 @@ class _BookPageWidgetState extends State<BookPageWidget> {
     );
 
     // Check initial connectivity
-    // Initial connectivity check
     _connectivity
         .checkConnectivity()
         .then((List<ConnectivityResult> resultList) {
@@ -60,17 +64,16 @@ class _BookPageWidgetState extends State<BookPageWidget> {
   @override
   void dispose() {
     _connectivitySubscription.cancel();
+    _bookSearchController.dispose();
     super.dispose();
   }
 
   void searchBook(String query) {
     setState(() {
       if (query.isEmpty) {
-        // If the query is empty, show all books
-        books = widget.apiFirebaseService.books;
+        displayedBooks = List<Book>.from(allBooks);
       } else {
-        // Filter books based on the query
-        books = widget.apiFirebaseService.books
+        displayedBooks = allBooks
             .where((book) =>
                 book.title.toLowerCase().contains(query.toLowerCase()))
             .toList();
@@ -90,7 +93,9 @@ class _BookPageWidgetState extends State<BookPageWidget> {
         automaticallyImplyLeading: false,
         title: Container(
           decoration: BoxDecoration(
-              color: Colors.black, borderRadius: BorderRadius.circular(20)),
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(20),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
           child: Column(
             children: [
@@ -122,8 +127,9 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                   ),
                   const SizedBox(width: 10),
                   IconButton(
-                      icon: const Icon(Icons.mic, color: Colors.white),
-                      onPressed: () {}),
+                    icon: const Icon(Icons.mic, color: Colors.white),
+                    onPressed: () {},
+                  ),
                 ],
               ),
             ],
@@ -133,13 +139,11 @@ class _BookPageWidgetState extends State<BookPageWidget> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Display a connectivity banner if offline.
           if (!_isConnected)
             Container(
               width: double.infinity,
               color: Colors.red[100],
               padding: const EdgeInsets.all(8),
-              // ignore: prefer_const_constructors
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
@@ -150,7 +154,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                   ),
                   SizedBox(width: 8),
                   Text(
-                    'No internet connection',
+                    'Ɛntɛrinɛti ɲɔgɔndan tɛ yen',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,
@@ -159,7 +163,6 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                 ],
               ),
             ),
-          // Title section remains visible.
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Text(
@@ -170,70 +173,82 @@ class _BookPageWidgetState extends State<BookPageWidget> {
               ),
             ),
           ),
-          // Expanded area for grid view or fallback message.
           Expanded(
             child: _isConnected
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: books.isNotEmpty
-                        ? GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 20,
-                              childAspectRatio: 1,
-                            ),
-                            itemCount: books.length,
-                            itemBuilder: (context, index) {
-                              final book = books[index];
-                              final isInProgress = widget
-                                  .userData.inProgressBooks
-                                  .any((b) => b.title == book.title);
-                              final isCompleted = widget.userData.completedBooks
-                                  .contains(book.title);
-                              final isDownloaded = widget
-                                  .userData.downloadBooks!
-                                  .contains(book.title);
+                ? FutureBuilder<List<Book>>(
+                    future: booksFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(child: Text('Error loading books'));
+                      } else {
+                        allBooks = snapshot.data ?? [];
+                        if (displayedBooks.isEmpty && allBooks.isNotEmpty) {
+                          displayedBooks = List<Book>.from(allBooks);
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: displayedBooks.isNotEmpty
+                              ? GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 20,
+                                    childAspectRatio: 1,
+                                  ),
+                                  itemCount: displayedBooks.length,
+                                  itemBuilder: (context, index) {
+                                    final book = displayedBooks[index];
+                                    final isInProgress = widget
+                                        .userData.inProgressBooks
+                                        .any((b) => b.title == book.title);
+                                    final isCompleted = widget
+                                        .userData.completedBooks
+                                        .contains(book.title);
+                                    final isDownloaded = widget
+                                        .userData.downloadBooks!
+                                        .contains(book.title);
 
-                              BookUser? bookUser;
-                              for (var element
-                                  in widget.userData.inProgressBooks) {
-                                if (book.title == element.title) {
-                                  bookUser = element;
-                                  break;
-                                }
-                              }
+                                    BookUser? bookUser;
+                                    for (var element
+                                        in widget.userData.inProgressBooks) {
+                                      if (book.title == element.title) {
+                                        bookUser = element;
+                                        break;
+                                      }
+                                    }
 
-                              return GestureDetector(
-                                onTap: () {
-                                  openLesson(
-                                    context,
-                                    book.title,
-                                    widget.userData,
-                                  );
-                                },
-                                child: BookWidgetView(
-                                  user: widget.userData,
-                                  book: book,
-                                  isCompleted: isCompleted,
-                                  isInProgress: isInProgress,
-                                  isDownloaded: isDownloaded,
-                                  bookUser: bookUser,
+                                    return GestureDetector(
+                                      onTap: () {
+                                        openLesson(context, book.title,
+                                            widget.userData);
+                                      },
+                                      child: BookWidgetView(
+                                        user: widget.userData,
+                                        book: book,
+                                        isCompleted: isCompleted,
+                                        isInProgress: isInProgress,
+                                        isDownloaded: isDownloaded,
+                                        bookUser: bookUser,
+                                      ),
+                                    );
+                                  },
+                                )
+                              : const Center(
+                                  child: Text(
+                                    'Gafe si tɛ yen',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                                 ),
-                              );
-                            },
-                          )
-                        : const Center(
-                            child: Text(
-                              'No books available',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ),
+                        );
+                      }
+                    },
                   )
                 : Center(
                     child: Text(
-                      'You are offline. Please check your connection.',
+                      'I tɛ ɛntɛrinɛti kan. Aw ye aw ka jɛgɛnsira lajɛ.',
                       style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                     ),
                   ),
@@ -259,7 +274,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
 
     if (updatedUserData != null) {
       setState(() {
-        userData = updatedUserData;
+        widget.userData = updatedUserData;
       });
     }
   }

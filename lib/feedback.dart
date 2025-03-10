@@ -30,11 +30,18 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     final String email = _emailController.text;
     final String message = _messageController.text;
 
-    final smtpServer = gmail('kidbigboss2017@gmail.com', 'zcyp ycxc bzdg vbnk');
+    // final smtpServer = gmail('anbekalanapp@robotsmali.org', 'K@lan-kadi.bam');
+    final smtpServer = SmtpServer(
+      'mail.robotsmali.org',
+      port: 465,
+      ssl: true,
+      username: 'anbekalanapp@robotsmali.org',
+      password: 'K@lan-kadi.bam',
+    );
 
     final emailMessage = Message()
       ..from = Address(email, name)
-      ..recipients.add('dembeleaymane2000@gmail.com')
+      ..recipients.add('anbekalanapp@robotsmali.org')
       ..subject = 'Feedback kura bɔra $name'
       ..text = message;
 

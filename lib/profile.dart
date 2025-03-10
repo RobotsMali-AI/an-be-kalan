@@ -1,14 +1,12 @@
-import 'dart:io';
-import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/models/Users.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 const placeholderImage =
     'https://drive.google.com/uc?export=download&id=1_egpUE2P2KJ3WVQ44iCT0ux6f_KdJVdO';
@@ -29,28 +27,19 @@ class _ProfilePageState extends State<ProfilePage> {
   bool showSaveButton = false;
   bool isLoading = false;
 
-  // Mock data for stats
-  final int totalExperience = 1250;
-  final String totalReadingTime = "25h 30m";
-  final int totalBooksCompleted = 42;
-
   @override
   void initState() {
+    super.initState();
+    photoURL = widget.user.photoURL; // Initialize with current user photo
     controller = TextEditingController(text: widget.user.displayName);
     controller.addListener(_onNameChanged);
-    super.initState();
   }
 
   @override
   void dispose() {
     controller.removeListener(_onNameChanged);
+    controller.dispose();
     super.dispose();
-  }
-
-  void setIsLoading() {
-    setState(() {
-      isLoading = !isLoading;
-    });
   }
 
   void _onNameChanged() {
@@ -66,46 +55,139 @@ class _ProfilePageState extends State<ProfilePage> {
       showSaveButton = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('I togo yele mala')),
+      const SnackBar(content: Text('Display name updated')),
     );
   }
 
-  Future<void> _uploadProfilePicture() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
-      setIsLoading();
-
-      try {
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('profile_pictures/${widget.user.uid}.jpg');
-        await ref.putFile(File(pickedImage.path));
-        final downloadURL = await ref.getDownloadURL();
-
-        await widget.user.updatePhotoURL(downloadURL);
-        if (!mounted) return;
-        setState(() {
-          photoURL = downloadURL;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile picture updated')),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to upload picture')),
-          );
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading();
-        }
+  Future<List<String>> fetchAvatarUrls() async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref().child('avatars');
+      final listResult = await storageRef.listAll();
+      final urls = <String>[];
+      for (var item in listResult.items) {
+        final url = await item.getDownloadURL();
+        urls.add(url);
       }
+      return urls;
+    } catch (e) {
+      print('Error fetching avatars: $e');
+      return [];
     }
+  }
+
+  Future<void> _chooseAvatar() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            height: 400,
+            decoration: BoxDecoration(
+              color: Colors.white, // flat white background for a simple look
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Aw ye aw ka Avatar Cool sugandi!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black, // black text for clarity
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: FutureBuilder<List<String>>(
+                    future: fetchAvatarUrls(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                            child: Text('Oops ye! Fɛn dɔ ma ɲɛ.'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('Avatar si tɛ yen sisan.'));
+                      } else {
+                        final urls = snapshot.data!;
+                        return GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                          itemCount: urls.length,
+                          itemBuilder: (context, index) {
+                            final avatarUrl = urls[index];
+                            return GestureDetector(
+                              onTap: () async {
+                                try {
+                                  await widget.user.updatePhotoURL(avatarUrl);
+                                  if (!mounted) return;
+                                  setState(() {
+                                    photoURL = avatarUrl;
+                                  });
+                                  Navigator.pop(context);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Avatar kura donna!')),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Oops ye! A ma se ka avatar kura ye.')),
+                                    );
+                                  }
+                                }
+                              },
+                              child: AnimatedScale(
+                                scale: 1.0,
+                                duration: const Duration(milliseconds: 200),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                        color: Colors.black, width: 2),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(avatarUrl,
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> _signOut() async {
@@ -127,28 +209,34 @@ class _ProfilePageState extends State<ProfilePage> {
       random.nextInt(256),
       random.nextInt(256),
       random.nextInt(256),
-      0.1, // Light overlay
+      0.1,
     );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'My Profile',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          'N ka Profil',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme:
+            const IconThemeData(color: Colors.white), // Adjusted for visibility
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _signOut,
+            tooltip: 'Ka bɔ', // Optional tooltip for accessibility
+          ),
+        ],
       ),
       body: GestureDetector(
         onTap: FocusScope.of(context).unfocus,
         child: Stack(
           children: [
             Positioned.fill(
-              child: Container(
-                color: Colors.grey.shade100,
-              ),
+              child: Container(color: Colors.grey.shade100),
             ),
             Column(
               children: [
@@ -158,7 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     CircleAvatar(
                       radius: 70,
                       backgroundImage: NetworkImage(
-                        widget.user.photoURL ?? placeholderImage,
+                        photoURL ?? placeholderImage,
                       ),
                     ),
                     Container(
@@ -172,23 +260,19 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      right: 8,
-                      bottom: 8,
-                      child: Material(
-                        color: Colors.grey.shade300,
-                        shape: const CircleBorder(),
-                        child: InkWell(
-                          onTap: _uploadProfilePicture,
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child:
-                                Icon(Icons.camera_alt, color: Colors.black54),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: _chooseAvatar,
+                  icon: const Icon(Icons.person),
+                  label: const Text('Ja sugandi'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade100,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 TextField(
@@ -197,7 +281,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   controller: controller,
                   style: const TextStyle(color: Colors.black, fontSize: 18),
                   decoration: const InputDecoration(
-                    hintText: "Enter your display name",
+                    hintText: "I ka jiracogo tɔgɔ sɛbɛn",
                     hintStyle: TextStyle(color: Colors.grey),
                     border: InputBorder.none,
                   ),
@@ -210,36 +294,24 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           _buildStatCard(
-                            title: "Experience",
+                            title: "Ko dɔn",
                             value: "${widget.userData.xp} XP",
                             icon: Icons.star,
                             backgroundColor: Colors.blue.shade100,
                           ),
                           const SizedBox(height: 10),
                           _buildStatCard(
-                            title: "Total Reading Time",
+                            title: "Kalan waati bɛɛ lajɛlen",
                             value: widget.userData.totalReadingTime.toString(),
                             icon: Icons.timer,
                             backgroundColor: Colors.green.shade100,
                           ),
                           const SizedBox(height: 10),
                           _buildStatCard(
-                            title: "Books Completed",
+                            title: "Gafew Dafara",
                             value: "${widget.userData.completedBooks.length}",
                             icon: Icons.book,
                             backgroundColor: Colors.orange.shade100,
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton.icon(
-                            onPressed: _signOut,
-                            icon: const Icon(Icons.logout),
-                            label: const Text('Sign Out'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.redAccent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                            ),
                           ),
                         ],
                       ),

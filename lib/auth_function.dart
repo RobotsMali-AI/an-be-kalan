@@ -17,7 +17,7 @@ Future<void> resetPassword(BuildContext context) async {
           borderRadius: BorderRadius.circular(16),
         ),
         title: const Text(
-          'Reset Password',
+          'Segin ka Password Lasegin',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         content: Form(
@@ -27,7 +27,7 @@ Future<void> resetPassword(BuildContext context) async {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Please enter your email address to receive a password reset link.',
+                'Aw ye aw ka imeyili ladɛrɛsi sɛbɛn walasa ka tɔgɔlasɛbɛn lasegincogo ladɛrɛsi sɔrɔ.',
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 20),
@@ -35,7 +35,7 @@ Future<void> resetPassword(BuildContext context) async {
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'Email address',
+                  hintText: 'Email ladɛrɛsi',
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
@@ -46,10 +46,10 @@ Future<void> resetPassword(BuildContext context) async {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Email is required';
+                    return 'Email de wajibiyalen don';
                   }
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
+                    return 'Aw ye bataki ci min bɛ se ka kɛ';
                   }
                   return null;
                 },
@@ -62,7 +62,7 @@ Future<void> resetPassword(BuildContext context) async {
             onPressed: () {
               Navigator.of(context).pop(); // Close the dialog
             },
-            child: const Text('Cancel'),
+            child: const Text('ka dankari'),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -71,9 +71,10 @@ Future<void> resetPassword(BuildContext context) async {
                 try {
                   await auth.sendPasswordResetEmail(email: email);
                   Navigator.of(context).pop(); // Close the dialog
-                  showSnackbar(context, 'Password reset email has been sent.');
+                  showSnackbar(context, 'Password reset email cilen don.');
                 } catch (e) {
-                  showSnackbar(context, 'Error sending password reset email.');
+                  showSnackbar(
+                      context, 'Misali la, i ye password reset email ci.');
                 }
               }
             },
@@ -82,7 +83,7 @@ Future<void> resetPassword(BuildContext context) async {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('Send'),
+            child: const Text('Ka ci'),
           ),
         ],
       );

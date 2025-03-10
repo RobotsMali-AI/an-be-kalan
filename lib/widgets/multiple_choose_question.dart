@@ -154,7 +154,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
             ),
             const SizedBox(height: 20),
             const Text(
-              "Awesome Job!",
+              "Baara ka bon kosɛbɛ!",
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -163,7 +163,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
             ),
             const SizedBox(height: 10),
             Text(
-              "You've completed ${widget.title}!",
+              "I ye baara dafa ${widget.title}!",
               style: const TextStyle(
                 fontSize: 18,
                 color: Colors.black,
@@ -339,7 +339,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Text(
-                          _isOverallCorrect() ? "Good Job!" : "Try Again!",
+                          _isOverallCorrect() ? "Baara ɲuman!" : "Baara jugu!",
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -366,7 +366,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                           ),
                         ),
                         child: const Text(
-                          "Submit",
+                          "Ka kolo",
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.white,
@@ -391,7 +391,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "Next",
+                              "Nata",
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,

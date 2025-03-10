@@ -49,8 +49,9 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
       // Increment XP only for correct answers
       widget.user.xp += 1;
     }
+  }
 
-    // Always proceed to the next question or show completion
+  void _nextQuestion() async {
     if (currentLevel < levels.length - 1) {
       setState(() {
         currentLevel++;
@@ -64,19 +65,86 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
           .saveUserData(widget.user.uid!, widget.user);
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Congratulations!'),
-          content: Text(
-              'You have completed all levels. You earned ${widget.user.xp} XP!'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close dialog
-                Navigator.pop(context); // Return to previous screen
-              },
-              child: const Text('OK'),
+        barrierDismissible: false,
+        builder: (context) => Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SingleChildScrollView(
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.8,
+                maxWidth: MediaQuery.of(context).size.width * 0.9,
+              ),
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Title with icon
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 32),
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Aw ni ce!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Content with score
+                  Flexible(
+                    child: Text(
+                      'I ye nivow bɛɛ dafa. I ye wari sɔrɔ ${widget.user.xp} XP!',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.visible,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Action button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close dialog
+                        Navigator.pop(context); // Return to previous screen
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'N SƆNNA',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       );
     }
@@ -116,7 +184,7 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Level ${currentLevel + 1}',
+                'Hakɛya ${currentLevel + 1}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -171,26 +239,53 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
               ),
             ],
           ),
-          // Check button
+          // Check button and Next button
           Positioned(
             bottom: 16,
             left: 16,
             right: 16,
-            child: ElevatedButton(
-              onPressed:
-                  hasChecked || selectedOption == null ? null : _checkSelection,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: hasChecked || selectedOption == null
+                        ? null
+                        : _checkSelection,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Waritasɛbɛn',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
                 ),
-              ),
-              child: const Text(
-                'Check',
-                style: TextStyle(fontSize: 18),
-              ),
+                if (hasChecked) ...[
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _nextQuestion,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(
+                        currentLevel < levels.length - 1 ? 'Gɛlɛn' : 'Dafa',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

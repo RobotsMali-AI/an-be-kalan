@@ -32,7 +32,7 @@ class _TranslationPageState extends State<TranslationPage> {
         _translatedText = translation;
       });
     } catch (e) {
-      _showErrorSnackbar('Connection error: ${e.toString()}');
+      _showErrorSnackbar('Jɛɲɔgɔnya fili: ${e.toString()}');
     } finally {
       setState(() => _isTranslating = false);
     }
@@ -103,7 +103,7 @@ class _TranslationPageState extends State<TranslationPage> {
             IconButton(
               icon: const Icon(Icons.swap_vert, color: Colors.black),
               onPressed: _swapLanguages,
-              tooltip: 'Swap languages',
+              tooltip: 'Kanw ɲɔgɔn falen-falen',
             ),
             _buildLanguageDropdown(_targetLanguage, false),
           ],
@@ -123,7 +123,7 @@ class _TranslationPageState extends State<TranslationPage> {
           fillColor: Colors.white,
         ),
         items: const [
-          DropdownMenuItem(value: "fr", child: Text("Farancɛ 🇫🇷")),
+          DropdownMenuItem(value: "fr", child: Text("faransikan 🇫🇷")),
           DropdownMenuItem(value: "en", child: Text("Angilɛ 🇬🇧")),
           DropdownMenuItem(value: "bm", child: Text("Bamanankan 🇲🇱")),
         ],

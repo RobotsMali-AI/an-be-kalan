@@ -117,7 +117,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                 Lottie.asset('assets/animations/celebration.json',
                     width: 300, repeat: false),
                 const Text(
-                  'Amazing Work!',
+                  'Baara Kabako!',
                   style: TextStyle(
                       fontSize: 32,
                       color: Colors.black,
@@ -126,7 +126,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.celebration, color: Colors.white),
-                  label: const Text('Finish!',
+                  label: const Text('Laban!',
                       style: TextStyle(color: Colors.white)),
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
@@ -169,6 +169,34 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
 
     final currentQuestion = questions[_currentQuestionIndex];
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        title: Container(
+          // padding: const EdgeInsets.all(16),
+          // margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                currentQuestion.question,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -180,34 +208,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
         child: SafeArea(
           child: Column(
             children: [
-              const SizedBox(
-                height: 50,
-              ),
               // Header with question and close button
-              Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      currentQuestion.question,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              ),
               // Progress indicator
               LinearProgressIndicator(
                 value: (_currentQuestionIndex + 1) / questions.length,
@@ -216,20 +217,20 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
               ),
               const SizedBox(height: 16),
               // Instruction text
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.touch_app, color: Colors.black),
-                    SizedBox(width: 10),
-                    Text(
-                      'Tap the correct picture for',
-                      style: TextStyle(fontSize: 18, color: Colors.black),
-                    ),
-                  ],
-                ),
-              ),
+              // const Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 16),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       Icon(Icons.touch_app, color: Colors.black),
+              //       SizedBox(width: 10),
+              //       Text(
+              //         'Ja bɛnnen digi',
+              //         style: TextStyle(fontSize: 18, color: Colors.black),
+              //       ),
+              //     ],
+              //   ),
+              // ),
               const SizedBox(height: 10),
               // Word display
               Padding(
@@ -244,18 +245,18 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
               ),
               const SizedBox(height: 20),
               // Hint button
-              IconButton(
-                icon: const Icon(Icons.lightbulb, color: Colors.black),
-                onPressed: () => setState(() => _showHint = !_showHint),
-              ),
-              if (_showHint)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Hint: Look for the animal associated with eggs on a farm.',
-                    style: TextStyle(color: Colors.black, fontSize: 16),
-                  ),
-                ),
+              // IconButton(
+              //   icon: const Icon(Icons.lightbulb, color: Colors.black),
+              //   onPressed: () => setState(() => _showHint = !_showHint),
+              // ),
+              // if (_showHint)
+              //   const Padding(
+              //     padding: EdgeInsets.all(16),
+              //     child: Text(
+              //       'Hint: Look for the animal associated with eggs on a farm.',
+              //       style: TextStyle(color: Colors.black, fontSize: 16),
+              //     ),
+              //   ),
               const SizedBox(height: 20),
               // ListView for images
               Expanded(
@@ -352,7 +353,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
                       ),
-                      child: const Text('Next'),
+                      child: const Text('Nata'),
                     ),
                   ],
                 ),

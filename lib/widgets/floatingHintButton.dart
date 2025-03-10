@@ -71,7 +71,7 @@ class _FloatingHintButtonState extends State<FloatingHintButton> {
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: const Text(
-                    "Long press to\nrecord again",
+                    "Dugukolo jan digi walasa ka\nsɛbɛnni kɛ tugun",
                     style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
                 ),
