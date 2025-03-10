@@ -1,0 +1,122 @@
+[
+    {
+      "word": "kunkolo",
+      "options": ["kunkolo", "kankolo", "kunkɔrɔ"],
+      "image": "assets/nkalanIm/tete.jpg",
+      "audio": "nkalanSound/tete.mp3",
+      "hint": "farikolo bɛɛ sanfɛ.",
+      "partial": "kun"
+    },
+    {
+      "word": "cɛkisɛ",
+      "options": ["cɛmisɛn", "cɛkisɛ", "camancɛ"],
+      "image": "assets/nkalanIm/tronc.jpg",
+      "audio": "nkalanSound/tronc.mp3",
+      "hint": "Kun ni sen cɛ.",
+      "partial": "cɛk"
+    },
+    {
+      "word": "joli",
+      "options": ["jaba", "joli", "fɔli"],
+      "image": "assets/nkalanIm/sang.jpg",
+      "audio": "nkalanSound/sang.mp3",
+      "hint": "ji bileman cɔri.",
+      "partial": "jo"
+    },
+    {
+      "word": "cakɛda",
+      "options": ["ciden", "caaman", "cakɛda"],
+      "image": "assets/nkalanIm/service.jpg",
+      "audio": "nkalanSound/service.mp3",
+      "hint": "baara ke kɛ yen.",
+      "partial": "cakɛ"
+    },
+    {
+      "word": "kelen",
+      "options": ["kelen", "kɛlɛ", "kalan"],
+      "image": "assets/nkalanIm/un.jpg",
+      "audio": "nkalanSound/un.mp3",
+      "hint": "daminɛ.",
+      "partial": "kel"
+    },
+    {
+      "word": "baara",
+      "options": ["barada", "bamankan", "baara"],
+      "image": "assets/nkalanIm/travail.jpg",
+      "audio": "nkalanSound/travail.mp3",
+      "hint": "a bɛ kɛ ni fanga ye.",
+      "partial": "baa"
+    },
+    {
+      "word": "kɔkɔ",
+      "options": ["kɔrɔ", "kɔkɔ", "kolo"],
+      "image": "assets/nkalanIm/sel.jpg",
+      "audio": "nkalanSound/sel.mp3",
+      "hint": "a kadi.",
+      "partial": "kɔ"
+    },
+    {
+      "word": "cɛkɔrɔba",
+      "options": ["jɔyɔrɔ", "cɛkisɛ", "cɛkɔrɔba"],
+      "image": "assets/nkalanIm/vieux.jpg",
+      "audio": "nkalanSound/vieux.mp3",
+      "hint": "san caaman.",
+      "partial": "cɛkɔr"
+    },
+    {
+      "word": "basiki",
+      "options": ["basiki", "baraji", "busan"],
+      "image": "assets/nkalanIm/tranquile.jpg",
+      "audio": "nkalanSound/tranquille.mp3",
+      "hint": "ka to yɔrɔkelen.",
+      "partial": "bas"
+    },
+    {
+      "word": "kini",
+      "options": ["kini", "kin", "kelen"],
+      "image": "assets/nkalanIm/riz.jpg",
+      "audio": "nkalanSound/riz.mp3",
+      "hint": "kisɛ jɛɛman.",
+      "partial": "ma"
+    },
+    {
+      "word": "kɛnɛya",
+      "options": ["gɛlɛya", "kɛlɛ", "kɛnɛya"],
+      "image": "assets/nkalanIm/sante.jpg",
+      "audio": "nkalanSound/sante.mp3",
+      "hint": "daamu don.",
+      "partial": "kɛn"
+    },
+    {
+      "word": "daba",
+      "options": ["dan", "bara", "daba"],
+      "image": "assets/nkalanIm/daba.jpg",
+      "audio": "nkalanSound/daba.mp3",
+      "hint": "ci kɛ lan.",
+      "partial": "da"
+    },
+    {
+      "word": "ekutɛri",
+      "options": ["ekutɛri", "kuntere", "kulukan"],
+      "image": "assets/nkalanIm/ecouteur.jpg",
+      "audio": "nkalanSound/ecouteur.mp3",
+      "hint": "ka dɔnkili lamɛ gindo la.",
+      "partial": "eku"
+    },
+    {
+      "word": "gaasi",
+      "options": ["gala", "gaari", "gaasi"],
+      "image": "assets/nkalanIm/gas.jpg",
+      "audio": "nkalanSound/gas.mp3",
+      "hint": "ka tobili kɛ ni dɔkɔ tɛ.",
+      "partial": "ga"
+    },
+    {
+      "word": "gafe",
+      "options": ["tafe", "gafe", "gafu"],
+      "image": "assets/nkalanIm/livre.jpg",
+      "audio": "nkalanSound/livre.mp3",
+      "hint": "kalan bɛ kɛ a kɔnɔ.",
+      "partial": "gaf"
+    }
+  ]
