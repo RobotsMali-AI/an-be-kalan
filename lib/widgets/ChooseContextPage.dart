@@ -106,7 +106,7 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
                 Lottie.asset('assets/animations/celebration.json',
                     width: 300, repeat: false),
                 const Text(
-                  'Great Job!',
+                  'Baara ɲana kosɛbɛ!',
                   style: TextStyle(
                     fontSize: 32,
                     color: Colors.black,
@@ -116,7 +116,7 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.celebration, color: Colors.white),
-                  label: const Text('Finish!',
+                  label: const Text('I tila la!',
                       style: TextStyle(color: Colors.white)),
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
@@ -195,7 +195,7 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
                   Icon(Icons.touch_app, color: Colors.black),
                   SizedBox(width: 10),
                   Text(
-                    'Tap the correct picture for',
+                    'ja ɲuman sugandi',
                     style: TextStyle(fontSize: 18, color: Colors.black),
                   ),
                 ],

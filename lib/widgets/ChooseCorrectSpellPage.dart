@@ -164,7 +164,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.celebration, color: Colors.black),
-                  label: const Text('Finish!',
+                  label: const Text('I tilala!',
                       style: TextStyle(color: Colors.black)),
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
@@ -206,7 +206,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text('Spell ${currentIndex + 1}/${spells.length}',
+        title: Text('Hakɛya ${currentIndex + 1}/${spells.length}',
             style: const TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -251,7 +251,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Possible Answers',
+                      'Jaabi ye ?',
                       style: TextStyle(
                         fontSize: 24,
                         color: Colors.black,
@@ -278,7 +278,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                         child: Column(
                           children: [
                             Text(
-                              'Start with: ${currentSpell['partial']}',
+                              'a daminɛ ye: ${currentSpell['partial']}',
                               style: const TextStyle(
                                   color: Colors.black, fontSize: 18),
                             ),
@@ -291,7 +291,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                                       const BorderSide(color: Colors.black),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                hintText: 'Type the word...',
+                                hintText: 'Daɲɛ sɛbɛn...',
                                 hintStyle: const TextStyle(color: Colors.grey),
                                 suffixIcon: IconButton(
                                   icon: const Icon(Icons.check,
@@ -316,7 +316,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
                             ),
-                            child: const Text('Next'),
+                            child: const Text('Dangan'),
                           ),
                         ],
                       ),

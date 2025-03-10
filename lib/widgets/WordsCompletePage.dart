@@ -249,7 +249,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                 Lottie.asset('assets/animations/celebration.json',
                     width: 300, repeat: false),
                 const Text(
-                  'You’re Awesome!',
+                  'Baara ɲana kosɛbɛ!',
                   style: TextStyle(
                       fontSize: 32,
                       color: Colors.white,
@@ -258,7 +258,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.check, color: Colors.black),
-                  label: const Text('Finish!',
+                  label: const Text('I tila la !',
                       style: TextStyle(color: Colors.black)),
                   onPressed: () => Navigator.pop(context),
                   style:
@@ -295,7 +295,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Word Builder',
+        title: const Text('Daɲɛ dafali',
             style: TextStyle(color: Colors.white, fontSize: 24)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -304,7 +304,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('Level ${currentIndex + 1}/${gameWords.length}',
+            child: Text('hakɛya ${currentIndex + 1}/${gameWords.length}',
                 style: const TextStyle(color: Colors.white)),
           ),
         ],
@@ -339,7 +339,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                     Text(
                         _showHint
                             ? gameWords[currentIndex]['hint']
-                            : 'Tap for Hint',
+                            : 'bilasirali',
                         style:
                             const TextStyle(fontSize: 18, color: Colors.black)),
                   ],
@@ -361,7 +361,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black),
-                  child: const Text('Delete'),
+                  child: const Text('Sigini jɔɔsi'),
                 ),
                 IconButton(
                   icon: const Icon(Icons.volume_up,
@@ -374,7 +374,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black),
-                    child: const Text('Next'),
+                    child: const Text('Dangan'),
                   ),
               ],
             ),
