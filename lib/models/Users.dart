@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:literacy_app/models/bookUser.dart';
-import 'package:literacy_app/models/xpLog.dart';
+import 'package:literacy_app/models/xplog.dart';
 
 class Users {
   String? uid;
