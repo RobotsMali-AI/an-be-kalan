@@ -32,7 +32,8 @@ secret.txt
 .pub-cache/
 .pub/
 /build/
-
+GoogleService-Info.plist
+Info.plist
 # Symbolication related
 app.*.symbols
 
