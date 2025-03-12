@@ -1,20 +1,21 @@
-import 'dart:io';
-import 'dart:math' as math;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/main.dart' show auth;
-import 'package:literacy_app/backend_code/user.dart' show deleteUserData;
+import 'package:literacy_app/models/Users.dart';
+import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 const placeholderImage =
     'https://drive.google.com/uc?export=download&id=1_egpUE2P2KJ3WVQ44iCT0ux6f_KdJVdO';
 
 class ProfilePage extends StatefulWidget {
-  final int xp;
+  final Users userData;
   final User user;
-  const ProfilePage({super.key, required this.user, required this.xp});
+
+  const ProfilePage({super.key, required this.user, required this.userData});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -28,31 +29,25 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
+    super.initState();
+    photoURL = widget.user.photoURL; // Initialize with current user photo
     controller = TextEditingController(text: widget.user.displayName);
     controller.addListener(_onNameChanged);
-
-    super.initState();
   }
 
   @override
   void dispose() {
     controller.removeListener(_onNameChanged);
+    controller.dispose();
     super.dispose();
-  }
-
-  void setIsLoading() {
-    setState(() {
-      isLoading = !isLoading;
-    });
   }
 
   void _onNameChanged() {
     setState(() {
-      showSaveButton = controller.text != widget.user.displayName && controller.text.isNotEmpty;
+      showSaveButton = controller.text != widget.user.displayName &&
+          controller.text.isNotEmpty;
     });
   }
-
-  List get userProviders => widget.user.providerData.map((e) => e.providerId).toList();
 
   Future updateDisplayName() async {
     await widget.user.updateDisplayName(controller.text);
@@ -60,83 +55,151 @@ class _ProfilePageState extends State<ProfilePage> {
       showSaveButton = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Name updated')),
+      const SnackBar(content: Text('Display name updated')),
     );
   }
 
-  Future<void> _uploadProfilePicture() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
-      setIsLoading();
-
-      try {
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child('profile_pictures/${widget.user.uid}.jpg');
-        await ref.putFile(File(pickedImage.path));
-        final downloadURL = await ref.getDownloadURL();
-
-        await widget.user.updatePhotoURL(downloadURL);
-        setState(() {
-          photoURL = downloadURL;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile picture updated')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to upload picture')),
-        );
+  Future<List<String>> fetchAvatarUrls() async {
+    try {
+      final storageRef = FirebaseStorage.instance.ref().child('avatars');
+      final listResult = await storageRef.listAll();
+      final urls = <String>[];
+      for (var item in listResult.items) {
+        final url = await item.getDownloadURL();
+        urls.add(url);
       }
-
-      setIsLoading();
+      return urls;
+    } catch (e) {
+      print('Error fetching avatars: $e');
+      return [];
     }
   }
 
-  Future<void> _deleteAccount() async {
-    final confirm = await showDialog<bool>(
+  Future<void> _chooseAvatar() async {
+    showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure you want to delete your account? This action is irreversible.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            height: 400,
+            decoration: BoxDecoration(
+              color: Colors.white, // flat white background for a simple look
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Aw ye aw ka Avatar Cool sugandi!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black, // black text for clarity
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: FutureBuilder<List<String>>(
+                    future: fetchAvatarUrls(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return const Center(
+                            child: Text('Oops ye! Fɛn dɔ ma ɲɛ.'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                            child: Text('Avatar si tɛ yen sisan.'));
+                      } else {
+                        final urls = snapshot.data!;
+                        return GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+                          itemCount: urls.length,
+                          itemBuilder: (context, index) {
+                            final avatarUrl = urls[index];
+                            return GestureDetector(
+                              onTap: () async {
+                                try {
+                                  await widget.user.updatePhotoURL(avatarUrl);
+                                  if (!mounted) return;
+                                  setState(() {
+                                    photoURL = avatarUrl;
+                                  });
+                                  Navigator.pop(context);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Avatar kura donna!')),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              'Oops ye! A ma se ka avatar kura ye.')),
+                                    );
+                                  }
+                                }
+                              },
+                              child: AnimatedScale(
+                                scale: 1.0,
+                                duration: const Duration(milliseconds: 200),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15),
+                                    border: Border.all(
+                                        color: Colors.black, width: 2),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black26,
+                                        blurRadius: 4,
+                                        offset: Offset(2, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Image.network(avatarUrl,
+                                        fit: BoxFit.cover),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-    );
-
-    if (confirm ?? false) {
-      try {
-        await deleteUserData(widget.user.uid);
-        await widget.user.delete();
-        Navigator.of(context).pop(); // Navigate to previous screen
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to delete account: $e')),
         );
-      }
-    }
+      },
+    );
   }
 
   Future<void> _signOut() async {
     if (widget.user.isAnonymous) {
-      await deleteUserData(widget.user.uid);
-      await widget.user.delete(); // Delete anonymous account
+      await context.read<ApiFirebaseService>().deleteUserData(widget.user.uid);
+      await widget.user.delete();
     }
     await auth.signOut();
     await GoogleSignIn().signOut();
-    Navigator.of(context).pop();
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -146,163 +209,162 @@ class _ProfilePageState extends State<ProfilePage> {
       random.nextInt(256),
       random.nextInt(256),
       random.nextInt(256),
-      0.4, // Light overlay
+      0.1,
     );
 
-    return GestureDetector(
-      onTap: FocusScope.of(context).unfocus,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'My Profile',
-            style: const TextStyle(fontSize: 20, color: Colors.white),
-          ),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white,),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          backgroundColor: Colors.black,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'N ka Profil',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        body: Stack(
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        elevation: 1,
+        iconTheme:
+            const IconThemeData(color: Colors.white), // Adjusted for visibility
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: _signOut,
+            tooltip: 'Ka bɔ', // Optional tooltip for accessibility
+          ),
+        ],
+      ),
+      body: GestureDetector(
+        onTap: FocusScope.of(context).unfocus,
+        child: Stack(
           children: [
-            Center(
-              child: SizedBox(
-                width: 400,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Stack(
-                        children: [
-                          CircleAvatar(
-                            maxRadius: 60,
-                            backgroundImage: NetworkImage(
-                              widget.user.photoURL ?? placeholderImage,
-                            ),
-                          ),
-                          Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: RadialGradient(
-                                colors: [
-                                  Colors.transparent,
-                                  randomColor,
-                                ],
-                                stops: const [0.7, 1.0],
-                              ),
-                            ),
-                          ),
-                          Positioned.directional(
-                            textDirection: Directionality.of(context),
-                            end: 0,
-                            bottom: 0,
-                            child: Material(
-                              clipBehavior: Clip.antiAlias,
-                              color: Theme.of(context).colorScheme.secondary,
-                              borderRadius: BorderRadius.circular(40),
-                              child: InkWell(
-                                onTap: _uploadProfilePicture,
-                                radius: 50,
-                                child: const SizedBox(
-                                  width: 35,
-                                  height: 35,
-                                  child: Icon(Icons.camera_alt),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+            Positioned.fill(
+              child: Container(color: Colors.grey.shade100),
+            ),
+            Column(
+              children: [
+                const SizedBox(height: 20),
+                Stack(
+                  children: [
+                    CircleAvatar(
+                      radius: 70,
+                      backgroundImage: NetworkImage(
+                        photoURL ?? placeholderImage,
                       ),
-                      const SizedBox(height: 10),
-                      TextField(
-                          textAlign: TextAlign.center,
-                          controller: controller,
-                          decoration: const InputDecoration(
-                            border: InputBorder.none,
-                            floatingLabelBehavior: FloatingLabelBehavior.never,
-                            alignLabelWithHint: true,
-                            label: Center(
-                              child: Text('Click to add a display name'),
-                            ),
-                          ),
-                        ),
-                      Text('${widget.xp} XP', ),
-                      const SizedBox(height: 5),
-                      Text(widget.user.email ?? 'user@anonymous.none'),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (userProviders.contains('password'))
-                            const Icon(Icons.mail),
-                          if (userProviders.contains('google.com'))
-                            SizedBox(
-                              width: 24,
-                              child: Image.network(
-                                'https://upload.wikimedia.org/wikipedia/commons/0/09/IOS_Google_icon.png',
-                              ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () {
-                          widget.user.sendEmailVerification();
-                        },
-                        child: const Text('Verify Email'),
-                      ),
-                      const Divider(thickness: 1.0,),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          _signOut();
-                        },
-                        icon: const Icon(Icons.logout),
-                        label: const Text('Sign Out'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple.shade100,
-                          foregroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
+                    ),
+                    Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [Colors.transparent, randomColor],
+                          stops: const [0.7, 1.0],
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          _deleteAccount();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                        ),
-                        child: const Text('Delete Account'),
-                      ),
-                    ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: _chooseAvatar,
+                  icon: const Icon(Icons.person),
+                  label: const Text('Ja sugandi'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade100,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Positioned.directional(
-              textDirection: Directionality.of(context),
-              end: 40,
-              top: 40,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: !showSaveButton
-                    ? SizedBox(key: UniqueKey())
-                    : TextButton(
-                  onPressed: isLoading ? null : updateDisplayName,
-                  child: const Text('Save changes'),
+                const SizedBox(height: 10),
+                TextField(
+                  onEditingComplete: updateDisplayName,
+                  textAlign: TextAlign.center,
+                  controller: controller,
+                  style: const TextStyle(color: Colors.black, fontSize: 18),
+                  decoration: const InputDecoration(
+                    hintText: "I ka jiracogo tɔgɔ sɛbɛn",
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: InputBorder.none,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          _buildStatCard(
+                            title: "Ko dɔn",
+                            value: "${widget.userData.xp} XP",
+                            icon: Icons.star,
+                            backgroundColor: Colors.blue.shade100,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildStatCard(
+                            title: "Kalan waati bɛɛ lajɛlen",
+                            value: widget.userData.totalReadingTime.toString(),
+                            icon: Icons.timer,
+                            backgroundColor: Colors.green.shade100,
+                          ),
+                          const SizedBox(height: 10),
+                          _buildStatCard(
+                            title: "Gafew Dafara",
+                            value: "${widget.userData.completedBooks.length}",
+                            icon: Icons.book,
+                            backgroundColor: Colors.orange.shade100,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color backgroundColor,
+  }) {
+    return Card(
+      color: backgroundColor,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(icon, color: Colors.black54),
+            ),
+            const SizedBox(width: 15),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    color: Colors.black54,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

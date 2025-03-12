@@ -1,11 +1,17 @@
 import 'dart:developer' show log;
+import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:literacy_app/constant.dart' show books;
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/backend_code/semb_database.dart';
+import 'package:literacy_app/feedback.dart';
 import 'package:literacy_app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
-import 'package:literacy_app/backend_code/user.dart' show getUserData;
 import 'package:literacy_app/main.dart' show auth;
-import 'package:literacy_app/lesson_screen.dart' show LessonScreen;
+import 'package:literacy_app/widgets/bookPageWidget.dart';
+import 'package:literacy_app/widgets/page_accueil_Nkalan.dart';
+import 'package:literacy_app/widgets/translate_page_widget.dart';
+import 'package:provider/provider.dart';
+import 'models/Users.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,22 +23,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedTabIndex = 0;
   User? user;
-  Map<String, dynamic>? userData;
-  bool isLoading = true; // Track loading state
-
+  bool isLoading = true;
+  bool verification = false;
+  // final Speech = SpeechToText();
   Future<void> initUserData() async {
     try {
       if (user != null) {
-        Map<String, dynamic> data = await getUserData(user!.uid);
+        verification = await context.read<DatabaseHelper>().getUser(user!.uid);
         setState(() {
-          userData = data;
-          isLoading = false; // Data fetched
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<ApiFirebaseService>().getUserData(user!.uid);
+            verification;
+          });
+          isLoading = false;
         });
       }
     } catch (e) {
       log('Error fetching user data: $e');
       setState(() {
-        isLoading = false; // Avoid infinite loading
+        isLoading = false;
       });
     }
   }
@@ -53,7 +62,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           user = event;
         });
-        initUserData(); // Reinitialize userData when user changes
+        initUserData();
       }
     });
 
@@ -62,233 +71,96 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    //trasncribe();
     if (isLoading) {
       return const Center(
-        child: CircularProgressIndicator(), // Loading spinner
+        child: CircularProgressIndicator(),
       );
     }
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Vocal Search Bar at the Top
-          Container(
-            color: Colors.black,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-            child: Column(
-              children: [
-                const Text(
-                  'An be Kalan',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Gafe dɔ ɲini',
-                          fillColor: Colors.white,
-                          filled: true,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    IconButton(
-                      icon: const Icon(Icons.mic, color: Colors.white),
-                      onPressed: () {
-                        // Implement vocal search logic here
-                      },
-                    ),
-                  ],
-                ),
-              ],
+      extendBody: true,
+      body: Consumer<ApiFirebaseService>(
+          builder: (conext, apiFirebaseService, _) {
+        if (apiFirebaseService.userInfo == null) {
+          apiFirebaseService.getUserData(user!.uid);
+          apiFirebaseService.getAllBooks();
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        Users userData = apiFirebaseService.userInfo!;
+        if (!verification) {
+          conext.read<DatabaseHelper>().insertUser(userData);
+          conext.read<DatabaseHelper>().getUser(userData.uid!);
+        }
+        // final downloadedBooks = conext
+        //     .read<DatabaseHelper>()
+        //     .books
+        //     .map((book) => book.title)
+        //     .toSet();
+
+        // for (var bookTitle in userData.downloadBooks ?? []) {
+        //   if (!downloadedBooks.contains(bookTitle)) {
+        //     final book = context
+        //         .read<ApiFirebaseService>()
+        //         .books
+        //         .firstWhereOrNull((b) => b.title == bookTitle);
+        //     if (book != null) {
+        //       conext.read<DatabaseHelper>().insertBook(book, userData.uid!);
+        //     }
+        //   }
+        // }
+        if (_selectedTabIndex == 0) {
+          return BookPageWidget(
+              apiFirebaseService: apiFirebaseService,
+              userData: userData,
+              user: user!);
+        }
+        //  else if (_selectedTabIndex == 1) {
+        //   return const GameLevelPage(); // Placeholder for identical page
+        // }
+        else if (_selectedTabIndex == 1) {
+          return const TranslationPage();
+        } else if (_selectedTabIndex == 2) {
+          return const AcceuilNkalan();
+        } else if (_selectedTabIndex == 3) {
+          return FeedbackScreen();
+        } else {
+          return ProfilePage(user: user!, userData: userData);
+        }
+      }),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: CrystalNavigationBar(
+          currentIndex: _selectedTabIndex,
+          selectedItemColor: Colors.yellowAccent,
+          unselectedItemColor: Colors.white,
+          backgroundColor: Colors.black,
+          onTap: (index) {
+            setState(() {
+              _selectedTabIndex = index;
+            });
+          },
+          items: [
+            CrystalNavigationBarItem(
+              icon: Icons.book,
             ),
-          ),
-          const SizedBox(height: 15),
-          // Book List
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'An ka gafew',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            CrystalNavigationBarItem(
+              icon: Icons.translate,
             ),
-          ),
-          const SizedBox(height: 2),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: 0.7,
-                ),
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  final book = books[index];
-                  final isInProgress = userData!['inProgressBooks']
-                      .any((b) => b['title'] == book['title']);
-                  final isCompleted =
-                  userData!['completedBooks'].contains(book['title']);
-
-                  return GestureDetector(
-                    onTap: () => openLesson(context, book['title']!),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Stack(
-                          children: [
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                image: DecorationImage(
-                                  image: NetworkImage(book['image']!),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(
-                                  isCompleted
-                                      ? 0.7 // Opacity for completed books
-                                      : isInProgress
-                                      ? 0.35 // Opacity for in-progress books
-                                      : 0.0, // No overlay for other books
-                                ),
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          book['title']!,
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 2,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+            CrystalNavigationBarItem(
+              icon: Icons.gamepad,
             ),
-          ),
-        ],
-      ),
-      // Navigation Tab Bar at the Bottom
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedTabIndex,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey[600],
-        showUnselectedLabels: true,
-        onTap: (index) {
-          setState(() {
-            _selectedTabIndex = index;
-          });
-          if (index == 0) {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context); // Go back to the existing HomePage instance
-            }
-          } else if (index == 3) {
-            showModalBottomSheet(
-              context: context,
-              builder: (context) => ListView(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.person),
-                    title: const Text('Profile'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      navigateToProfilePage();
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.settings),
-                    title: const Text('Settings'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      navigateToSettingsPage();
-                    },
-                  ),
-                ],
-              ),
-            );
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: 'Gafew'),
-          BottomNavigationBarItem(icon: Icon(Icons.grid_4x4), label: 'Crosswords'),
-          BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Daɲɛ'),
-          BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
-        ],
-      ),
-    );
-  }
-
-  void navigateToProfilePage() {
-    if (userData != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProfilePage(
-            xp: userData!["xp"],
-            user: user!,
-          ),
-        ),
-      );
-    }
-  }
-
-  void navigateToSettingsPage() {
-    // Logic for navigating to the Settings Page
-  }
-
-  Future<void> openLesson(BuildContext context, String bookTitle) async {
-    // Navigate to LessonScreen and await the result
-    final updatedUserData = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => LessonScreen(
-          uid: user!.uid,
-          userdata: userData!,
-          bookTitle: bookTitle,
+            CrystalNavigationBarItem(
+              icon: Icons.feedback_outlined,
+            ),
+            CrystalNavigationBarItem(
+              icon: Icons.person,
+            ),
+          ],
         ),
       ),
     );
-
-    // Update `userdata` if a result is returned
-    if (updatedUserData != null) {
-      setState(() {
-        userData = updatedUserData;
-      });
-    }
   }
 }

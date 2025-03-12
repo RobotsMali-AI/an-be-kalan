@@ -1,41 +1,24 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/main.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import './models/Users.dart' as users;
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:literacy_app/widgets/customRicheText.dart';
+import 'package:literacy_app/widgets/reusableButton.dart';
+import 'package:provider/provider.dart';
+import 'auth_function.dart';
+import 'widgets/customTextFormField.dart';
 
 typedef OAuthSignIn = void Function();
-
-/// Helper class to show a snackbar using the passed context.
-class ScaffoldSnackbar {
-  ScaffoldSnackbar(this._context);
-
-  /// The scaffold of current context.
-  factory ScaffoldSnackbar.of(BuildContext context) {
-    return ScaffoldSnackbar(context);
-  }
-
-  final BuildContext _context;
-
-  /// Helper method to show a SnackBar.
-  void show(String message) {
-    ScaffoldMessenger.of(_context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-  }
-}
 
 /// The mode of the current auth session, either [AuthMode.login] or [AuthMode.register].
 enum AuthMode { login, register }
 
 extension on AuthMode {
-  String get label => this == AuthMode.login ? 'Sign in' : 'Register';
+  String get label =>
+      this == AuthMode.login ? 'I ka don a kɔnɔ' : 'I tɔgɔ sɛbɛnni';
 }
 
 /// Entrypoint example for various sign-in flows with Firebase.
@@ -57,6 +40,7 @@ class _AuthGateState extends State<AuthGate> {
   AuthMode mode = AuthMode.login;
 
   bool isLoading = false;
+  late ApiFirebaseService apiFirebaseService;
 
   void setIsLoading() {
     setState(() {
@@ -69,7 +53,8 @@ class _AuthGateState extends State<AuthGate> {
   @override
   void initState() {
     super.initState();
-
+    apiFirebaseService =
+        Provider.of<ApiFirebaseService>(context, listen: false);
     authButtons = {
       Buttons.Google: _signInWithGoogle,
     };
@@ -80,6 +65,7 @@ class _AuthGateState extends State<AuthGate> {
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: Scaffold(
+        backgroundColor: Colors.white,
         body: Center(
           child: SingleChildScrollView(
             child: Center(
@@ -105,10 +91,12 @@ class _AuthGateState extends State<AuthGate> {
                           Visibility(
                             visible: error.isNotEmpty,
                             child: MaterialBanner(
-                              backgroundColor: Theme.of(context).colorScheme.error,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
                               content: SelectableText(
                                 error,
-                                style: const TextStyle(fontSize: 16, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
                               ),
                               actions: [
                                 TextButton(
@@ -118,148 +106,99 @@ class _AuthGateState extends State<AuthGate> {
                                     });
                                   },
                                   child: const Text(
-                                    'dismiss',
+                                    'ka gɛn',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
                               ],
-                              contentTextStyle: const TextStyle(color: Colors.white),
+                              contentTextStyle:
+                                  const TextStyle(color: Colors.white),
                               padding: const EdgeInsets.all(10),
                             ),
                           ),
                           const SizedBox(height: 20),
                           Column(
                             children: [
-                              TextFormField(
+                              CustomTextFormFieldWidget(
                                 controller: emailController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter your email',
-                                  border: OutlineInputBorder(),
-                                  hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
-                                ),
-                                keyboardType: TextInputType.emailAddress,
+                                hintText: 'Email',
+                                errorText: 'Email de wajibiyalen don',
+                                prefixIcon: Icons.email,
+                                inputType: TextInputType.emailAddress,
                                 autofillHints: const [AutofillHints.email],
-                                validator: (value) => value != null && value.isNotEmpty
-                                    ? null
-                                    : 'Email is required',
                               ),
                               const SizedBox(height: 20),
-                              TextFormField(
-                                controller: passwordController,
-                                obscureText: true,
-                                decoration: const InputDecoration(
-                                  hintText: 'Enter your password',
-                                  border: OutlineInputBorder(),
-                                  hintStyle: TextStyle(fontSize: 18, color: Colors.grey),
-                                ),
-                                validator: (value) => value != null && value.isNotEmpty
-                                    ? null
-                                    : 'Password is required',
-                              ),
+                              CustomTextFormFieldWidget(
+                                  controller: passwordController,
+                                  hintText: 'Kɔdi',
+                                  errorText: 'Kɔdi de wajibiyalen don',
+                                  prefixIcon: Icons.lock,
+                                  obscureText: true),
                             ],
                           ),
                           const SizedBox(height: 20),
                           SizedBox(
                             width: double.infinity,
                             height: 50,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.purple,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                textStyle: const TextStyle(fontSize: 20),
-                              ),
-                              onPressed: isLoading ? null : _emailAndPassword,
-                              child: isLoading
-                                  ? const CircularProgressIndicator.adaptive()
-                                  : Text(
-                                mode.label,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            child: ReusableButton(
+                                text: mode.label,
+                                onPressed: _emailAndPassword,
+                                isLoading: isLoading),
                           ),
                           TextButton(
-                            onPressed: _resetPassword,
+                            onPressed: () => resetPassword(context),
                             child: const Text(
-                              'Forgot password?',
-                              style: TextStyle(color: Colors.blue, fontSize: 16),
+                              'I ɲinɛna tɔgɔlasɛbɛn kɔ wa?',
+                              style:
+                                  TextStyle(color: Colors.blue, fontSize: 16),
                             ),
                           ),
                           ...authButtons.keys
                               .map(
                                 (button) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 200),
-                                child: isLoading
-                                    ? Container(
-                                  color: Colors.grey[200],
-                                  height: 50,
-                                  width: double.infinity,
-                                )
-                                    : SizedBox(
-                                  width: double.infinity,
-                                  height: 50,
-                                  child: SignInButton(
-                                    button,
-                                    onPressed: authButtons[button]!,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 5),
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 200),
+                                    child: isLoading
+                                        ? Container(
+                                            color: Colors.grey[200],
+                                            height: 50,
+                                            width: double.infinity,
+                                          )
+                                        : SizedBox(
+                                            width: double.infinity,
+                                            height: 50,
+                                            child: SignInButton(
+                                              button,
+                                              onPressed: authButtons[button]!,
+                                            ),
+                                          ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          )
+                              )
                               .toList(),
                           const SizedBox(height: 20),
-                          RichText(
-                            text: TextSpan(
-                              style: const TextStyle(fontSize: 18, color: Colors.black),
-                              children: [
-                                TextSpan(
-                                  text: mode == AuthMode.login
-                                      ? "Don't have an account? "
-                                      : 'Already have an account? ',
-                                ),
-                                TextSpan(
-                                  text: mode == AuthMode.login
-                                      ? 'Register now'
-                                      : 'Click to login',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      setState(() {
-                                        mode = mode == AuthMode.login
-                                            ? AuthMode.register
-                                            : AuthMode.login;
-                                      });
-                                    },
-                                ),
-                              ],
-                            ),
-                          ),
+                          CustomRichetext(
+                              text1: mode == AuthMode.login
+                                  ? "Yala i tɛ ni jatebɔsɛbɛn ye wa? "
+                                  : 'I ye jatebɔsɛbɛn sɔrɔ kaban wa? ',
+                              text2: mode == AuthMode.login
+                                  ? 'Aw ye aw tɔgɔ sɛbɛn sisan'
+                                  : 'A digi walisa ka don',
+                              onPressed: () {
+                                setState(() {
+                                  mode = mode == AuthMode.login
+                                      ? AuthMode.register
+                                      : AuthMode.login;
+                                });
+                              }),
                           const SizedBox(height: 10),
-                          RichText(
-                            text: TextSpan(
-                              style: const TextStyle(fontSize: 18, color: Colors.black),
-                              children: [
-                                const TextSpan(text: 'Or '),
-                                TextSpan(
-                                  text: 'continue as guest',
-                                  style: const TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  recognizer: TapGestureRecognizer()..onTap = _anonymousAuth,
-                                ),
-                              ],
-                            ),
-                          ),
+                          CustomRichetext(
+                              text1: 'Walima ',
+                              text2: 'ka t’a fɛ i n’a fɔ dunan',
+                              onPressed: _anonymousAuth),
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
@@ -271,48 +210,6 @@ class _AuthGateState extends State<AuthGate> {
         ),
       ),
     );
-  }
-
-  Future _resetPassword() async {
-    String? email;
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Send'),
-            ),
-          ],
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Enter your email'),
-              const SizedBox(height: 20),
-              TextFormField(
-                onChanged: (value) {
-                  email = value;
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-
-    if (email != null) {
-      try {
-        await auth.sendPasswordResetEmail(email: email!);
-        ScaffoldSnackbar.of(context).show('Password reset email is sent');
-      } catch (e) {
-        ScaffoldSnackbar.of(context).show(
-            'Error sending reset email password. Did you enter a valid email?');
-      }
-    }
   }
 
   Future<void> _anonymousAuth() async {
@@ -337,38 +234,95 @@ class _AuthGateState extends State<AuthGate> {
     if (formKey.currentState?.validate() ?? false) {
       setIsLoading();
       if (mode == AuthMode.login) {
-        await auth.signInWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
+        try {
+          await auth.signInWithEmailAndPassword(
+            email: emailController.text,
+            password: passwordController.text,
+          );
+        } on FirebaseAuthException catch (e) {
+          setState(() {
+            error = '${e.message}';
+            setIsLoading();
+            //showSnackbar(context, e.message ?? 'An error occurred');
+          });
+        } catch (e) {
+          setState(() {
+            error = '$e';
+            setIsLoading();
+            //showSnackbar(context, e.toString());
+          });
+        } finally {
+          setIsLoading();
+        }
       } else if (mode == AuthMode.register) {
-        await auth.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
+        try {
+          final userAuth = await auth.createUserWithEmailAndPassword(
+            email: emailController.text,
+            password: passwordController.text,
+          );
+          final user = users.Users(
+              uid: userAuth.user!.uid,
+              xp: 0,
+              completedBooks: [],
+              favoriteBooks: [],
+              inProgressBooks: [],
+              totalReadingTime: 0,
+              xpLog: []);
+          await apiFirebaseService.saveUserData(userAuth.user!.uid, user);
+        } on FirebaseAuthException catch (e) {
+          setState(() {
+            error = '${e.message}';
+            setIsLoading();
+            //showSnackbar(context, e.message ?? 'An error occurred');
+          });
+        } catch (e) {
+          setState(() {
+            error = '$e';
+            setIsLoading();
+            //showSnackbar(context, e.toString());
+          });
+        } finally {
+          setIsLoading();
+        }
       }
       setIsLoading();
     }
   }
 
   Future<void> _signInWithGoogle() async {
-    setIsLoading();
-    // Trigger the authentication flow
-    final googleUser = await GoogleSignIn().signIn();
+    try {
+      setIsLoading();
+      // Trigger the authentication flow
+      final googleUser = await GoogleSignIn().signIn();
 
-    // Obtain the auth details from the request
-    final googleAuth = await googleUser?.authentication;
+      // Obtain the auth details from the request
+      final googleAuth = await googleUser?.authentication;
 
-    if (googleAuth != null) {
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      if (googleAuth != null) {
+        // Create a new credential
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      // Once signed in, return the UserCredential
-      await auth.signInWithCredential(credential);
+        // Once signed in, return the UserCredential
+        await auth.signInWithCredential(credential);
+      }
+      setIsLoading();
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        error = '${e.message}';
+        setIsLoading();
+        //showSnackbar(context, e.message ?? 'An error occurred');
+      });
+    } catch (e) {
+      setState(() {
+        error = '$e';
+        setIsLoading();
+        //showSnackbar(context, e.toString());
+      });
+    } finally {
+      setIsLoading();
     }
-    setIsLoading();
   }
 }

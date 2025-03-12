@@ -2,10 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
-
 import 'package:literacy_app/auth.dart';
+import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/backend_code/semb_database.dart';
+import 'package:literacy_app/confidialiter.dart';
 import 'package:literacy_app/firebase_options.dart';
 import 'package:literacy_app/home.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Requires that a Firebase local emulator is running locally.
 /// See https://firebase.flutter.dev/docs/auth/start/#optional-prototype-and-test-with-firebase-local-emulator-suite
@@ -18,8 +22,9 @@ late final FirebaseAuth auth;
 // e.g via melos run firebase:emulator.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? hasSeenConfidialiter = prefs.getBool('hasSeenConfidialiter');
   app = await Firebase.initializeApp(
-    name: "Bambara Literacy App",
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await FirebaseAppCheck.instance.activate(
@@ -36,23 +41,33 @@ Future<void> main() async {
     // 3. App Attest provider
     // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
   );
-  auth = FirebaseAuth.instanceFor(app: app);
+  auth = FirebaseAuth.instance;
 
   if (shouldUseFirebaseEmulator) {
     await auth.useAuthEmulator('localhost', 9099);
   }
-
-  runApp(const LiteracyAppEntry());
+//const LiteracyAppEntry()
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
+      ChangeNotifierProvider(create: (_) => DatabaseHelper())
+    ],
+    child: LiteracyAppEntry(hasSeenConfidialiter: hasSeenConfidialiter),
+  ));
+  //runApp();
 }
 
 /// The entry point of the application.
 ///
 /// Returns a [MaterialApp].
 class LiteracyAppEntry extends StatelessWidget {
-  const LiteracyAppEntry({Key? key}) : super(key: key);
-
+  const LiteracyAppEntry({Key? key, required this.hasSeenConfidialiter})
+      : super(key: key);
+  final bool? hasSeenConfidialiter;
+  // SpeechToText speech = SpeechToText();
   @override
   Widget build(BuildContext context) {
+    // speech.processAudio();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'An be Kalan',
@@ -92,7 +107,9 @@ class LiteracyAppEntry extends StatelessWidget {
                       if (snapshot.hasData) {
                         return const HomePage();
                       }
-                      return const AuthGate();
+                      return hasSeenConfidialiter == true
+                          ? AuthGate()
+                          : PrivacyPolicyPage();
                     },
                   ),
                 ),
