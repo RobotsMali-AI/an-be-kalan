@@ -55,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
       showSaveButton = false;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Display name updated')),
+      const SnackBar(content: Text('Jiracogo tɔgɔ kura donna')),
     );
   }
 
@@ -94,7 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const Text(
-                  'Aw ye aw ka Avatar Cool sugandi!',
+                  'Aw ye aw ka ja ɲuman sugandi!',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -111,10 +111,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
                         return const Center(
-                            child: Text('Oops ye! Fɛn dɔ ma ɲɛ.'));
+                            child: Text('Ayiwa! Fɛn dɔ ma ɲɛ.'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(
-                            child: Text('Avatar si tɛ yen sisan.'));
+                        return const Center(child: Text('Ja si tɛ yen sisan.'));
                       } else {
                         final urls = snapshot.data!;
                         return GridView.builder(
@@ -139,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   if (mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text('Avatar kura donna!')),
+                                          content: Text('Ja kura donna!')),
                                     );
                                   }
                                 } catch (e) {
@@ -147,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text(
-                                              'Oops ye! A ma se ka avatar kura ye.')),
+                                              'Ayiwa! A ma se ka ja kura ye.')),
                                     );
                                   }
                                 }
@@ -294,7 +293,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Column(
                         children: [
                           _buildStatCard(
-                            title: "Ko dɔn",
+                            title: "Dɔnniya",
                             value: "${widget.userData.xp} XP",
                             icon: Icons.star,
                             backgroundColor: Colors.blue.shade100,
@@ -308,7 +307,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(height: 10),
                           _buildStatCard(
-                            title: "Gafew Dafara",
+                            title: "Gafew dafara",
                             value: "${widget.userData.completedBooks.length}",
                             icon: Icons.book,
                             backgroundColor: Colors.orange.shade100,

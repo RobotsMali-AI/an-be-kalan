@@ -5,6 +5,7 @@ import 'package:literacy_app/models/trueorfalse.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart'; // Added for sound support
 
 class TrueFalseQuestionPage extends StatefulWidget {
   final List<Trueorfalse> questions;
@@ -23,6 +24,8 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
   int currentIndex = 0;
   late ConfettiController _confettiController;
   final _buttonAnimDuration = 400.ms;
+  final AudioPlayer _audioPlayer = AudioPlayer(); // Audio player instance
+  int _correctCount = 0; // Tracks the number of correct answers
 
   @override
   void initState() {
@@ -33,19 +36,24 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
   @override
   void dispose() {
     _confettiController.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
-  void _checkAnswer(String answer) {
+  void _checkAnswer(String answer) async {
     setState(() {
       selectedAnswer = answer;
       isCorrect = answer ==
           (widget.questions[currentIndex].answers ? 'Sɛbɛ' : 'Nkalon');
-      if (isCorrect!) {
-        widget.user.xp += 1;
-        _confettiController.play();
-      }
     });
+    if (isCorrect!) {
+      widget.user.xp += 1;
+      _correctCount++;
+      _confettiController.play();
+      await _audioPlayer.play(AssetSource('sounds/correct.mp3'));
+    } else {
+      await _audioPlayer.play(AssetSource('sounds/wrong.mp3'));
+    }
   }
 
   void _nextQuestion() {
@@ -87,8 +95,15 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
                       fontWeight: FontWeight.bold,
                       color: Colors.black)),
               const SizedBox(height: 10),
-              Text("I ye bɛɛ sɔgɔ ${widget.questions.length} ɲininkaliw!",
-                  style: const TextStyle(fontSize: 18, color: Colors.black)),
+              Text(
+                "Correct Answers: $_correctCount / ${widget.questions.length}",
+                style: const TextStyle(fontSize: 18, color: Colors.black),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "XP Gained: $_correctCount",
+                style: const TextStyle(fontSize: 18, color: Colors.black),
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -109,6 +124,53 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
         ),
       ),
     );
+  }
+
+  Color _getButtonColor(String answer) {
+    if (selectedAnswer == null) return Colors.black;
+    if (answer == selectedAnswer) {
+      return isCorrect! ? Colors.grey.shade700 : Colors.grey.shade500;
+    }
+    if (answer ==
+        (widget.questions[currentIndex].answers ? 'Sɛbɛ' : 'Nkalon')) {
+      return Colors.grey.shade700;
+    }
+    return Colors.grey.shade300;
+  }
+
+  Widget _buildAnswerButton(String answer, IconData icon) {
+    final isSelected = selectedAnswer == answer;
+    return SizedBox(
+      width: 150,
+      child: ElevatedButton(
+        onPressed: selectedAnswer == null ? () => _checkAnswer(answer) : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: _getButtonColor(answer),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          elevation: 5,
+          shadowColor: Colors.black.withOpacity(0.2),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (isSelected)
+              Icon(icon, size: 24)
+                  .animate()
+                  .scale(duration: _buttonAnimDuration),
+            if (isSelected) const SizedBox(width: 10),
+            Text(answer,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    )
+        .animate(delay: answer == 'Sɛbɛ' ? 500.ms : 700.ms)
+        .slideX(begin: answer == 'Sɛbɛ' ? -1 : 1, curve: Curves.easeOutBack)
+        .fadeIn();
   }
 
   @override
@@ -249,55 +311,5 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
         ),
       ),
     );
-  }
-
-  Widget _buildAnswerButton(String answer, IconData icon) {
-    final isSelected = selectedAnswer == answer;
-    final isCorrectAnswer =
-        answer == (widget.questions[currentIndex].answers ? 'Sɛbɛ' : 'Nkalon');
-
-    return SizedBox(
-      width: 150,
-      child: ElevatedButton(
-        onPressed: selectedAnswer == null ? () => _checkAnswer(answer) : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _getButtonColor(answer),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 5,
-          shadowColor: Colors.black.withOpacity(0.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isSelected)
-              Icon(icon, size: 24)
-                  .animate()
-                  .scale(duration: _buttonAnimDuration),
-            if (isSelected) const SizedBox(width: 10),
-            Text(answer,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          ],
-        ),
-      ),
-    )
-        .animate(delay: answer == 'Sɛbɛ' ? 500.ms : 700.ms)
-        .slideX(begin: answer == 'Sɛbɛ' ? -1 : 1, curve: Curves.easeOutBack)
-        .fadeIn();
-  }
-
-  Color _getButtonColor(String answer) {
-    if (selectedAnswer == null) return Colors.black;
-    if (answer == selectedAnswer) {
-      return isCorrect! ? Colors.grey.shade700 : Colors.grey.shade500;
-    }
-    if (answer ==
-        (widget.questions[currentIndex].answers ? 'Sɛbɛ' : 'Nkalon')) {
-      return Colors.grey.shade700;
-    }
-    return Colors.grey.shade300;
   }
 }

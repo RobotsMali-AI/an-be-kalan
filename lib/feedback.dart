@@ -168,7 +168,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         controller: _nameController,
                         focusNode: _nameFocus,
                         nextFocus: _emailFocus,
-                        label: 'I Tɔgɔ',
+                        label: 'I tɔgɔ',
                         hint: 'I tɔgɔ sɛbɛn',
                         icon: Icons.person,
                       ),
@@ -177,8 +177,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         controller: _emailController,
                         focusNode: _emailFocus,
                         nextFocus: _messageFocus,
-                        label: 'Aw ka Email',
-                        hint: 'Aw ye aw ka email sɛbɛn',
+                        label: 'Aw ka imɛli',
+                        hint: 'Aw ye aw ka imɛli sɛbɛn',
                         icon: Icons.email,
                         isEmail: true,
                       ),
@@ -195,7 +195,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       ElevatedButton.icon(
                         onPressed: _pickImage,
                         icon: const Icon(Icons.image),
-                        label: const Text('Jaa nɔrɔ a la'),
+                        label: const Text('Ja nɔrɔ a la'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[800],
                           foregroundColor: Colors.white,
@@ -205,7 +205,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
-                            'Jaa sugandilen: ${_selectedImage!.name}',
+                            'Ja sugandilen: ${_selectedImage!.name}',
                             style: const TextStyle(color: Colors.white70),
                           ),
                         ),

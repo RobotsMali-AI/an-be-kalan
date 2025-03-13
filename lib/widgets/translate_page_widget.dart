@@ -130,8 +130,8 @@ class _TranslationPageState extends State<TranslationPage> {
           fillColor: Colors.white,
         ),
         items: const [
-          DropdownMenuItem(value: "fr", child: Text("faransikan 🇫🇷")),
-          DropdownMenuItem(value: "en", child: Text("Angilɛ 🇬🇧")),
+          DropdownMenuItem(value: "fr", child: Text("Faransikan 🇫🇷")),
+          DropdownMenuItem(value: "en", child: Text("Angilɛkan 🇬🇧")),
           DropdownMenuItem(value: "bm", child: Text("Bamanankan 🇲🇱")),
         ],
         onChanged: (newValue) => setState(() => isSource
@@ -174,7 +174,7 @@ class _TranslationPageState extends State<TranslationPage> {
       child: _isTranslating
           ? const CircularProgressIndicator(color: Colors.white)
           : const Text(
-              "Taa jabi",
+              "Ka bamanankan",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -195,7 +195,7 @@ class _TranslationPageState extends State<TranslationPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                "Taa jabi sɔrɔ:",
+                "Ka bamanankan sɔrɔ:",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

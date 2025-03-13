@@ -237,46 +237,77 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     );
   }
 
-  Widget _buildCelebration() {
-    return Stack(
-      children: [
-        Container(
-          color: Colors.black,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Lottie.asset('assets/animations/celebration.json',
-                    width: 300, repeat: false),
-                const Text(
-                  'Baara ɲana kosɛbɛ!',
-                  style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
+  Widget _showCelebrationDialog(BuildContext context) {
+    // Save user data to Firebase
+
+    // Show the celebration dialog
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(0),
+      child: Stack(
+        children: [
+          // Bright yellow background
+          Container(
+            color: Colors.white30, // Cheerful background color
+            child: Center(
+              child: Card(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.check, color: Colors.black),
-                  label: const Text('I tila la !',
-                      style: TextStyle(color: Colors.black)),
-                  onPressed: () => Navigator.pop(context),
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                elevation: 10, // Shadow for a floating effect
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Golden badge image
+                      Image.asset(
+                        'assets/badge.png', // Add this asset to your project
+                        width: 150,
+                      ),
+                      const SizedBox(height: 20),
+                      // Celebratory text in Bambara
+                      const Text(
+                        'Baara Kabako!',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Purple button with Bambara text
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(50), // Rounded shape
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 20,
+                          ),
+                        ),
+                        child: const Text(
+                          'Laban!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            colors: const [Colors.black, Colors.grey, Colors.white],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -289,7 +320,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     }
 
     if (_showCelebration) {
-      return Scaffold(body: _buildCelebration());
+      return Scaffold(body: _showCelebrationDialog(context));
     }
 
     return Scaffold(

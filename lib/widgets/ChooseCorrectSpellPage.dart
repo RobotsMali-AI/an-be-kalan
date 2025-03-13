@@ -143,50 +143,77 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
     );
   }
 
-  Widget _buildCelebration() {
-    return Stack(
-      children: [
-        Container(
-          color: Colors.white,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Lottie.asset('assets/animations/celebration.json',
-                    width: 300, repeat: false),
-                const Text(
-                  'Spelling Master!',
-                  style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+  Widget _showCelebrationDialog(BuildContext context) {
+    // Save user data to Firebase
+
+    // Show the celebration dialog
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(0),
+      child: Stack(
+        children: [
+          // Bright yellow background
+          Container(
+            color: Colors.white30, // Cheerful background color
+            child: Center(
+              child: Card(
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.celebration, color: Colors.black),
-                  label: const Text('I tilala!',
-                      style: TextStyle(color: Colors.black)),
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.black),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
+                elevation: 10, // Shadow for a floating effect
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Golden badge image
+                      Image.asset(
+                        'assets/badge.png', // Add this asset to your project
+                        width: 150,
+                      ),
+                      const SizedBox(height: 20),
+                      // Celebratory text in Bambara
+                      const Text(
+                        'Baara Kabako!',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      // Purple button with Bambara text
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(50), // Rounded shape
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 20,
+                          ),
+                        ),
+                        child: const Text(
+                          'Laban!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            colors: const [Colors.black, Colors.grey, Colors.white],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -198,7 +225,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
       );
     }
 
-    if (_showCelebration) return _buildCelebration();
+    if (_showCelebration) return _showCelebrationDialog(context);
 
     final currentSpell = spells[currentIndex];
     return Scaffold(

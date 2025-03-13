@@ -17,7 +17,7 @@ class AcceuilNkalan extends StatelessWidget {
         'page': const WordsCompletePage(),
       },
       {
-        'title': 'sɛbɛn coko ɲuma sukandili',
+        'title': 'Sɛbɛn cogo ɲuman sugandili',
         'image':
             'assets/imJeu2.jpg', // Replace with actual grayscale image path
         'page': const ChooseCorrectSpellPage(),

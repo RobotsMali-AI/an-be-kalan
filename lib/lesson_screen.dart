@@ -643,7 +643,7 @@ class LessonScreenState extends State<LessonScreen> {
                         const SizedBox(height: 12),
                         _buildStatRow(
                           icon: Icons.timer,
-                          label: 'Waati min Taara',
+                          label: 'Waati min taara',
                           value:
                               '${readingTimeInMinutes.toStringAsFixed(2)} minutes',
                           color: Colors.blue,
@@ -658,7 +658,7 @@ class LessonScreenState extends State<LessonScreen> {
                         const SizedBox(height: 12),
                         _buildStatRow(
                           icon: Icons.check_circle,
-                          label: 'Faranfasiya',
+                          label: 'Tilennenya',
                           value: '$averageAcc%',
                           color: Colors.orange,
                         ),
@@ -683,7 +683,7 @@ class LessonScreenState extends State<LessonScreen> {
                         ),
                       ),
                       child: const Text(
-                        'KA TAA FƐ',
+                        'Ka taa fɛ',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

@@ -35,7 +35,7 @@ Future<void> resetPassword(BuildContext context) async {
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'Email ladɛrɛsi',
+                  hintText: 'Imɛli ladɛrɛsi',
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
@@ -71,10 +71,10 @@ Future<void> resetPassword(BuildContext context) async {
                 try {
                   await auth.sendPasswordResetEmail(email: email);
                   Navigator.of(context).pop(); // Close the dialog
-                  showSnackbar(context, 'Password reset email cilen don.');
+                  showSnackbar(context, 'Password reset Imɛli cilen don.');
                 } catch (e) {
                   showSnackbar(
-                      context, 'Misali la, i ye password reset email ci.');
+                      context, 'Misali la, i ye password reset Imɛli ci.');
                 }
               }
             },

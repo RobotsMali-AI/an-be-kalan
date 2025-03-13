@@ -106,7 +106,7 @@ class _AuthGateState extends State<AuthGate> {
                                     });
                                   },
                                   child: const Text(
-                                    'ka gɛn',
+                                    'Ka bɔ',
                                     style: TextStyle(color: Colors.white),
                                   ),
                                 ),
@@ -121,8 +121,8 @@ class _AuthGateState extends State<AuthGate> {
                             children: [
                               CustomTextFormFieldWidget(
                                 controller: emailController,
-                                hintText: 'Email',
-                                errorText: 'Email de wajibiyalen don',
+                                hintText: 'Imɛli',
+                                errorText: 'Imɛli de wajibiyalen don',
                                 prefixIcon: Icons.email,
                                 inputType: TextInputType.emailAddress,
                                 autofillHints: const [AutofillHints.email],
@@ -182,7 +182,7 @@ class _AuthGateState extends State<AuthGate> {
                           CustomRichetext(
                               text1: mode == AuthMode.login
                                   ? "Yala i tɛ ni jatebɔsɛbɛn ye wa? "
-                                  : 'I ye jatebɔsɛbɛn sɔrɔ kaban wa? ',
+                                  : 'I kɔrɔlen jatebɔsɛbɛn na kaban wa? ',
                               text2: mode == AuthMode.login
                                   ? 'Aw ye aw tɔgɔ sɛbɛn sisan'
                                   : 'A digi walisa ka don',
