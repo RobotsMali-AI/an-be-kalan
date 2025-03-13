@@ -29,6 +29,9 @@ This project is a **Flutter mobile application** aimed at promoting early litera
 - **Interactive Lessons**  
   Structured lesson screens for teaching Bambara reading skills.
 
+- **Funny and educatinnal game**  
+  Funny games that encourage users to learn more without anxiety.
+
 - **Child-Friendly Interface**  
   Intuitive and colorful UI designed for young learners.
 
@@ -36,6 +39,8 @@ This project is a **Flutter mobile application** aimed at promoting early litera
 
 ## Screenshots
 TODO: *(Include screenshots of the app here.)*
+
+
 
 ---
 
