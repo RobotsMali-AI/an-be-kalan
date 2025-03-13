@@ -39,8 +39,58 @@ This project is a **Flutter mobile application** aimed at promoting early litera
 
 ## Screenshots
 TODO: *(Include screenshots of the app here.)*
+1. **Login Pages**:
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.43.58.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.44.03.png" alt="Alt text" width="500" height="800">
+</div>
+
+2. **Books Pages**
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.45.36.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.45.47.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.46.12.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.46.12.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.48.40.png" alt="Alt text" width="500" height="800">
+</div>
+
+3. **Books Quizz Page**
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.46.58.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.47.08.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.47.20.png" alt="Alt text" width="500" height="800">
+</div>
 
 
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.47.33.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.47.40.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.48.03.png" alt="Alt text" width="500" height="800">
+</div>
+
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.48.12.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.48.21.png" alt="Alt text" width="500" height="800">
+</div>
+
+6. **Translate Page**
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.49.05.png" alt="Alt text" width="500" height="800">
+</div>
+
+7. **Nkalan Game Pages**
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.49.10.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.49.24.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.50.18.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.49.59.png" alt="Alt text" width="500" height="800">
+</div>
+
+8. **Profile Pages**
+<div style="display: flex; justify-content: center;">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/569ae60a6bda76a50b12d03977b64fd2321a48f9/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2015.50.31.png" alt="Alt text" width="500" height="800">
+<img src="https://github.com/RobotsMali-AI/an-be-kalan/blob/c6d3c3fc26679ddb434a46e1c2e1f3e43885a731/Simulator%20Screenshot%20-%20ios%2016%20pro%20-%202025-03-13%20at%2017.22.37.png" alt="Alt text" width="500" height="800">
+</div>
 
 ---
 
