@@ -100,7 +100,7 @@ Follow these steps to run the app locally:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/diarray-hub/an-be-kalan.git
+   git clone https://github.com/RobotsMali-AI/an-be-kalan.git
    cd an-be-kalan
    ```
 
@@ -122,7 +122,7 @@ Follow these steps to run the app locally:
 
 ## Dependencies
 
-Key dependencies are listed in `pubspec.yaml`:
+Key dependencies are listed in `pubspec.yaml`, those include but are note limited too:
 
 - **Firebase**:
     - `firebase_core`
@@ -173,9 +173,23 @@ Feel free to submit a pull request or open an issue for any improvements.
 
 ---
 
-## License
+## License: GNU Affero General Public License v3 (AGPL-3.0)
+This project is licensed under the **AGPL-3.0**, meaning:
+- You **can** use, modify, and redistribute this software **for non-commercial purposes** as long as you credit [Research Lab Name].
+- If you modify or distribute this software, you **must keep it open-source** under the same AGPL-3.0 license.
+- Any use of this software **must include proper attribution** to [Research Lab Name].
+- **Commercial use is forbidden** unless explicitly authorized.
 
-This project is licensed under the MIT License.  
-See the [LICENSE](LICENSE) file for details.
+### What AGPL-3.0 Allows:
+✅ Users can **use, modify, and share** the software for non-commercial purposes.  
+✅ If redistributed (even modified), users **must provide source code** and keep it under AGPL-3.0.  
+✅ Derivative works must acknowledge the original authors.  
+
+### What AGPL-3.0 Doesn't Allow:
+❌ **Commercial use** is restricted unless the source remains open.  
+❌ Users **cannot incorporate** the code into proprietary, closed-source software.  
+❌ If used in an online service, the source code **must still be shared**.  
+
+For details, see the full [LICENSE](LICENSE) file for details.
 
 ---
