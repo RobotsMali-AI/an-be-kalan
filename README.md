@@ -175,18 +175,16 @@ Feel free to submit a pull request or open an issue for any improvements.
 
 ## License: GNU Affero General Public License v3 (AGPL-3.0)
 This project is licensed under the **AGPL-3.0**, meaning:
-- You **can** use, modify, and redistribute this software **for non-commercial purposes** as long as you credit [Research Lab Name].
+- You **can** use, modify, and redistribute this software **for commercial and non-commercial purposes** as long as you credit RobotsMali AI4D Lab.
 - If you modify or distribute this software, you **must keep it open-source** under the same AGPL-3.0 license.
-- Any use of this software **must include proper attribution** to [Research Lab Name].
-- **Commercial use is forbidden** unless explicitly authorized.
+- Any use of this software **must include proper attribution** to RobotsMali AI4D Lab.
 
 ### What AGPL-3.0 Allows:
-✅ Users can **use, modify, and share** the software for non-commercial purposes.  
+✅ Users can **use, modify, and share** the software.  
 ✅ If redistributed (even modified), users **must provide source code** and keep it under AGPL-3.0.  
 ✅ Derivative works must acknowledge the original authors.  
 
 ### What AGPL-3.0 Doesn't Allow:
-❌ **Commercial use** is restricted unless the source remains open.  
 ❌ Users **cannot incorporate** the code into proprietary, closed-source software.  
 ❌ If used in an online service, the source code **must still be shared**.  
 
