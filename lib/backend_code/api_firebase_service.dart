@@ -103,6 +103,7 @@ class ApiFirebaseService with ChangeNotifier {
   /// Function that creates and save empty user data dictionary for new user
   Users createUserData(String uid) {
     Users userData = Users(
+        downloadBooks: [],
         completedBooks: [],
         favoriteBooks: [],
         xpLog: [],

@@ -127,7 +127,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              automaticallyImplyLeading: false,
+              automaticallyImplyLeading: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: const Text(

@@ -262,6 +262,7 @@ class _AuthGateState extends State<AuthGate> {
           );
           final user = users.Users(
               uid: userAuth.user!.uid,
+              downloadBooks: [],
               xp: 0,
               completedBooks: [],
               favoriteBooks: [],

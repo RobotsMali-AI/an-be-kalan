@@ -183,6 +183,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                       } else if (snapshot.hasError) {
                         return const Center(child: Text('Error loading books'));
                       } else {
+                        allBooks = [];
                         allBooks = snapshot.data ?? [];
                         if (displayedBooks.isEmpty && allBooks.isNotEmpty) {
                           displayedBooks = List<Book>.from(allBooks);

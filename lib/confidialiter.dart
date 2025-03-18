@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:literacy_app/auth.dart';
+import 'package:literacy_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
@@ -67,7 +68,11 @@ class PrivacyPolicyPage extends StatelessWidget {
                   await prefs.setBool('hasSeenConfidialiter', true);
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => AuthGate()),
+                    MaterialPageRoute(
+                        builder: (context) => LiteracyAppEntry(
+                              hasSeenConfidialiter:
+                                  prefs.getBool('hasSeenConfidialiter'),
+                            )),
                   );
                 },
                 style: ElevatedButton.styleFrom(

@@ -90,7 +90,13 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
         _hasAnswered = false;
       });
     } else {
-      setState(() => _showCelebration = true);
+      context
+          .read<ApiFirebaseService>()
+          .saveUserData(widget.user.uid!, widget.user);
+      showDialog(
+        context: context,
+        builder: (_) => _buildCelebration(),
+      );
     }
   }
 
@@ -107,99 +113,68 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
 
   Widget _buildCelebration() {
     // Save user data before celebrating.
-    context
-        .read<ApiFirebaseService>()
-        .saveUserData(widget.user.uid!, widget.user);
-    return Stack(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.blueAccent.shade100,
-                Colors.purpleAccent.shade100,
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-          child: Center(
-            child: Card(
-              elevation: 10,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+    return Dialog(
+      child: Card(
+        elevation: 10,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset(
+                'assets/animations/celebration.json',
+                width: 250,
+                repeat: false,
               ),
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Lottie.asset(
-                      'assets/animations/celebration.json',
-                      width: 250,
-                      repeat: false,
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      performanceMessage(),
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'I ye ɲuman $correctAnswers/${questions.length}. I donniya $correctAnswers sɔrɔ!',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black54,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.celebration, color: Colors.white),
-                      label: const Text(
-                        'A bana',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 40,
-                          vertical: 15,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 20),
+              Text(
+                performanceMessage(),
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'I ye ɲuman $correctAnswers/${questions.length}. I donniya $correctAnswers sɔrɔ!',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.celebration, color: Colors.white),
+                label: const Text(
+                  'A bana',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            colors: const [
-              Colors.deepPurple,
-              Colors.purpleAccent,
-              Colors.blueAccent,
-              Colors.teal,
             ],
-            numberOfParticles: 30,
-            gravity: 0.3,
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -212,8 +187,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
 
   @override
   Widget build(BuildContext context) {
-    if (_showCelebration) return _buildCelebration();
-
     final currentQuestion = questions[_currentQuestionIndex];
     return Scaffold(
       appBar: AppBar(
