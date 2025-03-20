@@ -1,92 +1,1238 @@
-[
+  [
     {
-      "word": "cincin",
-      "image": "assets/nkalanIm/sable.jpg",
-      "audio": "nkalanSound/sable.mp3",
-      "hint": "siman bɛ kɛ a la"
+        "word": "abila",
+        "image": "assets/nkalanIm/laisse.jpg",
+        "audio": "nkalanSound/laisse.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "dan",
-      "image": "assets/nkalanIm/terminaison.jpg",
-      "audio": "nkalanSound/terminaison.mp3",
-      "hint": "a tɛ tɛmɛ yen ka"
+        "word": "adi",
+        "image": "assets/nkalanIm/donne.jpg",
+        "audio": "nkalanSound/donne.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "baara",
-      "image": "assets/nkalanIm/travail.jpg",
-      "audio": "nkalanSound/travail.mp3",
-      "hint": "a bɛ kɛ ni fanga ye."
+        "word": "alamisa",
+        "image": "assets/nkalanIm/jeudi.jpg",
+        "audio": "nkalanSound/jeudi.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "feere",
-      "image": "assets/nkalanIm/vente.jpg",
-      "audio": "nkalanSound/vente.mp3",
-      "hint": "falen wari la."
+        "word": "ale",
+        "image": "assets/nkalanIm/lui.jpg",
+        "audio": "nkalanSound/lui.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "fu",
-      "image": "assets/nkalanIm/zero.jpg",
-      "audio": "nkalanSound/zero.mp3",
-      "hint": "fosi fosi."
+        "word": "alikaama",
+        "image": "assets/nkalanIm/ble.jpg",
+        "audio": "nkalanSound/ble.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "fali",
-      "image": "assets/nkalanIm/ane.jpg",
-      "audio": "nkalanSound/ane.mp3",
-      "hint": "a bɛ bin dun."
+        "word": "aminɛ",
+        "image": "assets/nkalanIm/attrape.jpg",
+        "audio": "nkalanSound/attrape.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "araye",
-      "image": "assets/nkalanIm/rail.jpg",
-      "audio": "nkalanSound/rail.mp3",
-      "hint": "tɛrɛn bɛ boli"
+        "word": "araba",
+        "image": "assets/nkalanIm/mercredi.jpg",
+        "audio": "nkalanSound/mercredi.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "bonya",
-      "image": "assets/nkalanIm/respect.jpg",
-      "audio": "nkalanSound/respect.mp3",
-      "hint": "mɔgɔ kɔrɔba ni a kakan"
+        "word": "arajo",
+        "image": "assets/nkalanIm/radio.jpg",
+        "audio": "nkalanSound/radio.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "gato",
-      "image": "assets/nkalanIm/gateau.jpg",
-      "audio": "nkalanSound/gateau.mp3",
-      "hint": "a bɛ tigɛ wololi sankunbɛ la"
+        "word": "araye",
+        "image": "assets/nkalanIm/rail.jpg",
+        "audio": "nkalanSound/rail.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "busan",
-      "image": "assets/nkalanIm/fouet.jpg",
-      "audio": "nkalanSound/fouet.mp3",
-      "hint": "ka bukɔli kɛ"
+        "word": "ata",
+        "image": "assets/nkalanIm/prend.jpg",
+        "audio": "nkalanSound/prend.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "jeli",
-      "image": "assets/nkalanIm/griot.jpg",
-      "audio": "nkalanSound/griot.mp3",
-      "hint": "ka baramali kɛ"
+        "word": "awirili",
+        "image": "assets/nkalanIm/avril.jpg",
+        "audio": "nkalanSound/avril.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "bataki",
-      "image": "assets/nkalanIm/lettre.jpg",
-      "audio": "nkalanSound/lettre.mp3",
-      "hint": "ka cikan sɛbɛn"
+        "word": "ba",
+        "image": "assets/nkalanIm/fleuve.jpg",
+        "audio": "nkalanSound/fleuve.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "barama",
-      "image": "assets/nkalanIm/marmite.jpg",
-      "audio": "nkalanSound/marmite.mp3",
-      "hint": "ka tobili kɛ"
+        "word": "baara",
+        "image": "assets/nkalanIm/travail.jpg",
+        "audio": "nkalanSound/travail.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "fura",
-      "image": "assets/nkalanIm/medicament.jpg",
-      "audio": "nkalanSound/medicament.mp3",
-      "hint": "bana baana"
+        "word": "balimakɛ",
+        "image": "assets/nkalanIm/frere.jpg",
+        "audio": "nkalanSound/frere.mp3",
+        "hint": "I miiri dɔɔni"
     },
     {
-      "word": "kolo",
-      "image": "assets/nkalanIm/os.jpg",
-      "audio": "nkalanSound/os.mp3",
-      "hint": "a bɛ farikolo jɔ"
+        "word": "bama",
+        "image": "assets/nkalanIm/crocodile.jpg",
+        "audio": "nkalanSound/crocodile.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bamanankan",
+        "image": "assets/nkalanIm/bambara.jpg",
+        "audio": "nkalanSound/bambara.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bana",
+        "image": "assets/nkalanIm/maladie.jpg",
+        "audio": "nkalanSound/maladie.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "barama",
+        "image": "assets/nkalanIm/marmite.jpg",
+        "audio": "nkalanSound/marmite.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "basi",
+        "image": "assets/nkalanIm/couscous.jpg",
+        "audio": "nkalanSound/couscous.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "basiki",
+        "image": "assets/nkalanIm/tranquille.jpg",
+        "audio": "nkalanSound/tranquille.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bataki",
+        "image": "assets/nkalanIm/lettre.jpg",
+        "audio": "nkalanSound/lettre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bato",
+        "image": "assets/nkalanIm/bateau.jpg",
+        "audio": "nkalanSound/bateau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bere",
+        "image": "assets/nkalanIm/baton.jpg",
+        "audio": "nkalanSound/baton.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bɛlɛ",
+        "image": "assets/nkalanIm/gravier.jpg",
+        "audio": "nkalanSound/gravier.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "biɲɛ",
+        "image": "assets/nkalanIm/foie.jpg",
+        "audio": "nkalanSound/foie.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bolo",
+        "image": "assets/nkalanIm/main.jpg",
+        "audio": "nkalanSound/main.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bonya",
+        "image": "assets/nkalanIm/respect.jpg",
+        "audio": "nkalanSound/respect.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "bɔnbɔn",
+        "image": "assets/nkalanIm/bonbon.jpg",
+        "audio": "nkalanSound/bonbon.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "busan",
+        "image": "assets/nkalanIm/fouet.jpg",
+        "audio": "nkalanSound/fouet.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "buuru",
+        "image": "assets/nkalanIm/pain.jpg",
+        "audio": "nkalanSound/pain.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "caaman",
+        "image": "assets/nkalanIm/beaucoup.jpg",
+        "audio": "nkalanSound/beaucoup.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cakɛda",
+        "image": "assets/nkalanIm/service.jpg",
+        "audio": "nkalanSound/service.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "camancɛ",
+        "image": "assets/nkalanIm/milieu.jpg",
+        "audio": "nkalanSound/milieu.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛ",
+        "image": "assets/nkalanIm/homme.jpg",
+        "audio": "nkalanSound/homme.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛkɛ",
+        "image": "assets/nkalanIm/attieke.jpg",
+        "audio": "nkalanSound/attieke.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛkisɛ",
+        "image": "assets/nkalanIm/tronc.jpg",
+        "audio": "nkalanSound/tronc.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛkɔrɔba",
+        "image": "assets/nkalanIm/vieux.jpg",
+        "audio": "nkalanSound/vieux.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛmisɛn",
+        "image": "assets/nkalanIm/garcon.jpg",
+        "audio": "nkalanSound/garcon.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛɲɛ",
+        "image": "assets/nkalanIm/beaute.jpg",
+        "audio": "nkalanSound/beaute.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ci",
+        "image": "assets/nkalanIm/comissionner.jpg",
+        "audio": "nkalanSound/comissionner.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ciden",
+        "image": "assets/nkalanIm/messager.jpg",
+        "audio": "nkalanSound/messager.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cɛncɛn",
+        "image": "assets/nkalanIm/sable.jpg",
+        "audio": "nkalanSound/sable.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "cogoya",
+        "image": "assets/nkalanIm/facon.jpg",
+        "audio": "nkalanSound/facon.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "da",
+        "image": "assets/nkalanIm/bouche.jpg",
+        "audio": "nkalanSound/bouche.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "daba",
+        "image": "assets/nkalanIm/daba.jpg",
+        "audio": "nkalanSound/daba.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dan",
+        "image": "assets/nkalanIm/terminaison.jpg",
+        "audio": "nkalanSound/terminaison.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "danaya",
+        "image": "assets/nkalanIm/foi.jpg",
+        "audio": "nkalanSound/foi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "degeli",
+        "image": "assets/nkalanIm/entrainement.jpg",
+        "audio": "nkalanSound/entrainement.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "deli",
+        "image": "assets/nkalanIm/habitude.jpg",
+        "audio": "nkalanSound/habitude.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "delili",
+        "image": "assets/nkalanIm/quemander.jpg",
+        "audio": "nkalanSound/quemander.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "demisɛn",
+        "image": "assets/nkalanIm/enfant.jpg",
+        "audio": "nkalanSound/enfant.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "desanburu",
+        "image": "assets/nkalanIm/decembre.jpg",
+        "audio": "nkalanSound/decembre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dɛmɛ",
+        "image": "assets/nkalanIm/aide.jpg",
+        "audio": "nkalanSound/aide.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dɛsɛ",
+        "image": "assets/nkalanIm/incapacite.jpg",
+        "audio": "nkalanSound/incapacite.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "di",
+        "image": "assets/nkalanIm/miel.jpg",
+        "audio": "nkalanSound/miel.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dimi",
+        "image": "assets/nkalanIm/douleur.jpg",
+        "audio": "nkalanSound/douleur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "disi",
+        "image": "assets/nkalanIm/poitrine.jpg",
+        "audio": "nkalanSound/poitrine.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dogo",
+        "image": "assets/nkalanIm/cacher.jpg",
+        "audio": "nkalanSound/cacher.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dolo",
+        "image": "assets/nkalanIm/etoile.jpg",
+        "audio": "nkalanSound/etoile.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "don",
+        "image": "assets/nkalanIm/entre.jpg",
+        "audio": "nkalanSound/entre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "doonso",
+        "image": "assets/nkalanIm/chasseur.jpg",
+        "audio": "nkalanSound/chasseur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dɔgɔman",
+        "image": "assets/nkalanIm/petit.jpg",
+        "audio": "nkalanSound/petit.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "du",
+        "image": "assets/nkalanIm/famille.jpg",
+        "audio": "nkalanSound/famille.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dugu",
+        "image": "assets/nkalanIm/village.jpg",
+        "audio": "nkalanSound/village.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dukalen",
+        "image": "assets/nkalanIm/miroir.jpg",
+        "audio": "nkalanSound/miroir.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "duman",
+        "image": "assets/nkalanIm/doux.jpg",
+        "audio": "nkalanSound/doux.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dumuni",
+        "image": "assets/nkalanIm/repas.jpg",
+        "audio": "nkalanSound/repas.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "dusukun",
+        "image": "assets/nkalanIm/coeur.jpg",
+        "audio": "nkalanSound/coeur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "duwawu",
+        "image": "assets/nkalanIm/benediction.jpg",
+        "audio": "nkalanSound/benediction.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "e",
+        "image": "assets/nkalanIm/toi.jpg",
+        "audio": "nkalanSound/toi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ekutɛri",
+        "image": "assets/nkalanIm/ecouteur.jpg",
+        "audio": "nkalanSound/ecouteur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fa",
+        "image": "assets/nkalanIm/pere.jpg",
+        "audio": "nkalanSound/pere.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fali",
+        "image": "assets/nkalanIm/ane.jpg",
+        "audio": "nkalanSound/ane.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "famu",
+        "image": "assets/nkalanIm/comprehension.jpg",
+        "audio": "nkalanSound/comprehension.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fara",
+        "image": "assets/nkalanIm/pierre.jpg",
+        "audio": "nkalanSound/pierre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "farati",
+        "image": "assets/nkalanIm/attention.jpg",
+        "audio": "nkalanSound/attention.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fatɔ",
+        "image": "assets/nkalanIm/fou.jpg",
+        "audio": "nkalanSound/fou.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "feburuye",
+        "image": "assets/nkalanIm/fevrier.jpg",
+        "audio": "nkalanSound/fevrier.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "feere",
+        "image": "assets/nkalanIm/vente.jpg",
+        "audio": "nkalanSound/vente.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fɛɛrɛ",
+        "image": "assets/nkalanIm/strategie.jpg",
+        "audio": "nkalanSound/strategie.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fɛn",
+        "image": "assets/nkalanIm/chose.jpg",
+        "audio": "nkalanSound/chose.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fila",
+        "image": "assets/nkalanIm/peulh.jpg",
+        "audio": "nkalanSound/peulh.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "filen",
+        "image": "assets/nkalanIm/calebasse.jpg",
+        "audio": "nkalanSound/calebasse.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fili",
+        "image": "assets/nkalanIm/tromper.jpg",
+        "audio": "nkalanSound/tromper.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fiman",
+        "image": "assets/nkalanIm/noir.jpg",
+        "audio": "nkalanSound/noir.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fini",
+        "image": "assets/nkalanIm/habille.jpg",
+        "audio": "nkalanSound/habille.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fitini",
+        "image": "assets/nkalanIm/petite.jpg",
+        "audio": "nkalanSound/petite.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "foro",
+        "image": "assets/nkalanIm/champ.jpg",
+        "audio": "nkalanSound/champ.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "foronto",
+        "image": "assets/nkalanIm/piment.jpg",
+        "audio": "nkalanSound/piment.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fɔlɔ",
+        "image": "assets/nkalanIm/premier.jpg",
+        "audio": "nkalanSound/premier.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fu",
+        "image": "assets/nkalanIm/zero.jpg",
+        "audio": "nkalanSound/zero.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fukulan",
+        "image": "assets/nkalanIm/chapeau.jpg",
+        "audio": "nkalanSound/chapeau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fura",
+        "image": "assets/nkalanIm/medicament.jpg",
+        "audio": "nkalanSound/medicament.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "furu",
+        "image": "assets/nkalanIm/mariage.jpg",
+        "audio": "nkalanSound/mariage.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "fuuru",
+        "image": "assets/nkalanIm/estomac.jpg",
+        "audio": "nkalanSound/estomac.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ga",
+        "image": "assets/nkalanIm/hangar.jpg",
+        "audio": "nkalanSound/hangar.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gaasi",
+        "image": "assets/nkalanIm/gas.jpg",
+        "audio": "nkalanSound/gas.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gabugu",
+        "image": "assets/nkalanIm/cuisine.jpg",
+        "audio": "nkalanSound/cuisine.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gafa",
+        "image": "assets/nkalanIm/lunette.jpg",
+        "audio": "nkalanSound/lunette.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gafe",
+        "image": "assets/nkalanIm/livre.jpg",
+        "audio": "nkalanSound/livre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gala",
+        "image": "assets/nkalanIm/teinture.jpg",
+        "audio": "nkalanSound/teinture.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "garibu",
+        "image": "assets/nkalanIm/mendiant.jpg",
+        "audio": "nkalanSound/mendiant.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "garisɛkɛ",
+        "image": "assets/nkalanIm/chance.jpg",
+        "audio": "nkalanSound/chance.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gato",
+        "image": "assets/nkalanIm/gateau.jpg",
+        "audio": "nkalanSound/gateau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gɛlɛman",
+        "image": "assets/nkalanIm/dure.jpg",
+        "audio": "nkalanSound/dure.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gɛlɛya",
+        "image": "assets/nkalanIm/difficile.jpg",
+        "audio": "nkalanSound/difficile.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "gudɔrɔn",
+        "image": "assets/nkalanIm/goudron.jpg",
+        "audio": "nkalanSound/goudron.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "hakili",
+        "image": "assets/nkalanIm/cerveau.jpg",
+        "audio": "nkalanSound/cerveau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "halala",
+        "image": "assets/nkalanIm/propriete.jpg",
+        "audio": "nkalanSound/propriete.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "hami",
+        "image": "assets/nkalanIm/souci.jpg",
+        "audio": "nkalanSound/souci.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "hɛrɛ",
+        "image": "assets/nkalanIm/bonheur.jpg",
+        "audio": "nkalanSound/bonheur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "hiji",
+        "image": "assets/nkalanIm/hadj.jpg",
+        "audio": "nkalanSound/hadj.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "hinɛ",
+        "image": "assets/nkalanIm/pitie.jpg",
+        "audio": "nkalanSound/pitie.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "hɔrɔn",
+        "image": "assets/nkalanIm/honnete.jpg",
+        "audio": "nkalanSound/honnete.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "itali",
+        "image": "assets/nkalanIm/italie.jpg",
+        "audio": "nkalanSound/italie.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ja",
+        "image": "assets/nkalanIm/ombre.jpg",
+        "audio": "nkalanSound/ombre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jaba",
+        "image": "assets/nkalanIm/oignon.jpg",
+        "audio": "nkalanSound/oignon.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jabibi",
+        "image": "assets/nkalanIm/ananas.jpg",
+        "audio": "nkalanSound/ananas.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jago",
+        "image": "assets/nkalanIm/commerce.jpg",
+        "audio": "nkalanSound/commerce.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jalan",
+        "image": "assets/nkalanIm/sec.jpg",
+        "audio": "nkalanSound/sec.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jama",
+        "image": "assets/nkalanIm/foule.jpg",
+        "audio": "nkalanSound/foule.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "zanwuye",
+        "image": "assets/nkalanIm/janvier.jpg",
+        "audio": "nkalanSound/janvier.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "janya",
+        "image": "assets/nkalanIm/longeur.jpg",
+        "audio": "nkalanSound/longeur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jate",
+        "image": "assets/nkalanIm/compte.jpg",
+        "audio": "nkalanSound/compte.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jatigi",
+        "image": "assets/nkalanIm/tuteur.jpg",
+        "audio": "nkalanSound/tuteur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jeli",
+        "image": "assets/nkalanIm/griot.jpg",
+        "audio": "nkalanSound/griot.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jɛgɛ",
+        "image": "assets/nkalanIm/poisson.jpg",
+        "audio": "nkalanSound/poisson.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jɛnɛ",
+        "image": "assets/nkalanIm/djenne.jpg",
+        "audio": "nkalanSound/djenne.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ji",
+        "image": "assets/nkalanIm/eau.jpg",
+        "audio": "nkalanSound/eau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jinɛ",
+        "image": "assets/nkalanIm/diable.jpg",
+        "audio": "nkalanSound/diable.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jiri",
+        "image": "assets/nkalanIm/arbre.jpg",
+        "audio": "nkalanSound/arbre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jogo",
+        "image": "assets/nkalanIm/caractere.jpg",
+        "audio": "nkalanSound/caractere.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "joli",
+        "image": "assets/nkalanIm/sang.jpg",
+        "audio": "nkalanSound/sang.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jɔyɔrɔ",
+        "image": "assets/nkalanIm/place.jpg",
+        "audio": "nkalanSound/place.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "juma",
+        "image": "assets/nkalanIm/vendredi.jpg",
+        "audio": "nkalanSound/vendredi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "jumɛ",
+        "image": "assets/nkalanIm/quoi.jpg",
+        "audio": "nkalanSound/quoi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "zuwɛn",
+        "image": "assets/nkalanIm/juin.jpg",
+        "audio": "nkalanSound/juin.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "zuluye",
+        "image": "assets/nkalanIm/juillet.jpg",
+        "audio": "nkalanSound/juillet.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kaba",
+        "image": "assets/nkalanIm/mais.jpg",
+        "audio": "nkalanSound/mais.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kabako",
+        "image": "assets/nkalanIm/etonnement.jpg",
+        "audio": "nkalanSound/etonnement.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kalan",
+        "image": "assets/nkalanIm/apprentissage.jpg",
+        "audio": "nkalanSound/apprentissage.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kalanden",
+        "image": "assets/nkalanIm/eleve.jpg",
+        "audio": "nkalanSound/eleve.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kalanso",
+        "image": "assets/nkalanIm/ecole.jpg",
+        "audio": "nkalanSound/ecole.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kalaya",
+        "image": "assets/nkalanIm/chaud.jpg",
+        "audio": "nkalanSound/chaud.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "karamɔkɔ",
+        "image": "assets/nkalanIm/maitre.jpg",
+        "audio": "nkalanSound/maitre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kari",
+        "image": "assets/nkalanIm/dimanche.jpg",
+        "audio": "nkalanSound/dimanche.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kasa",
+        "image": "assets/nkalanIm/odeur.jpg",
+        "audio": "nkalanSound/odeur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kasi",
+        "image": "assets/nkalanIm/pleure.jpg",
+        "audio": "nkalanSound/pleure.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kelen",
+        "image": "assets/nkalanIm/un.jpg",
+        "audio": "nkalanSound/un.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɛlɛ",
+        "image": "assets/nkalanIm/guerre.jpg",
+        "audio": "nkalanSound/guerre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɛmɛ",
+        "image": "assets/nkalanIm/cent.jpg",
+        "audio": "nkalanSound/cent.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "sumalen",
+        "image": "assets/nkalanIm/fraiche.jpg",
+        "audio": "nkalanSound/fraiche.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɛnɛya",
+        "image": "assets/nkalanIm/sante.jpg",
+        "audio": "nkalanSound/sante.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kini",
+        "image": "assets/nkalanIm/riz.jpg",
+        "audio": "nkalanSound/riz.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kisɛ",
+        "image": "assets/nkalanIm/grain.jpg",
+        "audio": "nkalanSound/grain.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "koko",
+        "image": "assets/nkalanIm/mur.jpg",
+        "audio": "nkalanSound/mur.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kolo",
+        "image": "assets/nkalanIm/os.jpg",
+        "audio": "nkalanSound/os.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔ",
+        "image": "assets/nkalanIm/dos.jpg",
+        "audio": "nkalanSound/dos.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔkɔ",
+        "image": "assets/nkalanIm/sel.jpg",
+        "audio": "nkalanSound/sel.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔlɔsili",
+        "image": "assets/nkalanIm/surveiller.jpg",
+        "audio": "nkalanSound/surveiller.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔngɔ",
+        "image": "assets/nkalanIm/faim.jpg",
+        "audio": "nkalanSound/faim.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔnɔ",
+        "image": "assets/nkalanIm/oiseau.jpg",
+        "audio": "nkalanSound/oiseau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔɲɔmuso",
+        "image": "assets/nkalanIm/mariee.jpg",
+        "audio": "nkalanSound/mariee.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kɔɔri",
+        "image": "assets/nkalanIm/coton.jpg",
+        "audio": "nkalanSound/coton.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kumu",
+        "image": "assets/nkalanIm/acide.jpg",
+        "audio": "nkalanSound/acide.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kun",
+        "image": "assets/nkalanIm/cause.jpg",
+        "audio": "nkalanSound/cause.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kunafoni",
+        "image": "assets/nkalanIm/nouvelle.jpg",
+        "audio": "nkalanSound/nouvelle.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "kunkolo",
+        "image": "assets/nkalanIm/tete.jpg",
+        "audio": "nkalanSound/tete.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "laada",
+        "image": "assets/nkalanIm/habituel.jpg",
+        "audio": "nkalanSound/habituel.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ladili",
+        "image": "assets/nkalanIm/conseil.jpg",
+        "audio": "nkalanSound/conseil.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lajɛli",
+        "image": "assets/nkalanIm/regarde.jpg",
+        "audio": "nkalanSound/regarde.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lakalili",
+        "image": "assets/nkalanIm/raconter.jpg",
+        "audio": "nkalanSound/raconter.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lakare",
+        "image": "assets/nkalanIm/benjamin.jpg",
+        "audio": "nkalanSound/benjamin.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lamɛni",
+        "image": "assets/nkalanIm/ecoute.jpg",
+        "audio": "nkalanSound/ecoute.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "laɲini",
+        "image": "assets/nkalanIm/objectif.jpg",
+        "audio": "nkalanSound/objectif.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lemuruba",
+        "image": "assets/nkalanIm/orange.jpg",
+        "audio": "nkalanSound/orange.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lemurukumuni",
+        "image": "assets/nkalanIm/citron.jpg",
+        "audio": "nkalanSound/citron.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lɛ",
+        "image": "assets/nkalanIm/porc.jpg",
+        "audio": "nkalanSound/porc.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "lido",
+        "image": "assets/nkalanIm/ludo.jpg",
+        "audio": "nkalanSound/ludo.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "logo",
+        "image": "assets/nkalanIm/plantain.jpg",
+        "audio": "nkalanSound/plantain.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "maana",
+        "image": "assets/nkalanIm/histoire.jpg",
+        "audio": "nkalanSound/histoire.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "manika",
+        "image": "assets/nkalanIm/manding.jpg",
+        "audio": "nkalanSound/manding.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "marisi",
+        "image": "assets/nkalanIm/mars.jpg",
+        "audio": "nkalanSound/mars.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "masiri",
+        "image": "assets/nkalanIm/decoration.jpg",
+        "audio": "nkalanSound/decoration.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "massakɛ",
+        "image": "assets/nkalanIm/roi.jpg",
+        "audio": "nkalanSound/roi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "mɛ",
+        "image": "assets/nkalanIm/mai.jpg",
+        "audio": "nkalanSound/mai.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "mɛlɛkɛ",
+        "image": "assets/nkalanIm/ange.jpg",
+        "audio": "nkalanSound/ange.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "mi",
+        "image": "assets/nkalanIm/boire.jpg",
+        "audio": "nkalanSound/boire.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "miiri",
+        "image": "assets/nkalanIm/penser.jpg",
+        "audio": "nkalanSound/penser.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "misaali",
+        "image": "assets/nkalanIm/exemple.jpg",
+        "audio": "nkalanSound/exemple.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "misi",
+        "image": "assets/nkalanIm/boeuf.jpg",
+        "audio": "nkalanSound/boeuf.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "misiri",
+        "image": "assets/nkalanIm/mosquee.jpg",
+        "audio": "nkalanSound/mosquee.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "mɔkɔ",
+        "image": "assets/nkalanIm/personne.jpg",
+        "audio": "nkalanSound/personne.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "muku",
+        "image": "assets/nkalanIm/poudre.jpg",
+        "audio": "nkalanSound/poudre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "muru",
+        "image": "assets/nkalanIm/couteau.jpg",
+        "audio": "nkalanSound/couteau.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "muso",
+        "image": "assets/nkalanIm/femme.jpg",
+        "audio": "nkalanSound/femme.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "n'tɛnɛ",
+        "image": "assets/nkalanIm/lundi.jpg",
+        "audio": "nkalanSound/lundi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "nowanburu",
+        "image": "assets/nkalanIm/novembre.jpg",
+        "audio": "nkalanSound/novembre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "nɔnɔ",
+        "image": "assets/nkalanIm/lait.jpg",
+        "audio": "nkalanSound/lait.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "ɔkutɔburu",
+        "image": "assets/nkalanIm/octobre.jpg",
+        "audio": "nkalanSound/octobre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "sɛtanburu",
+        "image": "assets/nkalanIm/septembre.jpg",
+        "audio": "nkalanSound/septembre.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "sibiri",
+        "image": "assets/nkalanIm/samedi.jpg",
+        "audio": "nkalanSound/samedi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "sɔgɔmada",
+        "image": "assets/nkalanIm/matin.jpg",
+        "audio": "nkalanSound/matin.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "tangali",
+        "image": "assets/nkalanIm/proteger.jpg",
+        "audio": "nkalanSound/proteger.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "tarata",
+        "image": "assets/nkalanIm/mardi.jpg",
+        "audio": "nkalanSound/mardi.mp3",
+        "hint": "I miiri dɔɔni"
+    },
+    {
+        "word": "uti",
+        "image": "assets/nkalanIm/aout.jpg",
+        "audio": "nkalanSound/aout.mp3",
+        "hint": "I miiri dɔɔni"
     }
-  ]
+]
