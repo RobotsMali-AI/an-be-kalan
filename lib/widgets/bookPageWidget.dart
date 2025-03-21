@@ -209,7 +209,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                                         .userData.completedBooks
                                         .contains(book.title);
                                     final isDownloaded = widget
-                                        .userData.downloadBooks!
+                                        .userData.downloadBooks
                                         .contains(book.title);
 
                                     BookUser? bookUser;

@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:math';
 
 class WordsCompletePage extends StatefulWidget {
   const WordsCompletePage({super.key});
@@ -147,16 +148,23 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   }
 
   void _nextWord() {
-    if (currentIndex < gameWords.length - 1) {
-      setState(() {
-        currentIndex++;
-        userInput = '';
-        _isCorrect = false;
-        _showHint = false;
-      });
-    } else {
-      setState(() => _showCelebration = true);
-    }
+    // if (currentIndex < gameWords.length - 1) {
+    //   setState(() {
+    //     currentIndex++;
+    //     userInput = '';
+    //     _isCorrect = false;
+    //     _showHint = false;
+    //   });
+    // } else {
+    //   setState(() => _showCelebration = true);
+    // }
+
+    setState(() {
+      currentIndex = Random().nextInt(gameWords.length);
+      userInput = '';
+      _isCorrect = false;
+      _showHint = false;
+    });
   }
 
   Widget _buildWordDisplay() {

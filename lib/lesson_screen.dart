@@ -158,7 +158,7 @@ class LessonScreenState extends State<LessonScreen> {
     } else {
       currentSentences = [];
       currentSentence = '';
-      currentTextSpans = [TextSpan(text: "Page not found")];
+      currentTextSpans = [const TextSpan(text: "Page not found")];
       currentImageUrl = '';
     }
   }
@@ -403,7 +403,7 @@ class LessonScreenState extends State<LessonScreen> {
         // For punctuation, simply do not highlight.
         highlightedSpans.add(TextSpan(
           text: char,
-          style: TextStyle(
+          style: const TextStyle(
               color: Colors.red), // Or Colors.black if you prefer no highlight
         ));
       }

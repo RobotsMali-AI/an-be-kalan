@@ -4,6 +4,8 @@ import 'package:literacy_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
+  const PrivacyPolicyPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

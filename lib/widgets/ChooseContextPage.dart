@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:math';
 
 class ChooseContextPage extends StatefulWidget {
   const ChooseContextPage({super.key});
@@ -73,15 +73,21 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
       await _playAudio(contexts[currentIndex]['audio']);
       await Future.delayed(1.seconds);
 
-      if (currentIndex < contexts.length - 1) {
-        setState(() {
-          currentIndex++;
-          selectedImage = null;
-          _isCorrect = false;
-        });
-      } else {
-        setState(() => _showCelebration = true);
-      }
+      setState(() {
+        currentIndex = Random().nextInt(contexts.length);
+        selectedImage = null;
+        _isCorrect = false;
+      });
+
+      //     if (currentIndex < contexts.length - 1) {
+      //       setState(() {
+      //         currentIndex++;
+      //         selectedImage = null;
+      //         _isCorrect = false;
+      //       });
+      //     } else {
+      //       setState(() => _showCelebration = true);
+      //     }
     } else {
       await _audioPlayer.play(AssetSource('sounds/error.mp3'));
       setState(() => _isCorrect = false);

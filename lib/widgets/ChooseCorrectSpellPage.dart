@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:math';
 
 class ChooseCorrectSpellPage extends StatefulWidget {
   const ChooseCorrectSpellPage({super.key});
@@ -62,18 +63,28 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
   }
 
   void _nextWord() {
-    if (currentIndex < spells.length - 1) {
-      setState(() {
-        currentIndex++;
-        selectedOption = null;
-        _isCorrect = false;
-        _showHint = false;
-        _showWordCompletion = false;
-        _wordController.clear();
-      });
-    } else {
-      setState(() => _showCelebration = true);
-    }
+    // if (currentIndex < spells.length - 1) {
+    //   setState(() {
+    //     currentIndex++;
+    //     selectedOption = null;
+    //     _isCorrect = false;
+    //     _showHint = false;
+    //     _showWordCompletion = false;
+    //     _wordController.clear();
+    //   });
+    // } else {
+    //   setState(() => _showCelebration = true);
+    // }
+
+    setState(() {
+      currentIndex = Random().nextInt(spells.length);
+
+      selectedOption = null;
+      _isCorrect = false;
+      _showHint = false;
+      _showWordCompletion = false;
+      _wordController.clear();
+    });
   }
 
   void _checkTypedAnswer() {
