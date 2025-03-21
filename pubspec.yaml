@@ -118,6 +118,7 @@ flutter:
     - assets/jsons/questionsChoseContexPage.json
     - assets/jsons/chooseCorrectSpellPage.json
     - assets/jsons/wordCompletPage.json
+    - assets/jsons/alphabet.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,0 +1,14 @@
+[
+    {
+      "letter": "a",
+      "word": "abila",
+      "image": "assets/nkalanIm/laisse.jpg",
+      "audio": "nkalanSound/laisse.mp3"
+    },
+    {
+        "letter": "b",
+        "word": "ba",
+        "image": "assets/nkalanIm/fleuve.jpg",
+        "audio": "nkalanSound/fleuve.mp3"
+      }
+  ]
