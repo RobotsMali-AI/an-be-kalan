@@ -1,58 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:literacy_app/widgets/ChooseContextPage.dart';
-// import 'package:literacy_app/widgets/ChooseCorrectSpellPage.dart';
-// import 'package:literacy_app/widgets/WordsCompletePage.dart';
-// import 'package:path/path.dart';
-
-// class AcceuilNkalan extends StatelessWidget {
-//   const AcceuilNkalan({super.key});
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         backgroundColor: Colors.black,
-//         title: const Center(
-//           child: Text(
-//             'Game section',
-//             style: TextStyle(color: Colors.white),
-//           ),
-//         ),
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             ElevatedButton(
-//               onPressed: () => Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                     builder: (context) => const WordsCompletePage()),
-//               ),
-//               child: const Text('Words Complete'),
-//             ),
-//             ElevatedButton(
-//               onPressed: () => Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                     builder: (context) => const ChooseCorrectSpellPage()),
-//               ),
-//               child: const Text('Choose Correct Spell'),
-//             ),
-//             ElevatedButton(
-//               onPressed: () => Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                     builder: (context) => const ChooseContextPage()),
-//               ),
-//               child: const Text('Choose Context'),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:literacy_app/widgets/ChooseContextPage.dart';
 import 'package:literacy_app/widgets/ChooseCorrectSpellPage.dart';
@@ -72,7 +17,7 @@ class AcceuilNkalan extends StatelessWidget {
         'page': const WordsCompletePage(),
       },
       {
-        'title': 'sɛbɛn coko ɲuma sukandili',
+        'title': 'Sɛbɛn cogo ɲuman sugandili',
         'image':
             'assets/imJeu2.jpg', // Replace with actual grayscale image path
         'page': const ChooseCorrectSpellPage(),

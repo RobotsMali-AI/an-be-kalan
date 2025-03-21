@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   User? user;
   bool isLoading = true;
   bool verification = false;
-  // final Speech = SpeechToText();
+
   Future<void> initUserData() async {
     try {
       if (user != null) {
@@ -69,9 +69,33 @@ class _HomePageState extends State<HomePage> {
     log(user.toString());
   }
 
+  // void _onMoreIconTap(BuildContext context) async {
+  //   final size = MediaQuery.of(context).size;
+  //   final result = await showMenu(
+  //     context: context,
+  //     position: RelativeRect.fromLTRB(
+  //         size.width - 50, size.height - size.height * 0.28, 10, 0),
+  //     items: [
+  //       const PopupMenuItem(
+  //         value: 'profile',
+  //         child: Text('Profile'),
+  //       ),
+  //       const PopupMenuItem(
+  //         value: 'feedback',
+  //         child: Text('Feedback'),
+  //       ),
+  //     ],
+  //   );
+
+  //   if (result == 'profile') {
+  //     setState(() => _selectedTabIndex = 3); // Navigate to Profile
+  //   } else if (result == 'feedback') {
+  //     setState(() => _selectedTabIndex = 4); // Navigate to Feedback
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
-    //trasncribe();
     if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -94,38 +118,16 @@ class _HomePageState extends State<HomePage> {
           conext.read<DatabaseHelper>().insertUser(userData);
           conext.read<DatabaseHelper>().getUser(userData.uid!);
         }
-        // final downloadedBooks = conext
-        //     .read<DatabaseHelper>()
-        //     .books
-        //     .map((book) => book.title)
-        //     .toSet();
 
-        // for (var bookTitle in userData.downloadBooks ?? []) {
-        //   if (!downloadedBooks.contains(bookTitle)) {
-        //     final book = context
-        //         .read<ApiFirebaseService>()
-        //         .books
-        //         .firstWhereOrNull((b) => b.title == bookTitle);
-        //     if (book != null) {
-        //       conext.read<DatabaseHelper>().insertBook(book, userData.uid!);
-        //     }
-        //   }
-        // }
         if (_selectedTabIndex == 0) {
           return BookPageWidget(
               apiFirebaseService: apiFirebaseService,
               userData: userData,
               user: user!);
-        }
-        //  else if (_selectedTabIndex == 1) {
-        //   return const GameLevelPage(); // Placeholder for identical page
-        // }
-        else if (_selectedTabIndex == 1) {
+        } else if (_selectedTabIndex == 1) {
           return const TranslationPage();
         } else if (_selectedTabIndex == 2) {
           return const AcceuilNkalan();
-        } else if (_selectedTabIndex == 3) {
-          return FeedbackScreen();
         } else {
           return ProfilePage(user: user!, userData: userData);
         }
@@ -153,10 +155,7 @@ class _HomePageState extends State<HomePage> {
               icon: Icons.gamepad,
             ),
             CrystalNavigationBarItem(
-              icon: Icons.feedback_outlined,
-            ),
-            CrystalNavigationBarItem(
-              icon: Icons.person,
+              icon: Icons.person, // "More" icon
             ),
           ],
         ),

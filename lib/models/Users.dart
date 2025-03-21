@@ -6,7 +6,7 @@ class Users {
   String? uid;
   DateTime? birth_date;
   List<dynamic> completedBooks;
-  List<dynamic>? downloadBooks;
+  List<dynamic> downloadBooks;
   List<BookUser> inProgressBooks;
   List<dynamic> favoriteBooks;
   List<XPLog> xpLog;
@@ -16,7 +16,7 @@ class Users {
   Users({
     this.birth_date,
     this.uid,
-    this.downloadBooks,
+    required this.downloadBooks,
     required this.completedBooks,
     required this.inProgressBooks,
     required this.favoriteBooks,

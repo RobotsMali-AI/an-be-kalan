@@ -20,6 +20,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'models/Users.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:math';
 
 class LessonScreen extends StatefulWidget {
   final String uid;
@@ -275,42 +276,143 @@ class LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  // List<TextSpan> getHighlightedTextSpans(String transcription) {
+  //   String originalDisplay = currentSentence;
+  //   String originalCompare =
+  //       currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+  //   String transcriptionCompare =
+  //       transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+
+  //   List<TextSpan> highlightedSpans = [];
+  //   int matching = 0;
+  //   int compareIndex = 0;
+
+  //   for (int i = 0; i < originalDisplay.length; i++) {
+  //     String char = originalDisplay[i];
+  //     bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
+
+  //     if (isLetterOrSpace) {
+  //       bool isCorrect = compareIndex < transcriptionCompare.length &&
+  //           originalCompare[compareIndex] == transcriptionCompare[compareIndex];
+  //       if (isCorrect) matching++;
+  //       highlightedSpans.add(TextSpan(
+  //         text: char,
+  //         style: TextStyle(
+  //           color: isCorrect ? Colors.green : Colors.red,
+  //         ),
+  //       ));
+  //       compareIndex++;
+  //     } else {
+  //       highlightedSpans.add(TextSpan(
+  //         text: char,
+  //         style: TextStyle(color: Colors.red),
+  //       ));
+  //     }
+  //   }
+
+  //   double accuracy =
+  //       originalCompare.isEmpty ? 0 : matching / originalCompare.length;
+  //   double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
+  //   accuracies.add(adjustedAccuracy);
+
+  //   return highlightedSpans;
+  // }
+
+  Map<String, dynamic> computeAlignmentAndDistance(String ref, String hyp) {
+    int m = ref.length, n = hyp.length;
+    // Create dp table.
+    List<List<int>> dp = List.generate(
+        m + 1, (_) => List.filled(n + 1, 0, growable: false),
+        growable: false);
+
+    for (int i = 0; i <= m; i++) {
+      dp[i][0] = i;
+    }
+    for (int j = 0; j <= n; j++) {
+      dp[0][j] = j;
+    }
+    for (int i = 1; i <= m; i++) {
+      for (int j = 1; j <= n; j++) {
+        int cost = ref[i - 1] == hyp[j - 1] ? 0 : 1;
+        dp[i][j] = min(
+            dp[i - 1][j] + 1, min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost));
+      }
+    }
+
+    // Backtrace to compute the alignment (only for reference characters).
+    List<String> alignment = [];
+    int i = m, j = n;
+    while (i > 0 || j > 0) {
+      // Check diagonal move.
+      if (i > 0 &&
+          j > 0 &&
+          dp[i][j] == dp[i - 1][j - 1] + (ref[i - 1] == hyp[j - 1] ? 0 : 1)) {
+        alignment.add(ref[i - 1] == hyp[j - 1] ? "match" : "substitution");
+        i--;
+        j--;
+      }
+      // Check deletion.
+      else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
+        alignment.add("deletion");
+        i--;
+      }
+      // Check insertion.
+      else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
+        // For insertion, we don't record an operation for a reference character.
+        j--;
+      }
+    }
+    alignment = alignment.reversed.toList();
+    return {"alignment": alignment, "editDistance": dp[m][n]};
+  }
+
   List<TextSpan> getHighlightedTextSpans(String transcription) {
     String originalDisplay = currentSentence;
-    String originalCompare =
-        currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
-    String transcriptionCompare =
-        transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+    // Normalize by lowercasing and removing Unicode punctuation only.
+    String originalCompare = currentSentence
+        .toLowerCase()
+        .replaceAll(RegExp(r'\p{P}', unicode: true), '');
+    String transcriptionCompare = transcription
+        .toLowerCase()
+        .replaceAll(RegExp(r'\p{P}', unicode: true), '');
+
+    // Compute alignment and edit distance.
+    Map<String, dynamic> result =
+        computeAlignmentAndDistance(originalCompare, transcriptionCompare);
+    List<String> alignment = result["alignment"];
+    int editDistance = result["editDistance"];
 
     List<TextSpan> highlightedSpans = [];
-    int matching = 0;
-    int compareIndex = 0;
-
+    int alignmentIndex = 0;
+    int matchingCount = 0;
+    // Walk through the original display text.
     for (int i = 0; i < originalDisplay.length; i++) {
       String char = originalDisplay[i];
-      bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
-
+      bool isLetterOrSpace = RegExp(r'\p{L}|\s', unicode: true).hasMatch(char);
       if (isLetterOrSpace) {
-        bool isCorrect = compareIndex < transcriptionCompare.length &&
-            originalCompare[compareIndex] == transcriptionCompare[compareIndex];
-        if (isCorrect) matching++;
+        // Get the next operation from the alignment list.
+        String op = alignment[alignmentIndex];
+        alignmentIndex++;
+        bool isCorrect = (op == "match");
+        if (isCorrect) matchingCount++;
+        highlightedSpans.add(TextSpan(
+          text: char,
+          style: TextStyle(color: isCorrect ? Colors.green : Colors.red),
+        ));
+      } else {
+        // For punctuation, simply do not highlight.
         highlightedSpans.add(TextSpan(
           text: char,
           style: TextStyle(
-            color: isCorrect ? Colors.green : Colors.red,
-          ),
-        ));
-        compareIndex++;
-      } else {
-        highlightedSpans.add(TextSpan(
-          text: char,
-          style: TextStyle(color: Colors.red),
+              color: Colors.red), // Or Colors.black if you prefer no highlight
         ));
       }
     }
 
-    double accuracy =
-        originalCompare.isEmpty ? 0 : matching / originalCompare.length;
+    int total = originalCompare.length;
+    // Compute CER-based accuracy: accuracy = 1 - (editDistance / total), but not below 0.
+    double accuracy = total == 0 ? 0 : max(0, 1 - (editDistance / total));
+    // Boost accuracy by 1.15 and cap at 1.0.
     double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
     accuracies.add(adjustedAccuracy);
 
@@ -416,7 +518,6 @@ class LessonScreenState extends State<LessonScreen> {
     setState(() => _sending = false);
 
     final Users updatedUserData = result['userData'];
-    final int earnedXp = result['earnedXp'];
     final double averageAccuracy = result['averageAccuracy'];
 
     int totalBookWordCount = bookData!.content.values
@@ -488,92 +589,118 @@ class LessonScreenState extends State<LessonScreen> {
       context.read<ApiFirebaseService>().getUserData(widget.uid);
     });
     await showDialog(
-        context: context,
-        barrierDismissible: false, // Prevents dismissal by tapping outside
-        builder: (context) => Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              elevation: 8,
-              backgroundColor: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Takes only necessary space
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Title with a celebratory icon
-                    const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.star, color: Colors.amber, size: 32),
-                        SizedBox(width: 8),
-                        Text(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Title with a celebratory icon
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.star, color: Colors.amber, size: 32),
+                      SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
                           'Aw ni ce!',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  // Stat rows for XP, time, speed, and accuracy
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      children: [
+                        _buildStatRow(
+                          icon: Icons.monetization_on,
+                          label: 'XP Sɔrɔla',
+                          value:
+                              '${context.read<ApiFirebaseService>().userInfo!.xp} XP',
+                          color: Colors.green,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatRow(
+                          icon: Icons.timer,
+                          label: 'Waati min taara',
+                          value:
+                              '${readingTimeInMinutes.toStringAsFixed(2)} minutes',
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatRow(
+                          icon: Icons.speed,
+                          label: 'Kalan teliya',
+                          value: '$wordPerMin daɲɛw/minitiw',
+                          color: Colors.purple,
+                        ),
+                        const SizedBox(height: 12),
+                        _buildStatRow(
+                          icon: Icons.check_circle,
+                          label: 'Tilennenya',
+                          value: '$averageAcc%',
+                          color: Colors.orange,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    // Stat rows for XP, time, speed, and accuracy
-                    _buildStatRow(
-                      icon: Icons.monetization_on,
-                      label: 'XP Sɔrɔla',
-                      value:
-                          '${context.read<ApiFirebaseService>().userInfo!.xp} XP',
-                      color: Colors.green,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatRow(
-                      icon: Icons.timer,
-                      label: 'Waati min Taara',
-                      value:
-                          '${readingTimeInMinutes.toStringAsFixed(2)} minutes',
-                      color: Colors.blue,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatRow(
-                      icon: Icons.speed,
-                      label: 'Kalan teliya',
-                      value: '$wordPerMin daɲɛw/minitiw',
-                      color: Colors.purple,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildStatRow(
-                      icon: Icons.check_circle,
-                      label: 'Faranfasiya',
-                      value: '$averageAcc%',
-                      color: Colors.orange,
-                    ),
-                    const SizedBox(height: 24),
-                    // Continue button
-                    ElevatedButton(
+                  ),
+                  const SizedBox(height: 24),
+                  // Continue button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
                       onPressed: () => Navigator.pop(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black, // Button background
-                        foregroundColor: Colors.white, // Text/icon color
+                        backgroundColor: Colors.black,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 12),
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       child: const Text(
-                        'KA TAA FƐ',
+                        'Ka taa fɛ',
                         style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ).animate().fadeIn(duration: 300.ms).scale(
-                begin: const Offset(0.8, 0.8),
-                end: Offset(1.0, 1.0)) // Animation
-        );
+            ),
+          ),
+        ),
+      ).animate().fadeIn(duration: 300.ms).scale(
+            begin: const Offset(0.8, 0.8),
+            end: const Offset(1.0, 1.0),
+          ),
+    );
 
     Navigator.pop(context, updatedUserData);
   }
@@ -932,28 +1059,40 @@ class LessonScreenState extends State<LessonScreen> {
     required String value,
     required Color color,
   }) {
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(width: 12),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.black54,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 2,
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black54,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
-        const Spacer(), // Pushes value to the right
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: color,
+          Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

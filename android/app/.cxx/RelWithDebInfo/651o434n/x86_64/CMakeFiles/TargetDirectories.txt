@@ -1,0 +1,2 @@
+/Users/robotsmali/Documents/Projects/an-be-kalan/android/app/.cxx/RelWithDebInfo/651o434n/x86_64/CMakeFiles/edit_cache.dir
+/Users/robotsmali/Documents/Projects/an-be-kalan/android/app/.cxx/RelWithDebInfo/651o434n/x86_64/CMakeFiles/rebuild_cache.dir

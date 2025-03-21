@@ -11,6 +11,7 @@ class CustomRichetext extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RichText(
+      textAlign: TextAlign.center,
       text: TextSpan(
         style: const TextStyle(fontSize: 18, color: Colors.black),
         children: [

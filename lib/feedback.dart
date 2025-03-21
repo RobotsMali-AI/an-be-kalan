@@ -30,11 +30,18 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
     final String email = _emailController.text;
     final String message = _messageController.text;
 
-    final smtpServer = gmail('kidbigboss2017@gmail.com', 'zcyp ycxc bzdg vbnk');
+    // final smtpServer = gmail('anbekalanapp@robotsmali.org', 'K@lan-kadi.bam');
+    final smtpServer = SmtpServer(
+      'mail.robotsmali.org',
+      port: 465,
+      ssl: true,
+      username: 'anbekalanapp@robotsmali.org',
+      password: 'K@lan-kadi.bam',
+    );
 
     final emailMessage = Message()
       ..from = Address(email, name)
-      ..recipients.add('dembeleaymane2000@gmail.com')
+      ..recipients.add('anbekalanapp@robotsmali.org')
       ..subject = 'Feedback kura bɔra $name'
       ..text = message;
 
@@ -120,7 +127,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
-              automaticallyImplyLeading: false,
+              automaticallyImplyLeading: true,
               backgroundColor: Colors.transparent,
               elevation: 0,
               title: const Text(
@@ -161,7 +168,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         controller: _nameController,
                         focusNode: _nameFocus,
                         nextFocus: _emailFocus,
-                        label: 'I Tɔgɔ',
+                        label: 'I tɔgɔ',
                         hint: 'I tɔgɔ sɛbɛn',
                         icon: Icons.person,
                       ),
@@ -170,8 +177,8 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         controller: _emailController,
                         focusNode: _emailFocus,
                         nextFocus: _messageFocus,
-                        label: 'Aw ka Email',
-                        hint: 'Aw ye aw ka email sɛbɛn',
+                        label: 'Aw ka imɛli',
+                        hint: 'Aw ye aw ka imɛli sɛbɛn',
                         icon: Icons.email,
                         isEmail: true,
                       ),
@@ -188,7 +195,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                       ElevatedButton.icon(
                         onPressed: _pickImage,
                         icon: const Icon(Icons.image),
-                        label: const Text('Jaa nɔrɔ a la'),
+                        label: const Text('Ja nɔrɔ a la'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[800],
                           foregroundColor: Colors.white,
@@ -198,7 +205,7 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
                           child: Text(
-                            'Jaa sugandilen: ${_selectedImage!.name}',
+                            'Ja sugandilen: ${_selectedImage!.name}',
                             style: const TextStyle(color: Colors.white70),
                           ),
                         ),

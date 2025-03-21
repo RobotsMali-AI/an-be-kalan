@@ -4,6 +4,8 @@ import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/question.dart';
 import 'package:provider/provider.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:lottie/lottie.dart';
 
 class MultipleChoiceQuestionPage extends StatefulWidget {
   final List<Question> questions;
@@ -25,12 +27,13 @@ class MultipleChoiceQuestionPage extends StatefulWidget {
 class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
     with SingleTickerProviderStateMixin {
   int currentQuestionIndex = 0;
+  int correctCount = 0; // Track the number of correct answers
   List<String> selectedAnswers = [];
   bool isAnswered = false;
   late AnimationController _controller;
   late Animation<Offset> _shakeAnimation;
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
-  // Animation durations
   final _questionAnimDuration = 500.ms;
   final _optionAnimInterval = 100.ms;
 
@@ -49,21 +52,37 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
 
   void _toggleAnswer(String answer) {
     setState(() {
+      final allowedSelections =
+          widget.questions[currentQuestionIndex].correct.length;
       if (selectedAnswers.contains(answer)) {
+        // Remove the answer if it's already selected.
         selectedAnswers.remove(answer);
       } else {
-        selectedAnswers.add(answer);
+        // Only add the answer if the number of selections is below the allowed limit.
+        if (selectedAnswers.length < allowedSelections) {
+          selectedAnswers.add(answer);
+        }
+        // Optionally, you can provide feedback if the user tries to select too many answers.
       }
     });
   }
 
+  void _playSound(String soundPath) async {
+    await _audioPlayer.play(AssetSource(soundPath));
+  }
+
   void _checkAnswers() {
+    _playSound('sounds/check.mp3');
     setState(() {
       isAnswered = true;
       final correctAnswers = widget.questions[currentQuestionIndex].correct;
-      if (!(selectedAnswers.length == correctAnswers.length &&
-          selectedAnswers.every((answer) => correctAnswers.contains(answer)))) {
+      if (selectedAnswers.length == correctAnswers.length &&
+          selectedAnswers.every((answer) => correctAnswers.contains(answer))) {
         widget.user.xp += 1;
+        correctCount += 1; // Increment correct count when answer is correct
+        _playSound('sounds/correct.mp3');
+      } else {
+        _playSound('sounds/wrong.mp3');
         _controller.forward().then((_) => _controller.reverse());
       }
     });
@@ -90,36 +109,23 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
   }
 
   Color _getTileColor(String option) {
-    if (!isAnswered) {
-      return Colors.white;
-    }
+    if (!isAnswered) return Colors.white;
     final correctAnswers = widget.questions[currentQuestionIndex].correct;
     if (selectedAnswers.contains(option)) {
-      if (correctAnswers.contains(option)) {
-        return Colors.green;
-      } else {
-        return Colors.red;
-      }
+      return correctAnswers.contains(option) ? Colors.green : Colors.red;
     } else {
-      if (correctAnswers.contains(option)) {
-        return Colors.green
-            .withOpacity(0.3); // Light green for missed correct answers
-      } else {
-        return Colors.white;
-      }
+      return correctAnswers.contains(option)
+          ? Colors.green.withOpacity(0.3)
+          : Colors.white;
     }
   }
 
   Color _getTextColor(String option) {
-    if (!isAnswered) {
-      return Colors.black;
-    }
+    if (!isAnswered) return Colors.black;
     final tileColor = _getTileColor(option);
-    if (tileColor == Colors.green || tileColor == Colors.red) {
-      return Colors.white;
-    } else {
-      return Colors.black;
-    }
+    return (tileColor == Colors.green || tileColor == Colors.red)
+        ? Colors.white
+        : Colors.black;
   }
 
   bool _isOverallCorrect() {
@@ -140,21 +146,17 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
               color: Colors.black.withOpacity(0.2),
               spreadRadius: 10,
               blurRadius: 20,
-            )
+            ),
           ],
         ),
         padding: const EdgeInsets.all(30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.celebration,
-              size: 60,
-              color: Colors.black,
-            ),
+            Lottie.asset('assets/animations/celebration.json', width: 200),
             const SizedBox(height: 20),
             const Text(
-              "Awesome Job!",
+              "Baara ka bon kosɛbɛ!",
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -163,11 +165,10 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
             ),
             const SizedBox(height: 10),
             Text(
-              "You've completed ${widget.title}!",
-              style: const TextStyle(
-                fontSize: 18,
-                color: Colors.black,
-              ),
+              // Display correct answers and XP gained
+              "I ye hakɛ $correctCount/${widget.questions.length} dafa ani $correctCount XP sɔrɔ!",
+              style: const TextStyle(fontSize: 18, color: Colors.black),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -176,10 +177,8 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 15,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
               ),
               onPressed: () {
                 Navigator.pop(context);
@@ -187,10 +186,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
               },
               child: const Text(
                 "YAY!",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
             ),
           ],
@@ -251,167 +247,168 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
           ),
         ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.2),
       ),
-      body: Column(
-        children: [
-          // // Custom App Bar
-          // const SizedBox(
-          //   height: 50,
-          // ),
-
-          // Main Content
-          Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Question Card
-                    Container(
-                      margin: const EdgeInsets.only(top: 30, bottom: 40),
-                      padding: const EdgeInsets.all(25),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(25),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        currentQuestion.question,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          height: 1.3,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                        .animate(delay: _questionAnimDuration)
-                        .scaleXY(begin: 0.8, curve: Curves.elasticOut),
-
-                    // Answer Options with Color Feedback
-                    ...currentQuestion.options.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final option = entry.value;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Material(
-                          color: _getTileColor(option),
-                          child: CheckboxListTile(
-                            title: Text(
-                              option,
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: _getTextColor(option),
-                              ),
-                            ),
-                            value: selectedAnswers.contains(option),
-                            onChanged: isAnswered
-                                ? null
-                                : (bool? value) {
-                                    _toggleAnswer(option);
-                                  },
-                            activeColor: Colors.black,
-                            checkColor: Colors.white,
-                          ),
-                        )
-                            .animate(
-                              delay: _questionAnimDuration +
-                                  _optionAnimInterval * index,
-                            )
-                            .fadeIn()
-                            .slideX(begin: index.isEven ? 0.5 : -0.5),
-                      );
-                    }),
-
-                    const SizedBox(height: 20),
-
-                    // Overall Response Feedback
-                    if (isAnswered)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Text(
-                          _isOverallCorrect() ? "Good Job!" : "Try Again!",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color:
-                                _isOverallCorrect() ? Colors.green : Colors.red,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-
-                    const SizedBox(height: 20),
-
-                    // Submit Button
-                    if (!isAnswered)
-                      ElevatedButton(
-                        onPressed:
-                            selectedAnswers.isNotEmpty ? _checkAnswers : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 16,
-                          ),
-                        ),
-                        child: const Text(
-                          "Submit",
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-
-                    // Next Button
-                    if (isAnswered)
-                      ElevatedButton(
-                        onPressed: _nextQuestion,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              _isOverallCorrect() ? Colors.green : Colors.red,
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 40,
-                            vertical: 16,
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              "Next",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Icon(
-                              Icons.arrow_forward,
-                              size: 20,
-                              color: Colors.white,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white, Colors.grey[200]!],
+          ),
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(
+                        margin: const EdgeInsets.only(top: 30, bottom: 40),
+                        padding: const EdgeInsets.all(25),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(25),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              spreadRadius: 5,
                             ),
                           ],
                         ),
-                      ).animate().scale().shake(),
-                  ],
+                        child: Text(
+                          currentQuestion.question,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600,
+                            height: 1.3,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                          .animate(delay: _questionAnimDuration)
+                          .scaleXY(begin: 0.8, curve: Curves.elasticOut),
+                      ...currentQuestion.options.asMap().entries.map((entry) {
+                        final index = entry.key;
+                        final option = entry.value;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            decoration: BoxDecoration(
+                              color: _getTileColor(option),
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: CheckboxListTile(
+                              title: Text(
+                                option,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                  color: _getTextColor(option),
+                                ),
+                              ),
+                              value: selectedAnswers.contains(option),
+                              onChanged: isAnswered
+                                  ? null
+                                  : (bool? value) {
+                                      _toggleAnswer(option);
+                                    },
+                              activeColor: Colors.black,
+                              checkColor: Colors.white,
+                            ),
+                          )
+                              .animate(
+                                delay: _questionAnimDuration +
+                                    _optionAnimInterval * index,
+                              )
+                              .fadeIn()
+                              .slideX(begin: index.isEven ? 0.5 : -0.5),
+                        );
+                      }),
+                      const SizedBox(height: 20),
+                      if (isAnswered)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Text(
+                            _isOverallCorrect()
+                                ? "Baara ɲuman!"
+                                : "Baara jugu!",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: _isOverallCorrect()
+                                  ? Colors.green
+                                  : Colors.red,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+                      if (!isAnswered)
+                        ElevatedButton(
+                          onPressed:
+                              selectedAnswers.isNotEmpty ? _checkAnswers : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 16,
+                            ),
+                          ),
+                          child: const Text(
+                            "Ka jɛ",
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ),
+                      if (isAnswered)
+                        ElevatedButton(
+                          onPressed: _nextQuestion,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                _isOverallCorrect() ? Colors.green : Colors.red,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 40,
+                              vertical: 16,
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                "Nata",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
+                              SizedBox(width: 10),
+                              Icon(
+                                Icons.arrow_forward,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
+                        ).animate().scale().shake(),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -419,6 +416,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
   @override
   void dispose() {
     _controller.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_translate_api/google_translate_api.dart';
 
 class TranslationPage extends StatefulWidget {
@@ -21,18 +22,24 @@ class _TranslationPageState extends State<TranslationPage> {
     setState(() => _isTranslating = true);
 
     try {
-      final googleTranslate =
-          GoogleTranslate('[REMOVED]');
+      String apiKey = "";
+      try {
+        apiKey = await rootBundle.loadString('assets/secret.txt');
+      } catch (e) {
+        _showErrorSnackbar('Failed to load API key: $e');
+        return;
+      }
+      final googleTranslate = GoogleTranslate(apiKey);
       final translation = await googleTranslate.translate(
         text: _textController.text,
-        sourceLang: _sourceLanguage, // Specify the source language
+        sourceLang: _sourceLanguage,
         targetLang: _targetLanguage,
-      ); // Output: Hello
+      );
       setState(() {
         _translatedText = translation;
       });
     } catch (e) {
-      _showErrorSnackbar('Connection error: ${e.toString()}');
+      _showErrorSnackbar('Jɛɲɔgɔnya fili: ${e.toString()}');
     } finally {
       setState(() => _isTranslating = false);
     }
@@ -103,7 +110,7 @@ class _TranslationPageState extends State<TranslationPage> {
             IconButton(
               icon: const Icon(Icons.swap_vert, color: Colors.black),
               onPressed: _swapLanguages,
-              tooltip: 'Swap languages',
+              tooltip: 'Kanw ɲɔgɔn falen-falen',
             ),
             _buildLanguageDropdown(_targetLanguage, false),
           ],
@@ -123,8 +130,8 @@ class _TranslationPageState extends State<TranslationPage> {
           fillColor: Colors.white,
         ),
         items: const [
-          DropdownMenuItem(value: "fr", child: Text("Farancɛ 🇫🇷")),
-          DropdownMenuItem(value: "en", child: Text("Angilɛ 🇬🇧")),
+          DropdownMenuItem(value: "fr", child: Text("Faransikan 🇫🇷")),
+          DropdownMenuItem(value: "en", child: Text("Angilɛkan 🇬🇧")),
           DropdownMenuItem(value: "bm", child: Text("Bamanankan 🇲🇱")),
         ],
         onChanged: (newValue) => setState(() => isSource
@@ -167,7 +174,7 @@ class _TranslationPageState extends State<TranslationPage> {
       child: _isTranslating
           ? const CircularProgressIndicator(color: Colors.white)
           : const Text(
-              "Taa jabi",
+              "Ka bamanankan",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -188,7 +195,7 @@ class _TranslationPageState extends State<TranslationPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                "Taa jabi sɔrɔ:",
+                "Ka bamanankan sɔrɔ:",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,

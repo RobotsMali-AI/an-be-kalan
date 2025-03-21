@@ -10,8 +10,9 @@ import 'package:provider/provider.dart';
 
 class OneWordMultipleImagePage extends StatefulWidget {
   OneWordMultipleImagePage({required this.list, required this.user, super.key});
-  List<OneWordMultipleImagesQuestion> list;
-  Users user;
+  final List<OneWordMultipleImagesQuestion> list;
+  final Users user;
+
   @override
   _OneWordMultipleImagePageState createState() =>
       _OneWordMultipleImagePageState();
@@ -22,14 +23,14 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   late AnimationController _controller;
   final AudioPlayer _audioPlayer = AudioPlayer();
   final ConfettiController _confettiController =
-      ConfettiController(duration: 2.seconds);
+      ConfettiController(duration: const Duration(seconds: 2));
   int _currentQuestionIndex = 0;
   String? _selectedImage;
   bool _isCorrect = false;
-  bool _showHint = false;
+  bool _hasAnswered = false; // Track if the user has selected an answer
   bool _showCelebration = false;
+  int correctAnswers = 0; // Track correct answers
 
-  // Updated list of questions using the new class with Option objects
   List<OneWordMultipleImagesQuestion> questions = [];
 
   @override
@@ -39,7 +40,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1100),
       vsync: this,
-    )..forward(); // Start the animation when the page loads
+    )..forward();
   }
 
   @override
@@ -51,13 +52,13 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   }
 
   void _playAudio(String audioPath) async {
-    await _audioPlayer.stop(); // Prevent audio overlap
-    await _audioPlayer.play(AssetSource(audioPath.split('assets/')[1]));
+    await _audioPlayer.stop();
+    await _audioPlayer.play(AssetSource(audioPath));
   }
 
   void _checkAnswer(String imagePath) async {
+    if (_hasAnswered) return; // Prevent multiple selections
     final currentQuestion = questions[_currentQuestionIndex];
-    // Find the selected option
     final selectedOption = currentQuestion.options.firstWhere(
       (opt) => opt.image == imagePath,
       orElse: () => Option(image: '', correct: false),
@@ -67,25 +68,16 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
     setState(() {
       _selectedImage = imagePath;
       _isCorrect = isCorrect;
+      _hasAnswered = true;
     });
 
     if (isCorrect) {
-      _confettiController.play();
-      await Future.delayed(const Duration(seconds: 2));
+      correctAnswers++;
       widget.user.xp += 1;
-      if (_currentQuestionIndex < questions.length - 1) {
-        setState(() {
-          _currentQuestionIndex++;
-          _selectedImage = null;
-          _isCorrect = false;
-          _showHint = false;
-          // _loadRandomImage();
-        });
-      } else {
-        setState(() => _showCelebration = true);
-      }
+      _confettiController.play();
+      _playAudio('sounds/correct.mp3');
     } else {
-      await _audioPlayer.play(AssetSource('sounds/error.mp3'));
+      _playAudio('sounds/wrong.mp3');
     }
   }
 
@@ -95,64 +87,94 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
         _currentQuestionIndex++;
         _selectedImage = null;
         _isCorrect = false;
-        _showHint = false;
+        _hasAnswered = false;
       });
     } else {
-      setState(() => _showCelebration = true);
+      context
+          .read<ApiFirebaseService>()
+          .saveUserData(widget.user.uid!, widget.user);
+      showDialog(
+        context: context,
+        builder: (_) => _buildCelebration(),
+      );
+    }
+  }
+
+  String performanceMessage() {
+    double score = correctAnswers / questions.length;
+    if (score == 1.0) {
+      return 'Great Job! You got all answers correct!';
+    } else if (score >= 0.7) {
+      return 'Well Done! You did a fantastic job!';
+    } else {
+      return 'Good Effort! You can do even better!';
     }
   }
 
   Widget _buildCelebration() {
-    context
-        .read<ApiFirebaseService>()
-        .saveUserData(widget.user.uid!, widget.user);
-    return Stack(
-      children: [
-        Container(
-          color: Colors.white,
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Lottie.asset('assets/animations/celebration.json',
-                    width: 300, repeat: false),
-                const Text(
-                  'Amazing Work!',
-                  style: TextStyle(
-                      fontSize: 32,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold),
+    // Save user data before celebrating.
+    return Dialog(
+      child: Card(
+        elevation: 10,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Lottie.asset(
+                'assets/animations/celebration.json',
+                width: 250,
+                repeat: false,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                performanceMessage(),
+                style: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.celebration, color: Colors.white),
-                  label: const Text('Finish!',
-                      style: TextStyle(color: Colors.white)),
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 15),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'I ye ɲuman $correctAnswers/${questions.length}. I donniya $correctAnswers sɔrɔ!',
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.celebration, color: Colors.white),
+                label: const Text(
+                  'A bana',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepPurple,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 40,
+                    vertical: 15,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.topCenter,
-          child: ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            colors: [
-              Colors.black,
-              Colors.grey[800]!,
-              Colors.grey[600]!,
-              Colors.grey[400]!
+              ),
             ],
           ),
         ),
-      ],
+      ),
     );
   }
 
@@ -165,73 +187,51 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
 
   @override
   Widget build(BuildContext context) {
-    if (_showCelebration) return _buildCelebration();
-
     final currentQuestion = questions[_currentQuestionIndex];
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        automaticallyImplyLeading: false,
+        title: Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                currentQuestion.question,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.white], // Black-and-white theme
+            colors: [Colors.white, Colors.white],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              const SizedBox(
-                height: 50,
-              ),
-              // Header with question and close button
-              Container(
-                padding: const EdgeInsets.all(16),
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      currentQuestion.question,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              ),
-              // Progress indicator
               LinearProgressIndicator(
                 value: (_currentQuestionIndex + 1) / questions.length,
                 backgroundColor: Colors.grey[200],
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
               ),
-              const SizedBox(height: 16),
-              // Instruction text
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.touch_app, color: Colors.black),
-                    SizedBox(width: 10),
-                    Text(
-                      'Tap the correct picture for',
-                      style: TextStyle(fontSize: 18, color: Colors.black),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 10),
-              // Word display
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
@@ -243,21 +243,6 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                 ),
               ),
               const SizedBox(height: 20),
-              // Hint button
-              IconButton(
-                icon: const Icon(Icons.lightbulb, color: Colors.black),
-                onPressed: () => setState(() => _showHint = !_showHint),
-              ),
-              if (_showHint)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Text(
-                    'Hint: Look for the animal associated with eggs on a farm.',
-                    style: TextStyle(color: Colors.black, fontSize: 16),
-                  ),
-                ),
-              const SizedBox(height: 20),
-              // ListView for images
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -271,9 +256,9 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                       builder: (context, child) {
                         double animationValue = getAnimationValue(index);
                         return Opacity(
-                          opacity: animationValue, // Fade-in effect
+                          opacity: animationValue,
                           child: Transform.scale(
-                            scale: animationValue, // Scale-up effect
+                            scale: animationValue,
                             child: child,
                           ),
                         );
@@ -281,16 +266,18 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: GestureDetector(
-                          onTap: () => _checkAnswer(option.image),
+                          onTap: _hasAnswered
+                              ? null
+                              : () => _checkAnswer(option.image),
                           child: AnimatedContainer(
-                            duration: 300.ms,
+                            duration: const Duration(milliseconds: 300),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: isSelected
                                     ? (isCorrectOption
-                                        ? Colors.black
-                                        : Colors.grey[400]!)
+                                        ? Colors.green
+                                        : Colors.red)
                                     : Colors.transparent,
                                 width: 4,
                               ),
@@ -331,7 +318,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                               ),
                             ),
                           ).animate().shakeX(
-                                duration: 300.ms,
+                                duration: const Duration(milliseconds: 300),
                                 hz: 4,
                                 amount: isSelected && !_isCorrect ? 2 : 0,
                               ),
@@ -341,20 +328,18 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                   },
                 ),
               ),
-              if (_isCorrect)
-                Column(
-                  children: [
-                    Lottie.asset('assets/animations/success.json',
-                        width: 150, repeat: false),
-                    ElevatedButton(
-                      onPressed: _nextQuestion,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: const Text('Next'),
-                    ),
-                  ],
+              if (_hasAnswered)
+                ElevatedButton(
+                  onPressed: _nextQuestion,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: Text(
+                    _currentQuestionIndex < questions.length - 1
+                        ? 'Nata'
+                        : 'A bana',
+                  ),
                 ),
             ],
           ),

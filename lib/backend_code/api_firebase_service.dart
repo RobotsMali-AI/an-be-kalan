@@ -17,6 +17,31 @@ class ApiFirebaseService with ChangeNotifier {
   List<Book> books = [];
   Book? book;
 
+  Future<List<Book>> getBooks() async {
+    if (books.isNotEmpty) {
+      return books; // Return cached books if already loaded
+    }
+    // Replace with your actual Firebase fetch logic
+    try {
+      // Example: Fetch from Firebase
+      var fetchedBooks = await fetchBooksFromFirebase(); // Your implementation
+      books = List<Book>.from(fetchedBooks);
+      return books;
+    } catch (e) {
+      throw Exception('Failed to load books: $e');
+    }
+  }
+
+  // Your existing fetch logic here
+  Future<List<Book>> fetchBooksFromFirebase() async {
+    final booksData = <Book>[];
+    final data = await _firestore.collection('stories').get();
+    for (var element in data.docs) {
+      booksData.add(Book.fromJson(element));
+    }
+    return booksData;
+  }
+
   /// Function to save user data as a Firebase database collection
   Future<void> saveUserData(String uid, Users userData) async {
     await _firestore
@@ -78,6 +103,7 @@ class ApiFirebaseService with ChangeNotifier {
   /// Function that creates and save empty user data dictionary for new user
   Users createUserData(String uid) {
     Users userData = Users(
+        downloadBooks: [],
         completedBooks: [],
         favoriteBooks: [],
         xpLog: [],

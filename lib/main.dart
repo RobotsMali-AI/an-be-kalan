@@ -5,10 +5,11 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:literacy_app/auth.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
-import 'package:literacy_app/backend_code/transccribe.dart';
+import 'package:literacy_app/confidialiter.dart';
 import 'package:literacy_app/firebase_options.dart';
 import 'package:literacy_app/home.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Requires that a Firebase local emulator is running locally.
 /// See https://firebase.flutter.dev/docs/auth/start/#optional-prototype-and-test-with-firebase-local-emulator-suite
@@ -21,6 +22,8 @@ late final FirebaseAuth auth;
 // e.g via melos run firebase:emulator.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  bool? hasSeenConfidialiter = prefs.getBool('hasSeenConfidialiter');
   app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -49,7 +52,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
       ChangeNotifierProvider(create: (_) => DatabaseHelper())
     ],
-    child: const LiteracyAppEntry(),
+    child: LiteracyAppEntry(hasSeenConfidialiter: hasSeenConfidialiter),
   ));
   //runApp();
 }
@@ -58,7 +61,9 @@ Future<void> main() async {
 ///
 /// Returns a [MaterialApp].
 class LiteracyAppEntry extends StatelessWidget {
-  const LiteracyAppEntry({Key? key}) : super(key: key);
+  const LiteracyAppEntry({Key? key, required this.hasSeenConfidialiter})
+      : super(key: key);
+  final bool? hasSeenConfidialiter;
   // SpeechToText speech = SpeechToText();
   @override
   Widget build(BuildContext context) {
@@ -102,7 +107,9 @@ class LiteracyAppEntry extends StatelessWidget {
                       if (snapshot.hasData) {
                         return const HomePage();
                       }
-                      return const AuthGate();
+                      return hasSeenConfidialiter == true
+                          ? const AuthGate()
+                          : PrivacyPolicyPage();
                     },
                   ),
                 ),
