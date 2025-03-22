@@ -166,7 +166,7 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
                       userData.completedBooks.contains(book.title);
 
                   final isDownloaded =
-                      userData.downloadBooks!.contains(book.title);
+                      userData.downloadBooks.contains(book.title);
 
                   BookUser? bookUser;
                   for (var element in userData.inProgressBooks) {

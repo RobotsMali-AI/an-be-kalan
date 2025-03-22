@@ -9,7 +9,8 @@ import 'package:confetti/confetti.dart';
 import 'package:provider/provider.dart';
 
 class OneWordMultipleImagePage extends StatefulWidget {
-  OneWordMultipleImagePage({required this.list, required this.user, super.key});
+  const OneWordMultipleImagePage(
+      {required this.list, required this.user, super.key});
   final List<OneWordMultipleImagesQuestion> list;
   final Users user;
 
@@ -28,7 +29,7 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   String? _selectedImage;
   bool _isCorrect = false;
   bool _hasAnswered = false; // Track if the user has selected an answer
-  bool _showCelebration = false;
+  final bool _showCelebration = false;
   int correctAnswers = 0; // Track correct answers
 
   List<OneWordMultipleImagesQuestion> questions = [];

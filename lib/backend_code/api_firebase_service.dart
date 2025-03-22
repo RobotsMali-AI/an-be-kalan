@@ -192,8 +192,8 @@ class ApiFirebaseService with ChangeNotifier {
   }
 
   Future<void> addBookToSembest(Book b, Users userData) async {
-    if (!userData.downloadBooks!.contains(b.title)) {
-      userData.downloadBooks!.add(b.title);
+    if (!userData.downloadBooks.contains(b.title)) {
+      userData.downloadBooks.add(b.title);
     }
     await saveUserData(userData.uid!, userData);
     await helper.insertBook(b, userData.uid!);

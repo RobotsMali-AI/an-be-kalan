@@ -6,7 +6,7 @@ import 'package:literacy_app/models/oneimagemultiplewordsquestion.dart';
 import 'package:provider/provider.dart';
 
 class OneImageMultipleWordsPage extends StatefulWidget {
-  OneImageMultipleWordsPage(
+  const OneImageMultipleWordsPage(
       {required this.list, required this.user, super.key});
   final List<OneImageMultipleWordsQuestion> list;
   final Users user;

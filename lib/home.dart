@@ -3,7 +3,6 @@ import 'package:crystal_navigation_bar/crystal_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
-import 'package:literacy_app/feedback.dart';
 import 'package:literacy_app/profile.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:literacy_app/main.dart' show auth;
