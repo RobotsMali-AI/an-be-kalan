@@ -22,7 +22,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
 
   int currentIndex = 0;
   String? selectedOption;
-  bool _showCelebration = false;
+  final bool _showCelebration = false;
   bool _isCorrect = false;
   bool _showHint = false;
   bool _showWordCompletion = false;

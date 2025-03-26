@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:literacy_app/auth.dart';
 import 'package:literacy_app/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

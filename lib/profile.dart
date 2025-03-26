@@ -693,8 +693,10 @@ class _ProfilePageState extends State<ProfilePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.feedback),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => FeedbackScreen())),
+            onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const FeedbackScreen())),
             tooltip: 'Lafili',
           ),
           IconButton(

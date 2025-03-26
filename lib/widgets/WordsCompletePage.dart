@@ -5,7 +5,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'dart:math';
 
 class WordsCompletePage extends StatefulWidget {
   const WordsCompletePage({super.key});

@@ -21,7 +21,7 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
 
   int currentIndex = 0;
   String? selectedImage;
-  bool _showCelebration = false;
+  final bool _showCelebration = false;
   bool _isCorrect = false;
 
   @override
