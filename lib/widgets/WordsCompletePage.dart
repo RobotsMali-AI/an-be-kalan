@@ -5,7 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WordsCompletePage extends StatefulWidget {
   const WordsCompletePage({super.key});
@@ -20,18 +20,43 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
       ConfettiController(duration: const Duration(seconds: 2));
   final Random _random = Random();
 
-  List<Map<String, dynamic>> words = []; // Initialisé vide
+  List<Map<String, dynamic>> words = [];
   List<Map<String, dynamic>> gameWords = [];
   int currentIndex = 0;
   String userInput = '';
   bool _isCorrect = false;
   bool _showCelebration = false;
   bool _showHint = false;
+  List<String> completedWords = [];
 
   @override
   void initState() {
     super.initState();
-    _loadJsonData(); // Charger les données au démarrage
+    _loadJsonData();
+    _loadCompletedWords();
+  }
+
+  Widget buildHintText(String word, String partial) {
+    List<TextSpan> spans = [];
+    for (int i = 0; i < word.length; i++) {
+      if (partial[i] == '_') {
+        // Missing letter: show in bold
+        spans.add(TextSpan(
+          text: word[i],
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+        ));
+      } else {
+        // Already revealed letter: show normally
+        spans.add(TextSpan(
+          text: word[i],
+          style: const TextStyle(color: Colors.black),
+        ));
+      }
+    }
+    return RichText(
+      text: TextSpan(children: spans, style: const TextStyle(fontSize: 18)),
+    );
   }
 
   Future<void> _loadJsonData() async {
@@ -46,6 +71,18 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     } catch (e) {
       print('Erreur lors du chargement du JSON: $e');
     }
+  }
+
+  Future<void> _loadCompletedWords() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      completedWords = prefs.getStringList('completedWords') ?? [];
+    });
+  }
+
+  Future<void> _saveCompletedWords() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('completedWords', completedWords);
   }
 
   void _initializeGame() {
@@ -148,22 +185,40 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   }
 
   void _nextWord() {
-    // if (currentIndex < gameWords.length - 1) {
-    //   setState(() {
-    //     currentIndex++;
-    //     userInput = '';
-    //     _isCorrect = false;
-    //     _showHint = false;
-    //   });
-    // } else {
-    //   setState(() => _showCelebration = true);
-    // }
-
+    if (_isCorrect) {
+      final currentWord = gameWords[currentIndex]['word'] as String;
+      if (!completedWords.contains(currentWord)) {
+        completedWords.add(currentWord);
+        _saveCompletedWords();
+      }
+    }
     setState(() {
-      currentIndex = Random().nextInt(gameWords.length);
+      currentIndex = _random.nextInt(gameWords.length);
       userInput = '';
       _isCorrect = false;
       _showHint = false;
+    });
+  }
+
+  void _giveHint() {
+    final word = gameWords[currentIndex]['word'] as String;
+    final partial = gameWords[currentIndex]['partial'] as String;
+
+    List<int> underscoreIndices = [];
+    for (int i = 0; i < partial.length; i++) {
+      if (partial[i] == '_') {
+        underscoreIndices.add(i);
+      }
+    }
+
+    int numMissing = underscoreIndices.length;
+    if (userInput.length >= numMissing) return;
+
+    int hintPosition = userInput.length;
+    int selectedIndex = underscoreIndices[hintPosition];
+
+    setState(() {
+      userInput += word[selectedIndex];
     });
   }
 
@@ -174,19 +229,22 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     final inputChars = userInput.split('');
     int inputIndex = 0;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: chars.map<Widget>((char) {
-        if (char == '_') {
-          final inputChar =
-              inputIndex < inputChars.length ? inputChars[inputIndex] : '';
-          final isCorrect = inputChar.isNotEmpty &&
-              inputChar == word[inputIndex + partial.indexOf('_')];
-          inputIndex++;
-          return _buildLetterSlot(inputChar, isCorrect: isCorrect);
-        }
-        return _buildLetterSlot(char, isCorrect: true);
-      }).toList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: chars.map<Widget>((char) {
+          if (char == '_') {
+            final inputChar =
+                inputIndex < inputChars.length ? inputChars[inputIndex] : '';
+            final isCorrect = inputChar.isNotEmpty &&
+                inputChar == word[inputIndex + partial.indexOf('_')];
+            inputIndex++;
+            return _buildLetterSlot(inputChar, isCorrect: isCorrect);
+          }
+          return _buildLetterSlot(char, isCorrect: true);
+        }).toList(),
+      ),
     );
   }
 
@@ -246,37 +304,28 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   }
 
   Widget _showCelebrationDialog(BuildContext context) {
-    // Save user data to Firebase
-
-    // Show the celebration dialog
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(0),
       child: Stack(
         children: [
-          // Bright yellow background
           Container(
-            color: Colors.white30, // Cheerful background color
+            color: Colors.white30,
             child: Center(
               child: Card(
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                elevation: 10, // Shadow for a floating effect
+                elevation: 10,
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Golden badge image
-                      Image.asset(
-                        'assets/badge.png', // Add this asset to your project
-                        width: 150,
-                      ),
+                      Image.asset('assets/badge.png', width: 150),
                       const SizedBox(height: 20),
-                      // Celebratory text in Bambara
                       const Text(
                         'Baara Kabako!',
                         style: TextStyle(
@@ -286,14 +335,12 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Purple button with Bambara text
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(50), // Rounded shape
+                            borderRadius: BorderRadius.circular(50),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 50,
@@ -302,10 +349,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                         ),
                         child: const Text(
                           'Laban!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
                     ],
@@ -343,7 +387,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text('hakɛya ${currentIndex + 1}/${gameWords.length}',
+            child: Text('Hakɛ: ${completedWords.length}',
                 style: const TextStyle(color: Colors.white)),
           ),
         ],
@@ -359,7 +403,8 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                   ? Lottie.asset('assets/animations/success.json',
                       width: 150, repeat: false, key: UniqueKey())
                   : Image.asset(gameWords[currentIndex]['image'],
-                      height: 180, key: UniqueKey()),
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      key: UniqueKey()),
             ),
             const SizedBox(height: 16),
             GestureDetector(
@@ -392,16 +437,25 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: () => setState(() => userInput =
-                      userInput.isNotEmpty
-                          ? userInput.substring(0, userInput.length - 1)
-                          : ''),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black),
-                  child: const Text('Sigini jɔɔsi'),
-                ),
+                if (!_isCorrect)
+                  ElevatedButton(
+                    onPressed: () => setState(() => userInput =
+                        userInput.isNotEmpty
+                            ? userInput.substring(0, userInput.length - 1)
+                            : ''),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black),
+                    child: const Text('Sigini jɔɔsi'),
+                  ),
+                // if (!_isCorrect)
+                //   ElevatedButton(
+                //     onPressed: _giveHint,
+                //     style: ElevatedButton.styleFrom(
+                //         backgroundColor: Colors.white,
+                //         foregroundColor: Colors.black),
+                //     child: const Text('Bilasirali'),
+                //   ),
                 IconButton(
                   icon: const Icon(Icons.volume_up,
                       color: Colors.black, size: 30),

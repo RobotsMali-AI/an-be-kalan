@@ -4,7 +4,7 @@
     "options": ["ale", "adi", "abila"],
     "image": "assets/nkalanIm/laisse.jpg",
     "audio": "nkalanSound/laisse.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "I bolo bɔ a la",
     "partial": "abi"
   },
   {
@@ -12,7 +12,7 @@
     "options": ["abila", "adi", "aminɛ"],
     "image": "assets/nkalanIm/donne.jpg",
     "audio": "nkalanSound/donne.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "i bolo gɛrɛ",
     "partial": "ad"
   },
   {
@@ -20,7 +20,7 @@
     "options": ["araba", "alamisa", "juma"],
     "image": "assets/nkalanIm/jeudi.jpg",
     "audio": "nkalanSound/jeudi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "Dugujɛ juma la",
     "partial": "ala"
   },
   {
@@ -28,7 +28,7 @@
     "options": ["ale", "e", "adi"],
     "image": "assets/nkalanIm/lui.jpg",
     "audio": "nkalanSound/lui.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "e, ne ani ...",
     "partial": "al"
   },
   {
@@ -36,7 +36,7 @@
     "options": ["kaba", "alikaama", "alamisa"],
     "image": "assets/nkalanIm/ble.jpg",
     "audio": "nkalanSound/ble.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ kɛ makarɔni ye",
     "partial": "ali"
   },
   {
@@ -44,7 +44,7 @@
     "options": ["ata", "aminɛ", "adi"],
     "image": "assets/nkalanIm/attrape.jpg",
     "audio": "nkalanSound/attrape.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ kɛ ni bolo ye",
     "partial": "ami"
   },
   {
@@ -52,7 +52,7 @@
     "options": ["araba", "tarata", "alamisa"],
     "image": "assets/nkalanIm/mercredi.jpg",
     "audio": "nkalanSound/mercredi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ni dugu jɛra tarata kɔ",
     "partial": "ara"
   },
   {
@@ -60,7 +60,7 @@
     "options": ["gafe", "arajo", "araye"],
     "image": "assets/nkalanIm/radio.jpg",
     "audio": "nkalanSound/radio.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka kunafoni lamɛ",
     "partial": "ara"
   },
   {
@@ -68,7 +68,7 @@
     "options": ["foro", "araye", "arajo"],
     "image": "assets/nkalanIm/rail.jpg",
     "audio": "nkalanSound/rail.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "tɛrɛn ka sira",
     "partial": "ara"
   },
   {
@@ -76,7 +76,7 @@
     "options": ["ata", "aminɛ", "adi"],
     "image": "assets/nkalanIm/prend.jpg",
     "audio": "nkalanSound/prend.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... ka da i kun",
     "partial": "at"
   },
   {
@@ -84,7 +84,7 @@
     "options": ["marisi", "feburuye", "awirili"],
     "image": "assets/nkalanIm/avril.jpg",
     "audio": "nkalanSound/avril.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo naani",
     "partial": "awi"
   },
   {
@@ -92,7 +92,7 @@
     "options": ["ji", "ba", "bolo"],
     "image": "assets/nkalanIm/fleuve.jpg",
     "audio": "nkalanSound/fleuve.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... ji bɛ boli",
     "partial": "b"
   },
   {
@@ -100,7 +100,7 @@
     "options": ["baara", "bonya", "bana"],
     "image": "assets/nkalanIm/travail.jpg",
     "audio": "nkalanSound/travail.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... de bɛ mɔnɛ bɔ",
     "partial": "baa"
   },
   {
@@ -108,7 +108,7 @@
     "options": ["balimakɛ", "fa", "cɛ"],
     "image": "assets/nkalanIm/frere.jpg",
     "audio": "nkalanSound/frere.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "baden cɛman",
     "partial": "bali"
   },
   {
@@ -116,7 +116,7 @@
     "options": ["ba", "basi", "bama"],
     "image": "assets/nkalanIm/crocodile.jpg",
     "audio": "nkalanSound/crocodile.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ji la doonso",
     "partial": "bam"
   },
   {
@@ -124,7 +124,7 @@
     "options": ["manika", "bamanankan", "mɔkɔ"],
     "image": "assets/nkalanIm/bambara.jpg",
     "audio": "nkalanSound/bambara.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "maliyɛn caaman b'a fɔ",
     "partial": "bama"
   },
   {
@@ -132,7 +132,7 @@
     "options": ["baara", "dimi", "bana"],
     "image": "assets/nkalanIm/maladie.jpg",
     "audio": "nkalanSound/maladie.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... de y'an bɛ juku ye",
     "partial": "ban"
   },
   {
@@ -140,7 +140,7 @@
     "options": ["bama", "barama", "basi"],
     "image": "assets/nkalanIm/marmite.jpg",
     "audio": "nkalanSound/marmite.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "tobili bɛ kɛ n'a ye",
     "partial": "bara"
   },
   {
@@ -148,7 +148,7 @@
     "options": ["basi", "basiki", "bama"],
     "image": "assets/nkalanIm/couscous.jpg",
     "audio": "nkalanSound/couscous.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a muku walima a nama",
     "partial": "bas"
   },
   {
@@ -156,7 +156,7 @@
     "options": ["bonya", "basi", "basiki"],
     "image": "assets/nkalanIm/tranquille.jpg",
     "audio": "nkalanSound/tranquille.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka to yɔrɔ kelen",
     "partial": "basi"
   },
   {
@@ -164,7 +164,7 @@
     "options": ["bato", "bere", "bataki"],
     "image": "assets/nkalanIm/lettre.jpg",
     "audio": "nkalanSound/lettre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ sɛbɛn papiye kan ka ci",
     "partial": "bat"
   },
   {
@@ -172,7 +172,7 @@
     "options": ["bataki", "ba", "bato"],
     "image": "assets/nkalanIm/bateau.jpg",
     "audio": "nkalanSound/bateau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jila mɔbili ba",
     "partial": "bat"
   },
   {
@@ -180,7 +180,7 @@
     "options": ["bere", "bolo", "bɛlɛ"],
     "image": "assets/nkalanIm/baton.jpg",
     "audio": "nkalanSound/baton.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... kari ka fali bukɔ",
     "partial": "ber"
   },
   {
@@ -188,7 +188,7 @@
     "options": ["bɛlɛ", "fara", "bere"],
     "image": "assets/nkalanIm/gravier.jpg",
     "audio": "nkalanSound/gravier.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kisɛ ka kunba ni cɛncɛn ye",
     "partial": "bɛ"
   },
   {
@@ -196,7 +196,7 @@
     "options": ["disi", "biɲɛ", "bolo"],
     "image": "assets/nkalanIm/foie.jpg",
     "audio": "nkalanSound/foie.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "misi sɔn ni a ...",
     "partial": "bi"
   },
   {
@@ -204,7 +204,7 @@
     "options": ["bere", "bolo", "ba"],
     "image": "assets/nkalanIm/main.jpg",
     "audio": "nkalanSound/main.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "sen fila ni ... fila",
     "partial": "bol"
   },
   {
@@ -212,7 +212,7 @@
     "options": ["bonya", "basiki", "baara"],
     "image": "assets/nkalanIm/respect.jpg",
     "audio": "nkalanSound/respect.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... bɛ mande",
     "partial": "bon"
   },
   {
@@ -220,7 +220,7 @@
     "options": ["kini", "buuru", "bɔnbɔn"],
     "image": "assets/nkalanIm/bonbon.jpg",
     "audio": "nkalanSound/bonbon.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "timimani",
     "partial": "bɔn"
   },
   {
@@ -228,7 +228,7 @@
     "options": ["bere", "busan", "muru"],
     "image": "assets/nkalanIm/fouet.jpg",
     "audio": "nkalanSound/fouet.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bɛ kɛ ka bukɔli kɛ",
     "partial": "bus"
   },
   {
@@ -236,7 +236,7 @@
     "options": ["bɔnbɔn", "buuru", "kini"],
     "image": "assets/nkalanIm/pain.jpg",
     "audio": "nkalanSound/pain.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... ni kafe kadi",
     "partial": "buu"
   },
   {
@@ -244,7 +244,7 @@
     "options": ["caaman", "cɛ", "camancɛ"],
     "image": "assets/nkalanIm/beaucoup.jpg",
     "audio": "nkalanSound/beaucoup.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kelen tɛ, fila tɛ",
     "partial": "caa"
   },
   {
@@ -260,7 +260,7 @@
     "options": ["camancɛ", "caaman", "cɛ"],
     "image": "assets/nkalanIm/milieu.jpg",
     "audio": "nkalanSound/milieu.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "yuruku yuruku bɛ jamana ... la",
     "partial": "cam"
   },
   {
@@ -268,7 +268,7 @@
     "options": ["cɛmisɛn", "cɛ", "fa"],
     "image": "assets/nkalanIm/homme.jpg",
     "audio": "nkalanSound/homme.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ muso furu",
     "partial": "c"
   },
   {
@@ -276,7 +276,7 @@
     "options": ["cɛɲɛ", "cɛkisɛ", "cɛkɛ"],
     "image": "assets/nkalanIm/attieke.jpg",
     "audio": "nkalanSound/attieke.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kolowari kaw ka dumuni mandi",
     "partial": "cɛk"
   },
   {
@@ -284,7 +284,7 @@
     "options": ["cɛkɔrɔba", "cɛkisɛ", "cɛkɛ"],
     "image": "assets/nkalanIm/tronc.jpg",
     "audio": "nkalanSound/tronc.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "cɛntiri siri yɔrɔ",
     "partial": "cɛki"
   },
   {
@@ -292,7 +292,7 @@
     "options": ["cɛmisɛn", "cɛkɔrɔba", "cɛkisɛ"],
     "image": "assets/nkalanIm/vieux.jpg",
     "audio": "nkalanSound/vieux.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bonbonsi jɛra",
     "partial": "cɛkɔ"
   },
   {
@@ -300,7 +300,7 @@
     "options": ["cɛ", "demisɛn", "cɛmisɛn"],
     "image": "assets/nkalanIm/garcon.jpg",
     "audio": "nkalanSound/garcon.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a ka dɔgɔn wa muso tɛ",
     "partial": "cɛmi"
   },
   {
@@ -308,7 +308,7 @@
     "options": ["hɛrɛ", "cɛkɛ", "cɛɲɛ"],
     "image": "assets/nkalanIm/beaute.jpg",
     "audio": "nkalanSound/beaute.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka dilan ka ... kosɛbɛ ",
     "partial": "cɛɲ"
   },
   {
@@ -316,7 +316,7 @@
     "options": ["cakɛda", "ci", "ciden"],
     "image": "assets/nkalanIm/comissionner.jpg",
     "audio": "nkalanSound/comissionner.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ni cɛnin tɛ sɔn ... ma",
     "partial": "c"
   },
   {
@@ -324,7 +324,7 @@
     "options": ["ciden", "cakɛda", "ci"],
     "image": "assets/nkalanIm/messager.jpg",
     "audio": "nkalanSound/messager.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ ta ci la",
     "partial": "cid"
   },
   {
@@ -332,7 +332,7 @@
     "options": ["cɛncɛn", "fara", "cɛkɛ"],
     "image": "assets/nkalanIm/sable.jpg",
     "audio": "nkalanSound/sable.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ ɲakami siman la",
     "partial": "cɛn"
   },
   {
@@ -340,7 +340,7 @@
     "options": ["fɛɛrɛ", "jogo", "cogoya"],
     "image": "assets/nkalanIm/facon.jpg",
     "audio": "nkalanSound/facon.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a kɛ ... ɲɛna",
     "partial": "cogo"
   },
   {
@@ -348,7 +348,7 @@
     "options": ["disi", "da", "daba"],
     "image": "assets/nkalanIm/bouche.jpg",
     "audio": "nkalanSound/bouche.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ɲi bɛ ... kɔnɔ",
     "partial": "d"
   },
   {
@@ -356,7 +356,7 @@
     "options": ["daba", "dan", "da"],
     "image": "assets/nkalanIm/daba.jpg",
     "audio": "nkalanSound/daba.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "sɛnɛ bɛ kɛ ni ... ye",
     "partial": "dab"
   },
   {
@@ -364,7 +364,7 @@
     "options": ["danaya", "daba", "dan"],
     "image": "assets/nkalanIm/terminaison.jpg",
     "audio": "nkalanSound/terminaison.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a tɛ tɛmɛ yen ka",
     "partial": "da"
   },
   {
@@ -380,7 +380,7 @@
     "options": ["degeli", "dɛmɛ", "deli"],
     "image": "assets/nkalanIm/entrainement.jpg",
     "audio": "nkalanSound/entrainement.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... de ba to i bɛ se fɛnw kɛ cogo la",
     "partial": "deg"
   },
   {
@@ -388,7 +388,7 @@
     "options": ["deli", "delili", "degeli"],
     "image": "assets/nkalanIm/habitude.jpg",
     "audio": "nkalanSound/habitude.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ni mɛɛna a kan, i bɛ ... a la",
     "partial": "del"
   },
   {
@@ -396,7 +396,7 @@
     "options": ["delili", "dɛmɛ", "deli"],
     "image": "assets/nkalanIm/quemander.jpg",
     "audio": "nkalanSound/quemander.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "garibuw ka baara don",
     "partial": "deli"
   },
   {
@@ -404,7 +404,7 @@
     "options": ["dɔgɔman", "demisɛn", "cɛmisɛn"],
     "image": "assets/nkalanIm/enfant.jpg",
     "audio": "nkalanSound/enfant.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "mɔgɔ bɛɛ bɛ tɛmɛ ... ya fɛ",
     "partial": "demi"
   },
   {
@@ -412,7 +412,7 @@
     "options": ["desanburu", "nowanburu", "ɔkutɔburu"],
     "image": "assets/nkalanIm/decembre.jpg",
     "audio": "nkalanSound/decembre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo laban",
     "partial": "desa"
   },
   {
@@ -420,7 +420,7 @@
     "options": ["dɛsɛ", "dɛmɛ", "degeli"],
     "image": "assets/nkalanIm/aide.jpg",
     "audio": "nkalanSound/aide.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dɛsɛbagatɔw ni ... kakan",
     "partial": "dɛ"
   },
   {
@@ -428,7 +428,7 @@
     "options": ["dɛmɛ", "gɛlɛya", "dɛsɛ"],
     "image": "assets/nkalanIm/incapacite.jpg",
     "audio": "nkalanSound/incapacite.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bonya fɛ, fo ka a ... ka don dafɛ",
     "partial": "dɛs"
   },
   {
@@ -436,7 +436,7 @@
     "options": ["disi", "di", "dimi"],
     "image": "assets/nkalanIm/miel.jpg",
     "audio": "nkalanSound/miel.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a kadi fɛn bɛɛ ye",
     "partial": "d"
   },
   {
@@ -444,7 +444,7 @@
     "options": ["di", "dimi", "disi"],
     "image": "assets/nkalanIm/douleur.jpg",
     "audio": "nkalanSound/douleur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a sen jokinna, a bɛ ka a ...",
     "partial": "dim"
   },
   {
@@ -452,7 +452,7 @@
     "options": ["biɲɛ", "disi", "da"],
     "image": "assets/nkalanIm/poitrine.jpg",
     "audio": "nkalanSound/poitrine.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kɔnɔbara ni kan cɛ",
     "partial": "dis"
   },
   {
@@ -460,7 +460,7 @@
     "options": ["dolo", "don", "dogo"],
     "image": "assets/nkalanIm/cacher.jpg",
     "audio": "nkalanSound/cacher.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka bila ɲɛ kana a ye",
     "partial": "dog"
   },
   {
@@ -468,7 +468,7 @@
     "options": ["dolo", "ji", "dogo"],
     "image": "assets/nkalanIm/etoile.jpg",
     "audio": "nkalanSound/etoile.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kalo dɔkɔni",
     "partial": "dol"
   },
   {
@@ -476,7 +476,7 @@
     "options": ["don", "doonso", "dogo"],
     "image": "assets/nkalanIm/entre.jpg",
     "audio": "nkalanSound/entre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka ... so da fɛ",
     "partial": "do"
   },
   {
@@ -484,7 +484,7 @@
     "options": ["doonso", "jeli", "don"],
     "image": "assets/nkalanIm/chasseur.jpg",
     "audio": "nkalanSound/chasseur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ sogo faga kungo la",
     "partial": "doon"
   },
   {
@@ -492,7 +492,7 @@
     "options": ["duman", "dɔgɔman", "demisɛn"],
     "image": "assets/nkalanIm/petit.jpg",
     "audio": "nkalanSound/petit.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a ma bon",
     "partial": "dɔgɔ"
   },
   {
@@ -500,7 +500,7 @@
     "options": ["dugu", "du", "duman"],
     "image": "assets/nkalanIm/famille.jpg",
     "audio": "nkalanSound/famille.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "fa ni ba ani denw",
     "partial": "d"
   },
   {
@@ -508,7 +508,7 @@
     "options": ["foro", "du", "dugu"],
     "image": "assets/nkalanIm/village.jpg",
     "audio": "nkalanSound/village.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a tigi ni a denw bɛɛ ye mɔgɔw ye",
     "partial": "dug"
   },
   {
@@ -516,7 +516,7 @@
     "options": ["kelen", "dukalen", "duman"],
     "image": "assets/nkalanIm/miroir.jpg",
     "audio": "nkalanSound/miroir.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka i yɛrɛ filɛ",
     "partial": "duka"
   },
   {
@@ -524,7 +524,7 @@
     "options": ["duman", "dumuni", "du"],
     "image": "assets/nkalanIm/doux.jpg",
     "audio": "nkalanSound/doux.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ni bɛ ... dun, i bɛ bonya",
     "partial": "dum"
   },
   {
@@ -532,7 +532,7 @@
     "options": ["dumuni", "kini", "duman"],
     "image": "assets/nkalanIm/repas.jpg",
     "audio": "nkalanSound/repas.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ dun",
     "partial": "dumu"
   },
   {
@@ -540,7 +540,7 @@
     "options": ["hakili", "disi", "dusukun"],
     "image": "assets/nkalanIm/coeur.jpg",
     "audio": "nkalanSound/coeur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ne ya kanu ni ... ye",
     "partial": "dusu"
   },
   {
@@ -548,7 +548,7 @@
     "options": ["duwawu", "hɛrɛ", "dɛmɛ"],
     "image": "assets/nkalanIm/benediction.jpg",
     "audio": "nkalanSound/benediction.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "mɔgɔkɔrɔbaw b'a kɛ demisɛw ye",
     "partial": "duwa"
   },
   {
@@ -556,7 +556,7 @@
     "options": ["fa", "e", "ale"],
     "image": "assets/nkalanIm/toi.jpg",
     "audio": "nkalanSound/toi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ne ni ... ani ale",
     "partial": "e"
   },
   {
@@ -564,7 +564,7 @@
     "options": ["lamɛni", "ekutɛri", "gafa"],
     "image": "assets/nkalanIm/ecouteur.jpg",
     "audio": "nkalanSound/ecouteur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "lamɛni kɛ ni a juru ye",
     "partial": "eku"
   },
   {
@@ -572,7 +572,7 @@
     "options": ["balimakɛ", "fa", "cɛ"],
     "image": "assets/nkalanIm/pere.jpg",
     "audio": "nkalanSound/pere.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bamuso cɛ",
     "partial": "f"
   },
   {
@@ -580,7 +580,7 @@
     "options": ["foro", "fara", "fali"],
     "image": "assets/nkalanIm/ane.jpg",
     "audio": "nkalanSound/ane.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "wotoro sama",
     "partial": "fal"
   },
   {
@@ -588,7 +588,7 @@
     "options": ["famu", "farati", "hakili"],
     "image": "assets/nkalanIm/comprehension.jpg",
     "audio": "nkalanSound/comprehension.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ kɛ ni hakiliye",
     "partial": "fam"
   },
   {
@@ -596,7 +596,7 @@
     "options": ["fara", "bɛlɛ", "fali"],
     "image": "assets/nkalanIm/pierre.jpg",
     "audio": "nkalanSound/pierre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ bɔ kulucilen la",
     "partial": "far"
   },
   {
@@ -604,7 +604,7 @@
     "options": ["famu", "farati", "laɲini"],
     "image": "assets/nkalanIm/attention.jpg",
     "audio": "nkalanSound/attention.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a b'a to i bɛ kisi",
     "partial": "fara"
   },
   {
@@ -612,7 +612,7 @@
     "options": ["fili", "fatɔ", "fiman"],
     "image": "assets/nkalanIm/fou.jpg",
     "audio": "nkalanSound/fou.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a hakili y'a janfa",
     "partial": "fat"
   },
   {
@@ -620,7 +620,7 @@
     "options": ["feburuye", "marisi", "zanwuye"],
     "image": "assets/nkalanIm/fevrier.jpg",
     "audio": "nkalanSound/fevrier.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kalo filanan",
     "partial": "febu"
   },
   {
@@ -628,7 +628,7 @@
     "options": ["foro", "feere", "fɛɛrɛ"],
     "image": "assets/nkalanIm/vente.jpg",
     "audio": "nkalanSound/vente.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "k'a di ka wari minɛ",
     "partial": "fee"
   },
   {
@@ -636,7 +636,7 @@
     "options": ["feere", "fɛɛrɛ", "cogoya"],
     "image": "assets/nkalanIm/strategie.jpg",
     "audio": "nkalanSound/strategie.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka ... sigi sen ka walasa ka taaɲɛ",
     "partial": "fɛɛ"
   },
   {
@@ -652,7 +652,7 @@
     "options": ["fiman", "fila", "fili"],
     "image": "assets/nkalanIm/peulh.jpg",
     "audio": "nkalanSound/peulh.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "misi tigiw don",
     "partial": "fil"
   },
   {
@@ -660,7 +660,7 @@
     "options": ["foro", "filen", "fila"],
     "image": "assets/nkalanIm/calebasse.jpg",
     "audio": "nkalanSound/calebasse.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... ni galama bɛ bɔ barasun la",
     "partial": "file"
   },
   {
@@ -668,7 +668,7 @@
     "options": ["fili", "fatɔ", "fila"],
     "image": "assets/nkalanIm/tromper.jpg",
     "audio": "nkalanSound/tromper.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ji min baga bɛɛ bɛ fili",
     "partial": "fil"
   },
   {
@@ -676,7 +676,7 @@
     "options": ["fatɔ", "fiman", "fila"],
     "image": "assets/nkalanIm/noir.jpg",
     "audio": "nkalanSound/noir.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ kirikiri",
     "partial": "fim"
   },
   {
@@ -684,7 +684,7 @@
     "options": ["fini", "fila", "fitini"],
     "image": "assets/nkalanIm/habille.jpg",
     "audio": "nkalanSound/habille.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ mɔgɔ sutura",
     "partial": "fin"
   },
   {
@@ -692,7 +692,7 @@
     "options": ["fitini", "fini", "dɔgɔman"],
     "image": "assets/nkalanIm/petite.jpg",
     "audio": "nkalanSound/petite.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a ka dɔgɔn kosɛbɛ",
     "partial": "fit"
   },
   {
@@ -700,7 +700,7 @@
     "options": ["foro", "fɛn", "fara"],
     "image": "assets/nkalanIm/champ.jpg",
     "audio": "nkalanSound/champ.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "sɛnɛkɛ yɔrɔ",
     "partial": "for"
   },
   {
@@ -708,7 +708,7 @@
     "options": ["kumu", "foro", "foronto"],
     "image": "assets/nkalanIm/piment.jpg",
     "audio": "nkalanSound/piment.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a ka farin",
     "partial": "foro"
   },
   {
@@ -716,7 +716,7 @@
     "options": ["kelen", "foro", "fɔlɔ"],
     "image": "assets/nkalanIm/premier.jpg",
     "audio": "nkalanSound/premier.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛɛ daminɛ",
     "partial": "fɔ"
   },
   {
@@ -724,7 +724,7 @@
     "options": ["fɛn", "fu", "fura"],
     "image": "assets/nkalanIm/zero.jpg",
     "audio": "nkalanSound/zero.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "fosi",
     "partial": "f"
   },
   {
@@ -732,7 +732,7 @@
     "options": ["fini", "fukulan", "filen"],
     "image": "assets/nkalanIm/chapeau.jpg",
     "audio": "nkalanSound/chapeau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ don kunkolo la",
     "partial": "fuku"
   },
   {
@@ -740,7 +740,7 @@
     "options": ["fura", "furu", "fu"],
     "image": "assets/nkalanIm/medicament.jpg",
     "audio": "nkalanSound/medicament.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ bana ban",
     "partial": "fur"
   },
   {
@@ -748,7 +748,7 @@
     "options": ["muso", "furu", "fura"],
     "image": "assets/nkalanIm/mariage.jpg",
     "audio": "nkalanSound/mariage.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka muso yɛlɛma cɛ ka so",
     "partial": "fur"
   },
   {
@@ -764,7 +764,7 @@
     "options": ["gaasi", "ga", "gafa"],
     "image": "assets/nkalanIm/hangar.jpg",
     "audio": "nkalanSound/hangar.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "so tɛ n'ka a bɛ suma di",
     "partial": "g"
   },
   {
@@ -772,7 +772,7 @@
     "options": ["ga", "gudɔrɔn", "gaasi"],
     "image": "assets/nkalanIm/gas.jpg",
     "audio": "nkalanSound/gas.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ fiɲɛ kasa yɛlɛma",
     "partial": "gaa"
   },
   {
@@ -780,7 +780,7 @@
     "options": ["gafa", "gabugu", "ga"],
     "image": "assets/nkalanIm/cuisine.jpg",
     "audio": "nkalanSound/cuisine.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "tobili kɛ yɔrɔ",
     "partial": "gab"
   },
   {
@@ -788,7 +788,7 @@
     "options": ["gafe", "gafa", "gaasi"],
     "image": "assets/nkalanIm/lunette.jpg",
     "audio": "nkalanSound/lunette.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ don ɲɛ la",
     "partial": "gaf"
   },
   {
@@ -796,7 +796,7 @@
     "options": ["gafe", "gato", "gafa"],
     "image": "assets/nkalanIm/livre.jpg",
     "audio": "nkalanSound/livre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a kɔnɔfɛnw bɛ kalan",
     "partial": "gaf"
   },
   {
@@ -804,7 +804,7 @@
     "options": ["gala", "gɛlɛman", "gaasi"],
     "image": "assets/nkalanIm/teinture.jpg",
     "audio": "nkalanSound/teinture.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ finiw kulɛri falen",
     "partial": "gal"
   },
   {
@@ -812,7 +812,7 @@
     "options": ["garisɛkɛ", "jatigi", "garibu"],
     "image": "assets/nkalanIm/mendiant.jpg",
     "audio": "nkalanSound/mendiant.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "u bɛ kɛ morikalansow ani siradaw la",
     "partial": "gari"
   },
   {
@@ -820,7 +820,7 @@
     "options": ["hɛrɛ", "garisɛkɛ", "garibu"],
     "image": "assets/nkalanIm/chance.jpg",
     "audio": "nkalanSound/chance.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "... duman tigi ka sugu kadi",
     "partial": "gari"
   },
   {
@@ -828,7 +828,7 @@
     "options": ["gato", "buuru", "gafe"],
     "image": "assets/nkalanIm/gateau.jpg",
     "audio": "nkalanSound/gateau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ dilan kɔɲɔw ni wololi sankunbɛnw la",
     "partial": "gat"
   },
   {
@@ -836,7 +836,7 @@
     "options": ["gɛlɛman", "dɛsɛ", "gɛlɛya"],
     "image": "assets/nkalanIm/dure.jpg",
     "audio": "nkalanSound/dure.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "makaman tɛ",
     "partial": "gɛlɛ"
   },
   {
@@ -844,7 +844,7 @@
     "options": ["gɛlɛman", "gɛlɛya", "kɛlɛ"],
     "image": "assets/nkalanIm/difficile.jpg",
     "audio": "nkalanSound/difficile.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "nɔgɔman tɛ",
     "partial": "gɛlɛ"
   },
   {
@@ -852,7 +852,7 @@
     "options": ["gudɔrɔn", "fara", "gaasi"],
     "image": "assets/nkalanIm/goudron.jpg",
     "audio": "nkalanSound/goudron.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "mɔbiliw blɛ boli a kan",
     "partial": "gud"
   },
   {
@@ -860,7 +860,7 @@
     "options": ["dusukun", "hakili", "famu"],
     "image": "assets/nkalanIm/cerveau.jpg",
     "audio": "nkalanSound/cerveau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "miiri bɛ kɛ ni a ye",
     "partial": "haki"
   },
   {
@@ -868,7 +868,7 @@
     "options": ["halala", "hiji", "hɛrɛ"],
     "image": "assets/nkalanIm/propriete.jpg",
     "audio": "nkalanSound/propriete.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "i kelenpew ta don",
     "partial": "hala"
   },
   {
@@ -876,7 +876,7 @@
     "options": ["hami", "hinɛ", "hakili"],
     "image": "assets/nkalanIm/souci.jpg",
     "audio": "nkalanSound/souci.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "cɛbakɔrɔ ni ... tɛ ban",
     "partial": "ham"
   },
   {
@@ -884,7 +884,7 @@
     "options": ["halala", "hɛrɛ", "cɛɲɛ"],
     "image": "assets/nkalanIm/bonheur.jpg",
     "audio": "nkalanSound/bonheur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ALA ka ... kɛ an bɛɛ ye",
     "partial": "hɛ"
   },
   {
@@ -892,7 +892,7 @@
     "options": ["itali", "hiji", "halala"],
     "image": "assets/nkalanIm/hadj.jpg",
     "audio": "nkalanSound/hadj.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ kɛ alkaaba la",
     "partial": "hij"
   },
   {
@@ -900,7 +900,7 @@
     "options": ["duwawu", "hinɛ", "hami"],
     "image": "assets/nkalanIm/pitie.jpg",
     "audio": "nkalanSound/pitie.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka ... fantaw la",
     "partial": "hin"
   },
   {
@@ -908,7 +908,7 @@
     "options": ["hɛrɛ", "jatigi", "hɔrɔn"],
     "image": "assets/nkalanIm/honnete.jpg",
     "audio": "nkalanSound/honnete.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kan kelen tigi don",
     "partial": "hɔr"
   },
   {
@@ -916,7 +916,7 @@
     "options": ["itali", "jɛnɛ", "hiji"],
     "image": "assets/nkalanIm/italie.jpg",
     "audio": "nkalanSound/italie.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "erɔpu jamanaba dɔ don",
     "partial": "ita"
   },
   {
@@ -924,7 +924,7 @@
     "options": ["ji", "jaba", "ja"],
     "image": "assets/nkalanIm/ombre.jpg",
     "audio": "nkalanSound/ombre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ni tile bɛ taa, a bɛ janya",
     "partial": "j"
   },
   {
@@ -932,7 +932,7 @@
     "options": ["jabibi", "jaba", "jago"],
     "image": "assets/nkalanIm/oignon.jpg",
     "audio": "nkalanSound/oignon.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ kɛ na la",
     "partial": "jab"
   },
   {
@@ -940,7 +940,7 @@
     "options": ["foro", "jaba", "jabibi"],
     "image": "assets/nkalanIm/ananas.jpg",
     "audio": "nkalanSound/ananas.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jiriden don",
     "partial": "jabi"
   },
   {
@@ -948,7 +948,7 @@
     "options": ["jago", "feere", "jaba"],
     "image": "assets/nkalanIm/commerce.jpg",
     "audio": "nkalanSound/commerce.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "sani ni feereli",
     "partial": "jag"
   },
   {
@@ -956,7 +956,7 @@
     "options": ["janya", "jalan", "jama"],
     "image": "assets/nkalanIm/sec.jpg",
     "audio": "nkalanSound/sec.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ji fosi tɛ a la",
     "partial": "jal"
   },
   {
@@ -964,7 +964,7 @@
     "options": ["jama", "jɔyɔrɔ", "jalan"],
     "image": "assets/nkalanIm/foule.jpg",
     "audio": "nkalanSound/foule.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "u ka ca",
     "partial": "jam"
   },
   {
@@ -972,7 +972,7 @@
     "options": ["zanwuye", "marisi", "feburuye"],
     "image": "assets/nkalanIm/janvier.jpg",
     "audio": "nkalanSound/janvier.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo fɔlɔ",
     "partial": "zan"
   },
   {
@@ -980,7 +980,7 @@
     "options": ["jate", "jalan", "janya"],
     "image": "assets/nkalanIm/longeur.jpg",
     "audio": "nkalanSound/longeur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ taa yɔrɔjan",
     "partial": "jan"
   },
   {
@@ -988,7 +988,7 @@
     "options": ["kalan", "jate", "janya"],
     "image": "assets/nkalanIm/compte.jpg",
     "audio": "nkalanSound/compte.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kelen, fila, saba, naani ...",
     "partial": "jat"
   },
   {
@@ -996,7 +996,7 @@
     "options": ["jatigi", "massakɛ", "jeli"],
     "image": "assets/nkalanIm/tuteur.jpg",
     "audio": "nkalanSound/tuteur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "mɔkɔ marayɔrɔ min tɛ aw ka so ye",
     "partial": "jati"
   },
   {
@@ -1004,7 +1004,7 @@
     "options": ["doonso", "jeli", "jatigi"],
     "image": "assets/nkalanIm/griot.jpg",
     "audio": "nkalanSound/griot.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "u bɛ so weele mɔkɔw la",
     "partial": "jel"
   },
   {
@@ -1012,7 +1012,7 @@
     "options": ["jɛgɛ", "ji", "jɛnɛ"],
     "image": "assets/nkalanIm/poisson.jpg",
     "audio": "nkalanSound/poisson.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ ji kɔnɔ",
     "partial": "jɛg"
   },
   {
@@ -1020,7 +1020,7 @@
     "options": ["jɛgɛ", "jɛnɛ", "itali"],
     "image": "assets/nkalanIm/djenne.jpg",
     "audio": "nkalanSound/djenne.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bɔkɔ misiriba bɛ a dukula",
     "partial": "jɛn"
   },
   {
@@ -1028,7 +1028,7 @@
     "options": ["ba", "ji", "jɛgɛ"],
     "image": "assets/nkalanIm/eau.jpg",
     "audio": "nkalanSound/eau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka i mi",
     "partial": "j"
   },
   {
@@ -1036,7 +1036,7 @@
     "options": ["mɛlɛkɛ", "ji", "jinɛ"],
     "image": "assets/nkalanIm/diable.jpg",
     "audio": "nkalanSound/diable.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "mɔgɔ minuw tɛ ye ɲɛ la",
     "partial": "jin"
   },
   {
@@ -1044,7 +1044,7 @@
     "options": ["jiri", "kolo", "ji"],
     "image": "assets/nkalanIm/arbre.jpg",
     "audio": "nkalanSound/arbre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ falen wa a bɛ suma di",
     "partial": "jir"
   },
   {
@@ -1052,7 +1052,7 @@
     "options": ["jogo", "cogoya", "jago"],
     "image": "assets/nkalanIm/caractere.jpg",
     "audio": "nkalanSound/caractere.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "i bɛ waleya min kɛ ka caaya",
     "partial": "jog"
   },
   {
@@ -1060,7 +1060,7 @@
     "options": ["dolo", "joli", "ji"],
     "image": "assets/nkalanIm/sang.jpg",
     "audio": "nkalanSound/sang.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ boli farikolo kɔnɔ",
     "partial": "jol"
   },
   {
@@ -1068,7 +1068,7 @@
     "options": ["jɔyɔrɔ", "dugu", "jama"],
     "image": "assets/nkalanIm/place.jpg",
     "audio": "nkalanSound/place.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "misiri kɔnɔ, ɲɛfɛla ye almaami ... ye",
     "partial": "jɔy"
   },
   {
@@ -1076,7 +1076,7 @@
     "options": ["tarata", "juma", "alamisa"],
     "image": "assets/nkalanIm/vendredi.jpg",
     "audio": "nkalanSound/vendredi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jama bɛ taa seli tilegan fɛ",
     "partial": "jum"
   },
   {
@@ -1084,7 +1084,7 @@
     "options": ["jɛgɛ", "jumɛ", "juma"],
     "image": "assets/nkalanIm/quoi.jpg",
     "audio": "nkalanSound/quoi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ɲininkali don",
     "partial": "jum"
   },
   {
@@ -1092,7 +1092,7 @@
     "options": ["zuwɛn", "mɛ", "zuluye"],
     "image": "assets/nkalanIm/juin.jpg",
     "audio": "nkalanSound/juin.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo wɔɔrɔnan",
     "partial": "zuw"
   },
   {
@@ -1100,7 +1100,7 @@
     "options": ["uti", "zuluye", "zuwɛn"],
     "image": "assets/nkalanIm/juillet.jpg",
     "audio": "nkalanSound/juillet.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo wolowulanan",
     "partial": "zulu"
   },
   {
@@ -1108,7 +1108,7 @@
     "options": ["kaba", "kalan", "kabako"],
     "image": "assets/nkalanIm/mais.jpg",
     "audio": "nkalanSound/mais.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a kisɛ ka kunba",
     "partial": "kab"
   },
   {
@@ -1116,7 +1116,7 @@
     "options": ["kabako", "kasi", "kaba"],
     "image": "assets/nkalanIm/etonnement.jpg",
     "audio": "nkalanSound/etonnement.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "fɛn minuw bɛ mɔgɔ dabaliban",
     "partial": "kaba"
   },
   {
@@ -1124,7 +1124,7 @@
     "options": ["kalan", "kalaya", "kaba"],
     "image": "assets/nkalanIm/apprentissage.jpg",
     "audio": "nkalanSound/apprentissage.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dɔniya ɲinin",
     "partial": "kal"
   },
   {
@@ -1132,7 +1132,7 @@
     "options": ["karamɔkɔ", "kalanden", "kalan"],
     "image": "assets/nkalanIm/eleve.jpg",
     "audio": "nkalanSound/eleve.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ dɔniya ɲini la",
     "partial": "kala"
   },
   {
@@ -1140,7 +1140,7 @@
     "options": ["kalanso", "gafe", "kalan"],
     "image": "assets/nkalanIm/ecole.jpg",
     "audio": "nkalanSound/ecole.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kalan bɛ kɛ yɔrɔmin",
     "partial": "kalan"
   },
   {
@@ -1148,7 +1148,7 @@
     "options": ["sumalen", "kalan", "kalaya"],
     "image": "assets/nkalanIm/chaud.jpg",
     "audio": "nkalanSound/chaud.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a sigi tasuma kan ka ...",
     "partial": "kala"
   },
   {
@@ -1156,7 +1156,7 @@
     "options": ["massakɛ", "karamɔkɔ", "kalanden"],
     "image": "assets/nkalanIm/maitre.jpg",
     "audio": "nkalanSound/maitre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ dɔniya di",
     "partial": "kara"
   },
   {
@@ -1164,7 +1164,7 @@
     "options": ["sɔgɔmada", "kari", "kasi"],
     "image": "assets/nkalanIm/dimanche.jpg",
     "audio": "nkalanSound/dimanche.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dɔkɔkun bɛ laban don min la",
     "partial": "kar"
   },
   {
@@ -1172,7 +1172,7 @@
     "options": ["kasi", "kasa", "kabako"],
     "image": "assets/nkalanIm/odeur.jpg",
     "audio": "nkalanSound/odeur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "nu bɛ ... sama",
     "partial": "kas"
   },
   {
@@ -1180,7 +1180,7 @@
     "options": ["dimi", "kasi", "kasa"],
     "image": "assets/nkalanIm/pleure.jpg",
     "audio": "nkalanSound/pleure.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ɲɛji bɛ bɔ",
     "partial": "kas"
   },
   {
@@ -1188,7 +1188,7 @@
     "options": ["kelen", "fɔlɔ", "kɛlɛ"],
     "image": "assets/nkalanIm/un.jpg",
     "audio": "nkalanSound/un.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jate bɛ daminɛ ni a ye",
     "partial": "kel"
   },
   {
@@ -1196,7 +1196,7 @@
     "options": ["kɛlɛ", "gɛlɛya", "kelen"],
     "image": "assets/nkalanIm/guerre.jpg",
     "audio": "nkalanSound/guerre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jamanaw ni ɲɔgɔn cɛ ... maɲi",
     "partial": "kɛ"
   },
   {
@@ -1204,7 +1204,7 @@
     "options": ["caaman", "kɛmɛ", "kelen"],
     "image": "assets/nkalanIm/cent.jpg",
     "audio": "nkalanSound/cent.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka kelen fara 99 kan",
     "partial": "kɛm"
   },
   {
@@ -1212,7 +1212,7 @@
     "options": ["sumalen", "kɛnɛya", "kalaya"],
     "image": "assets/nkalanIm/fraiche.jpg",
     "audio": "nkalanSound/fraiche.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a ma kalan",
     "partial": "sum"
   },
   {
@@ -1220,7 +1220,7 @@
     "options": ["kɛnɛya", "bana", "sumalen"],
     "image": "assets/nkalanIm/sante.jpg",
     "audio": "nkalanSound/sante.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bana tɛ a la",
     "partial": "kɛnɛ"
   },
   {
@@ -1228,7 +1228,7 @@
     "options": ["kisɛ", "kini", "dumuni"],
     "image": "assets/nkalanIm/riz.jpg",
     "audio": "nkalanSound/riz.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "zamɛ walima najima",
     "partial": "kin"
   },
   {
@@ -1236,7 +1236,7 @@
     "options": ["kolo", "kisɛ", "kini"],
     "image": "assets/nkalanIm/grain.jpg",
     "audio": "nkalanSound/grain.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "muku tɛ fara tɛ",
     "partial": "kis"
   },
   {
@@ -1244,7 +1244,7 @@
     "options": ["koko", "kɔkɔ", "kolo"],
     "image": "assets/nkalanIm/mur.jpg",
     "audio": "nkalanSound/mur.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "so bɛ kooli n'a ye",
     "partial": "kok"
   },
   {
@@ -1252,7 +1252,7 @@
     "options": ["kolo", "jiri", "koko"],
     "image": "assets/nkalanIm/os.jpg",
     "audio": "nkalanSound/os.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka karaba ... ni fasa",
     "partial": "kol"
   },
   {
@@ -1260,7 +1260,7 @@
     "options": ["kɔkɔ", "kɔ", "kolo"],
     "image": "assets/nkalanIm/dos.jpg",
     "audio": "nkalanSound/dos.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "cɛkɔrɔba ... kurulen don",
     "partial": "k"
   },
   {
@@ -1268,7 +1268,7 @@
     "options": ["kɔkɔ", "kumu", "kɔ"],
     "image": "assets/nkalanIm/sel.jpg",
     "audio": "nkalanSound/sel.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ na timiya",
     "partial": "kɔk"
   },
   {
@@ -1276,7 +1276,7 @@
     "options": ["kɔ", "lamɛni", "kɔlɔsili"],
     "image": "assets/nkalanIm/surveiller.jpg",
     "audio": "nkalanSound/surveiller.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka i janto a la",
     "partial": "kɔlɔ"
   },
   {
@@ -1284,7 +1284,7 @@
     "options": ["kɔngɔ", "dimi", "kɔkɔ"],
     "image": "assets/nkalanIm/faim.jpg",
     "audio": "nkalanSound/faim.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ni dumuni tɛ i kɔnɔ",
     "partial": "kɔn"
   },
   {
@@ -1292,7 +1292,7 @@
     "options": ["jɛgɛ", "kɔnɔ", "kolo"],
     "image": "assets/nkalanIm/oiseau.jpg",
     "audio": "nkalanSound/oiseau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ pan ni kaman ye",
     "partial": "kɔn"
   },
   {
@@ -1300,7 +1300,7 @@
     "options": ["muso", "kɔɲɔmuso", "cɛkɔrɔba"],
     "image": "assets/nkalanIm/mariee.jpg",
     "audio": "nkalanSound/mariee.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "muso min furula sisan",
     "partial": "kɔɲɔ"
   },
   {
@@ -1308,7 +1308,7 @@
     "options": ["kɔkɔ", "kɔɔri", "kisɛ"],
     "image": "assets/nkalanIm/coton.jpg",
     "audio": "nkalanSound/coton.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a jɛlen wa a bɛ kɛ fini ye",
     "partial": "kɔɔ"
   },
   {
@@ -1316,7 +1316,7 @@
     "options": ["foronto", "kumu", "kɔkɔ"],
     "image": "assets/nkalanIm/acide.jpg",
     "audio": "nkalanSound/acide.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a ma kuna wa a ma timi",
     "partial": "kum"
   },
   {
@@ -1324,7 +1324,7 @@
     "options": ["kun", "kunafoni", "kunkolo"],
     "image": "assets/nkalanIm/cause.jpg",
     "audio": "nkalanSound/cause.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ko bɛ kɛ min kɔsɔn",
     "partial": "ku"
   },
   {
@@ -1332,7 +1332,7 @@
     "options": ["maana", "kunafoni", "kun"],
     "image": "assets/nkalanIm/nouvelle.jpg",
     "audio": "nkalanSound/nouvelle.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kibaru min bɛ i bɔ kow kalama",
     "partial": "kuna"
   },
   {
@@ -1340,7 +1340,7 @@
     "options": ["kunkolo", "kolo", "kun"],
     "image": "assets/nkalanIm/tete.jpg",
     "audio": "nkalanSound/tete.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "falikolo sanfɛla",
     "partial": "kunk"
   },
   {
@@ -1348,7 +1348,7 @@
     "options": ["laada", "lamɛni", "ladili"],
     "image": "assets/nkalanIm/habituel.jpg",
     "audio": "nkalanSound/habituel.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kow kɛ cogo kɔrɔ",
     "partial": "laa"
   },
   {
@@ -1356,7 +1356,7 @@
     "options": ["ladili", "lajɛli", "laada"],
     "image": "assets/nkalanIm/conseil.jpg",
     "audio": "nkalanSound/conseil.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ki bilasira",
     "partial": "ladi"
   },
   {
@@ -1364,7 +1364,7 @@
     "options": ["lamɛni", "lajɛli", "ladili"],
     "image": "assets/nkalanIm/regarde.jpg",
     "audio": "nkalanSound/regarde.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka ɲɛ waga a la",
     "partial": "laj"
   },
   {
@@ -1372,7 +1372,7 @@
     "options": ["lajɛli", "lakalili", "maana"],
     "image": "assets/nkalanIm/raconter.jpg",
     "audio": "nkalanSound/raconter.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka fɔ ni da ye",
     "partial": "laka"
   },
   {
@@ -1380,7 +1380,7 @@
     "options": ["kalanden", "laada", "lakare"],
     "image": "assets/nkalanIm/benjamin.jpg",
     "audio": "nkalanSound/benjamin.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "den bɛɛ la fitini",
     "partial": "laka"
   },
   {
@@ -1388,7 +1388,7 @@
     "options": ["kɔlɔsili", "lamɛni", "lajɛli"],
     "image": "assets/nkalanIm/ecoute.jpg",
     "audio": "nkalanSound/ecoute.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ki tulomajɔ a fɛ",
     "partial": "lam"
   },
   {
@@ -1396,7 +1396,7 @@
     "options": ["ladili", "laɲini", "farati"],
     "image": "assets/nkalanIm/objectif.jpg",
     "audio": "nkalanSound/objectif.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ ka kɛ kun min kama",
     "partial": "laɲ"
   },
   {
@@ -1404,7 +1404,7 @@
     "options": ["lemuruba", "kaba", "lemurukumuni"],
     "image": "assets/nkalanIm/orange.jpg",
     "audio": "nkalanSound/orange.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jiriden don",
     "partial": "lemu"
   },
   {
@@ -1412,7 +1412,7 @@
     "options": ["lemurukumuni", "foronto", "lemuruba"],
     "image": "assets/nkalanIm/citron.jpg",
     "audio": "nkalanSound/citron.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "jiriden kumunen",
     "partial": "lemuru"
   },
   {
@@ -1420,7 +1420,7 @@
     "options": ["lɛ", "lido", "logo"],
     "image": "assets/nkalanIm/porc.jpg",
     "audio": "nkalanSound/porc.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bagan don, a cɛ ka juku",
     "partial": "l"
   },
   {
@@ -1428,7 +1428,7 @@
     "options": ["lɛ", "lido", "logo"],
     "image": "assets/nkalanIm/ludo.jpg",
     "audio": "nkalanSound/ludo.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "tulon don, a bɛ kɛ karo karoni kɔnɔ",
     "partial": "lid"
   },
   {
@@ -1436,7 +1436,7 @@
     "options": ["jabibi", "logo", "lɛ"],
     "image": "assets/nkalanIm/plantain.jpg",
     "audio": "nkalanSound/plantain.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ i ko namasa",
     "partial": "log"
   },
   {
@@ -1444,7 +1444,7 @@
     "options": ["manika", "maana", "kunafoni"],
     "image": "assets/nkalanIm/histoire.jpg",
     "audio": "nkalanSound/histoire.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka ko kɔrɔw baro bɔ",
     "partial": "maa"
   },
   {
@@ -1452,7 +1452,7 @@
     "options": ["manika", "bamanankan", "maana"],
     "image": "assets/nkalanIm/manding.jpg",
     "audio": "nkalanSound/manding.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "Sunjata bɔnaw",
     "partial": "mani"
   },
   {
@@ -1460,7 +1460,7 @@
     "options": ["marisi", "zanwuye", "mɛ"],
     "image": "assets/nkalanIm/mars.jpg",
     "audio": "nkalanSound/mars.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo filanan",
     "partial": "mari"
   },
   {
@@ -1468,7 +1468,7 @@
     "options": ["cɛɲɛ", "masiri", "misiri"],
     "image": "assets/nkalanIm/decoration.jpg",
     "audio": "nkalanSound/decoration.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ don walasa k'i cɛɲɛ",
     "partial": "mas"
   },
   {
@@ -1476,7 +1476,7 @@
     "options": ["karamɔkɔ", "massakɛ", "jatigi"],
     "image": "assets/nkalanIm/roi.jpg",
     "audio": "nkalanSound/roi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ jamana mara",
     "partial": "massa"
   },
   {
@@ -1484,7 +1484,7 @@
     "options": ["mɛ", "zuwɛn", "marisi"],
     "image": "assets/nkalanIm/mai.jpg",
     "audio": "nkalanSound/mai.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo duurunan",
     "partial": "m"
   },
   {
@@ -1492,7 +1492,7 @@
     "options": ["hiji", "mɛlɛkɛ", "jinɛ"],
     "image": "assets/nkalanIm/ange.jpg",
     "audio": "nkalanSound/ange.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ALA ka cidenw san ni dugu cɛ",
     "partial": "mɛl"
   },
   {
@@ -1500,7 +1500,7 @@
     "options": ["miiri", "mi", "misi"],
     "image": "assets/nkalanIm/boire.jpg",
     "audio": "nkalanSound/boire.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ji ta k'a ...",
     "partial": "m"
   },
   {
@@ -1508,7 +1508,7 @@
     "options": ["mi", "miiri", "hakili"],
     "image": "assets/nkalanIm/penser.jpg",
     "audio": "nkalanSound/penser.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "hakili jakabɔ",
     "partial": "mii"
   },
   {
@@ -1516,7 +1516,7 @@
     "options": ["misaali", "lakalili", "maana"],
     "image": "assets/nkalanIm/exemple.jpg",
     "audio": "nkalanSound/exemple.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka tamasiɲɛ kɛ ni fɛn dɔ ye",
     "partial": "misa"
   },
   {
@@ -1524,7 +1524,7 @@
     "options": ["misi", "logo", "mi"],
     "image": "assets/nkalanIm/boeuf.jpg",
     "audio": "nkalanSound/boeuf.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "bagan don wa gere bɛ a la",
     "partial": "mis"
   },
   {
@@ -1532,7 +1532,7 @@
     "options": ["kalanso", "misiri", "masiri"],
     "image": "assets/nkalanIm/mosquee.jpg",
     "audio": "nkalanSound/mosquee.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "silamɛw seli yɔrɔ",
     "partial": "misi"
   },
   {
@@ -1548,7 +1548,7 @@
     "options": ["muku", "kumu", "muso"],
     "image": "assets/nkalanIm/poudre.jpg",
     "audio": "nkalanSound/poudre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "kolo tɛ kisɛ tɛ",
     "partial": "muk"
   },
   {
@@ -1556,7 +1556,7 @@
     "options": ["muku", "muru", "busan"],
     "image": "assets/nkalanIm/couteau.jpg",
     "audio": "nkalanSound/couteau.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ tigɛli kɛ",
     "partial": "mur"
   },
   {
@@ -1564,7 +1564,7 @@
     "options": ["muso", "kɔɲɔmuso", "mɔkɔ"],
     "image": "assets/nkalanIm/femme.jpg",
     "audio": "nkalanSound/femme.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "a bɛ taafe siri",
     "partial": "mus"
   },
   {
@@ -1572,7 +1572,7 @@
     "options": ["sibiri", "tarata", "n'tɛnɛ"],
     "image": "assets/nkalanIm/lundi.jpg",
     "audio": "nkalanSound/lundi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dɔkɔkun tile fɔlɔ",
     "partial": "n’tɛ"
   },
   {
@@ -1580,7 +1580,7 @@
     "options": ["nowanburu", "sɛtanburu", "desanburu"],
     "image": "assets/nkalanIm/novembre.jpg",
     "audio": "nkalanSound/novembre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo 11",
     "partial": "nowa"
   },
   {
@@ -1588,7 +1588,7 @@
     "options": ["n’tɛnɛ", "nɔnɔ", "di"],
     "image": "assets/nkalanIm/lait.jpg",
     "audio": "nkalanSound/lait.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ji walima muku, jɛɛma pasi",
     "partial": "nɔn"
   },
   {
@@ -1596,7 +1596,7 @@
     "options": ["ɔkutɔburu", "nowanburu", "sɛtanburu"],
     "image": "assets/nkalanIm/octobre.jpg",
     "audio": "nkalanSound/octobre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo 10",
     "partial": "ɔku"
   },
   {
@@ -1604,7 +1604,7 @@
     "options": ["nowanburu", "sɛtanburu", "ɔkutɔburu"],
     "image": "assets/nkalanIm/septembre.jpg",
     "audio": "nkalanSound/septembre.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo 9",
     "partial": "sɛta"
   },
   {
@@ -1612,7 +1612,7 @@
     "options": ["sɔgɔmada", "sibiri", "juma"],
     "image": "assets/nkalanIm/samedi.jpg",
     "audio": "nkalanSound/samedi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dɔkɔkun tile wɔɔrɔnan",
     "partial": "sib"
   },
   {
@@ -1620,7 +1620,7 @@
     "options": ["sibiri", "kari", "sɔgɔmada"],
     "image": "assets/nkalanIm/matin.jpg",
     "audio": "nkalanSound/matin.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dugujɛra sisan",
     "partial": "sɔgɔ"
   },
   {
@@ -1628,7 +1628,7 @@
     "options": ["kɔlɔsili", "tangali", "tarata"],
     "image": "assets/nkalanIm/proteger.jpg",
     "audio": "nkalanSound/proteger.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "ka tɔɔrɔ bali ka i sɔrɔ",
     "partial": "tang"
   },
   {
@@ -1636,7 +1636,7 @@
     "options": ["tarata", "araba", "tangali"],
     "image": "assets/nkalanIm/mardi.jpg",
     "audio": "nkalanSound/mardi.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "dɔkɔkun tile filanan",
     "partial": "tar"
   },
   {
@@ -1644,7 +1644,7 @@
     "options": ["uti", "zuluye", "mɛ"],
     "image": "assets/nkalanIm/aout.jpg",
     "audio":"nkalanSound/aout.mp3",
-    "hint": "I miri dɔɔni",
+    "hint": "san kalo seeginan",
     "partial": "ut"
   }
 ]

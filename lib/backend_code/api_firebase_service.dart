@@ -86,7 +86,7 @@ class ApiFirebaseService with ChangeNotifier {
       ),
     );
 
-    // Send the request
+    // Send the request]
     final response = await request.send();
     print(response);
     // Parse the streamed response
@@ -94,6 +94,10 @@ class ApiFirebaseService with ChangeNotifier {
       final respStr = await response.stream.bytesToString();
       return jsonDecode(respStr);
     } else {
+      SnackBar(
+        content: Text("Request failed with status code ${response.statusCode}"),
+        duration: Duration(seconds: 10),
+      );
       return {
         "error": "Request failed with status code ${response.statusCode}"
       };
@@ -221,6 +225,10 @@ class ApiFirebaseService with ChangeNotifier {
     // Validate file format
     if (!filePath.endsWith('.m4a') && !filePath.endsWith('.wav')) {
       print('Unsupported file format: $filePath');
+      SnackBar(
+        content: Text('Unsupported file format: $filePath'),
+        duration: Duration(seconds: 30),
+      );
       return null;
     }
     try {
@@ -228,9 +236,11 @@ class ApiFirebaseService with ChangeNotifier {
 
       final transcribe = await transcribeAudio(audioFile);
       return transcribe["transcription"];
-    } catch (e, stackTrace) {
-      print('Exception occurred: $e');
-      print(stackTrace);
+    } catch (e) {
+      SnackBar(
+        content: Text('Failed to transcribe audio: $e'),
+        duration: Duration(seconds: 30),
+      );
       return null;
     }
   }

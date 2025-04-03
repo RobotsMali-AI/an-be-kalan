@@ -5,7 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChooseCorrectSpellPage extends StatefulWidget {
   const ChooseCorrectSpellPage({super.key});
@@ -18,9 +18,9 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   final ConfettiController _confettiController =
       ConfettiController(duration: 2.seconds);
-  List<Map<String, dynamic>> spells = []; // Initialisé vide
-
-  int currentIndex = 0;
+  List<Map<String, dynamic>> allSpells = []; // All spells from JSON
+  List<Map<String, dynamic>> remainingSpells = []; // Spells yet to be shown
+  Map<String, dynamic>? currentSpell;
   String? selectedOption;
   bool _showCelebration = false;
   bool _isCorrect = false;
@@ -31,7 +31,8 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
   @override
   void initState() {
     super.initState();
-    _loadJsonData(); // Charger les données au démarrage
+    _loadJsonData();
+    _loadGameState();
   }
 
   Future<void> _loadJsonData() async {
@@ -40,61 +41,84 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
           .loadString('assets/jsons/chooseCorrectSpellPage.json');
       final List<dynamic> jsonData = jsonDecode(jsonString);
       setState(() {
-        spells = jsonData.cast<Map<String, dynamic>>();
+        allSpells = jsonData.cast<Map<String, dynamic>>();
+        remainingSpells = List.from(allSpells)
+          ..shuffle(); // Shuffle spells initially
+        if (remainingSpells.isNotEmpty) {
+          currentSpell = remainingSpells.removeAt(0); // Pick first spell
+        }
       });
     } catch (e) {
-      print('Erreur lors du chargement du JSON: $e');
+      print('Error loading JSON: $e');
     }
+  }
+
+  Future<void> _loadGameState() async {
+    _loadJsonData();
+    final prefs = await SharedPreferences.getInstance();
+    final String? savedSpells = prefs.getString('remainingSpells');
+    if (savedSpells != null) {
+      final List<dynamic> jsonData = jsonDecode(savedSpells);
+      setState(() {
+        remainingSpells = jsonData.cast<Map<String, dynamic>>();
+        if (remainingSpells.isNotEmpty) {
+          currentSpell = remainingSpells.removeAt(0);
+        } else {
+          _showCelebration = true; // Game finished if no spells remain
+        }
+      });
+    } else {
+      _loadJsonData(); // Load fresh game if no saved state
+    }
+  }
+
+  Future<void> _saveGameState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('remainingSpells', jsonEncode(remainingSpells));
   }
 
   void checkAnswer(String option) async {
     setState(() {
       selectedOption = option;
-      _isCorrect = option == spells[currentIndex]['word'];
+      _isCorrect = option == currentSpell!['word'];
     });
 
     if (_isCorrect) {
       _confettiController.play();
-      _playAudio(spells[currentIndex]['audio']);
+      _playAudio(currentSpell!['audio']);
       await Future.delayed(1.seconds);
+      //_nextWord(); // Automatically proceed to next spell after correct answer
     } else {
       await _audioPlayer.play(AssetSource('sounds/error.mp3'));
     }
   }
 
   void _nextWord() {
-    // if (currentIndex < spells.length - 1) {
-    //   setState(() {
-    //     currentIndex++;
-    //     selectedOption = null;
-    //     _isCorrect = false;
-    //     _showHint = false;
-    //     _showWordCompletion = false;
-    //     _wordController.clear();
-    //   });
-    // } else {
-    //   setState(() => _showCelebration = true);
-    // }
-
-    setState(() {
-      currentIndex = Random().nextInt(spells.length);
-
-      selectedOption = null;
-      _isCorrect = false;
-      _showHint = false;
-      _showWordCompletion = false;
-      _wordController.clear();
-    });
+    if (remainingSpells.isNotEmpty) {
+      setState(() {
+        currentSpell = remainingSpells.removeAt(0); // Take next spell
+        selectedOption = null;
+        _isCorrect = false;
+        _showHint = false;
+        _showWordCompletion = false;
+        _wordController.clear();
+      });
+      _saveGameState(); // Save state after moving to next spell
+    } else {
+      setState(() => _showCelebration = true); // Show celebration when done
+      _saveGameState();
+    }
   }
 
   void _checkTypedAnswer() {
-    if (_wordController.text.toUpperCase() == spells[currentIndex]['word']) {
+    if (_wordController.text.toUpperCase() == currentSpell!['word']) {
       setState(() {
         selectedOption = _wordController.text.toUpperCase();
         _isCorrect = true;
       });
       _confettiController.play();
-      _playAudio(spells[currentIndex]['audio']);
+      _playAudio(currentSpell!['audio']);
+      _nextWord(); // Proceed to next spell after correct typed answer
     } else {
       _audioPlayer.play(AssetSource('sounds/error.mp3'));
     }
@@ -102,10 +126,12 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
 
   Widget _buildOption(String option) {
     final isSelected = selectedOption == option;
-    final isCorrectOption = option == spells[currentIndex]['word'];
+    final isCorrectOption = option == currentSpell!['word'];
 
     return GestureDetector(
-      onTap: () => checkAnswer(option),
+      onTap: (selectedOption != null && _isCorrect)
+          ? null
+          : () => checkAnswer(option), // Disable tap after selection
       child: AnimatedContainer(
         duration: 300.ms,
         decoration: BoxDecoration(
@@ -116,7 +142,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
           borderRadius: BorderRadius.circular(15),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(12.0),
           child: Row(
             children: [
               if (isSelected)
@@ -128,7 +154,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
               Text(
                 option,
                 style: TextStyle(
-                  fontSize: 24,
+                  fontSize: 20,
                   color: isSelected && isCorrectOption
                       ? Colors.white
                       : Colors.black,
@@ -154,67 +180,105 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
     );
   }
 
-  Widget _showCelebrationDialog(BuildContext context) {
-    // Save user data to Firebase
+  // Widget _buildOption(String option) {
+  //   final isSelected = selectedOption == option;
+  //   final isCorrectOption = option == currentSpell!['word'];
 
-    // Show the celebration dialog
+  //   return GestureDetector(
+  //     onTap: () => checkAnswer(option),
+  //     child: AnimatedContainer(
+  //       duration: 300.ms,
+  //       decoration: BoxDecoration(
+  //         color: isSelected
+  //             ? (isCorrectOption ? Colors.black : Colors.grey[300])
+  //             : Colors.white,
+  //         border: Border.all(color: Colors.black),
+  //         borderRadius: BorderRadius.circular(15),
+  //       ),
+  //       child: Padding(
+  //         padding: const EdgeInsets.all(16.0),
+  //         child: Row(
+  //           children: [
+  //             if (isSelected)
+  //               Icon(
+  //                 isCorrectOption ? Icons.check : Icons.close,
+  //                 color: isCorrectOption ? Colors.white : Colors.black,
+  //               ),
+  //             const SizedBox(width: 10),
+  //             Text(
+  //               option,
+  //               style: TextStyle(
+  //                 fontSize: 24,
+  //                 color: isSelected && isCorrectOption
+  //                     ? Colors.white
+  //                     : Colors.black,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     )
+  //         .animate()
+  //         .scaleXY(
+  //           begin: 1,
+  //           end: isSelected ? 1.05 : 1,
+  //           duration: 200.ms,
+  //         )
+  //         .then()
+  //         .shakeX(
+  //           duration: 300.ms,
+  //           hz: 4,
+  //           amount: isSelected && !isCorrectOption ? 1 : 0,
+  //         ),
+  //   );
+  // }
+
+  Widget _showCelebrationDialog(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(0),
       child: Stack(
         children: [
-          // Bright yellow background
           Container(
-            color: Colors.white30, // Cheerful background color
+            color: Colors.white30,
             child: Center(
               child: Card(
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                elevation: 10, // Shadow for a floating effect
+                    borderRadius: BorderRadius.circular(20)),
+                elevation: 10,
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Golden badge image
-                      Image.asset(
-                        'assets/badge.png', // Add this asset to your project
-                        width: 150,
-                      ),
+                      Image.asset('assets/badge.png', width: 150),
                       const SizedBox(height: 20),
-                      // Celebratory text in Bambara
                       const Text(
                         'Baara Kabako!',
                         style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                       const SizedBox(height: 20),
-                      // Purple button with Bambara text
                       ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _restartGame(); // Restart game with new random order
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(50), // Rounded shape
-                          ),
+                              borderRadius: BorderRadius.circular(50)),
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 50,
-                            vertical: 20,
-                          ),
+                              horizontal: 50, vertical: 20),
                         ),
                         child: const Text(
-                          'Laban!',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
+                          'Restart!',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                       ),
                     ],
@@ -228,24 +292,35 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
     );
   }
 
+  void _restartGame() {
+    setState(() {
+      remainingSpells = List.from(allSpells)..shuffle(); // Reshuffle all spells
+      currentSpell = remainingSpells.removeAt(0);
+      _showCelebration = false;
+    });
+    _saveGameState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (spells.isEmpty) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+    if (allSpells.isEmpty || currentSpell == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     if (_showCelebration) return _showCelebrationDialog(context);
 
-    final currentSpell = spells[currentIndex];
+    // Shuffle options for the current spell
+    List<String> options = List.from(currentSpell!['options']);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
-        title: Text('Hakɛya ${currentIndex + 1}/${spells.length}',
-            style: const TextStyle(color: Colors.white)),
+        title: Text(
+          'Hakɛya ${allSpells.length - remainingSpells.length - 1}/${allSpells.length}', // Adjusted level count
+          style: const TextStyle(color: Colors.white),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -254,7 +329,8 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
       body: Column(
         children: [
           LinearProgressIndicator(
-            value: currentIndex / spells.length,
+            value: (allSpells.length - remainingSpells.length - 1) /
+                allSpells.length, // Adjusted progress
             backgroundColor: Colors.grey[300],
             valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
           ),
@@ -265,14 +341,14 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(currentSpell['image'], height: 200),
+                    Image.asset(currentSpell!['image'], height: 200),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         IconButton(
                           icon:
                               const Icon(Icons.volume_up, color: Colors.black),
-                          onPressed: () => _playAudio(currentSpell['audio']),
+                          onPressed: () => _playAudio(currentSpell!['audio']),
                         ),
                         IconButton(
                           icon:
@@ -291,13 +367,12 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                     const Text(
                       'Jaabi ye ?',
                       style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
+                          fontSize: 24,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
-                    ...currentSpell['options'].map((option) => Padding(
+                    ...options.map((option) => Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: _buildOption(option),
                         )),
@@ -305,7 +380,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                       Padding(
                         padding: const EdgeInsets.only(top: 20),
                         child: Text(
-                          currentSpell['hint'],
+                          currentSpell!['hint'],
                           style: const TextStyle(
                               color: Colors.black, fontSize: 18),
                         ),
@@ -316,7 +391,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                         child: Column(
                           children: [
                             Text(
-                              'a daminɛ ye: ${currentSpell['partial']}',
+                              'a daminɛ ye: ${currentSpell!['partial']}',
                               style: const TextStyle(
                                   color: Colors.black, fontSize: 18),
                             ),
@@ -347,7 +422,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                       Column(
                         children: [
                           Lottie.asset('assets/animations/success.json',
-                              width: 150, repeat: false),
+                              width: 120, repeat: false),
                           ElevatedButton(
                             onPressed: _nextWord,
                             style: ElevatedButton.styleFrom(
