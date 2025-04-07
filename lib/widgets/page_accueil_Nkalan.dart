@@ -29,12 +29,12 @@ class AcceuilNkalan extends StatelessWidget {
             'assets/imJeu1.jpg', // Replace with actual grayscale image path
         'page': const ChooseContextPage(),
       },
-      // {
-      //   'title': 'Kalan',
-      //   'image':
-      //       'assets/imJeu1.jpg', // Replace with actual grayscale image path
-      //   'page': AlphabetPage(),
-      // },
+      {
+        'title': 'Kalan',
+        'image':
+            'assets/imJeu1.jpg', // Replace with actual grayscale image path
+        'page': AlphabetPage(),
+      },
     ];
 
     return Scaffold(
