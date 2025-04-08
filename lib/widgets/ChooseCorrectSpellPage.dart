@@ -131,15 +131,25 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
     return GestureDetector(
       onTap: (selectedOption != null && _isCorrect)
           ? null
-          : () => checkAnswer(option), // Disable tap after selection
+          : () => checkAnswer(option),
       child: AnimatedContainer(
         duration: 300.ms,
         decoration: BoxDecoration(
           color: isSelected
               ? (isCorrectOption ? Colors.black : Colors.grey[300])
               : Colors.white,
-          border: Border.all(color: Colors.black),
+          border: Border.all(
+            color: Colors.black,
+            width: 2,
+          ),
           borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 5,
+              spreadRadius: 1,
+            ),
+          ],
         ),
         child: Padding(
           padding: const EdgeInsets.all(12.0),
@@ -180,60 +190,6 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
     );
   }
 
-  // Widget _buildOption(String option) {
-  //   final isSelected = selectedOption == option;
-  //   final isCorrectOption = option == currentSpell!['word'];
-
-  //   return GestureDetector(
-  //     onTap: () => checkAnswer(option),
-  //     child: AnimatedContainer(
-  //       duration: 300.ms,
-  //       decoration: BoxDecoration(
-  //         color: isSelected
-  //             ? (isCorrectOption ? Colors.black : Colors.grey[300])
-  //             : Colors.white,
-  //         border: Border.all(color: Colors.black),
-  //         borderRadius: BorderRadius.circular(15),
-  //       ),
-  //       child: Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: Row(
-  //           children: [
-  //             if (isSelected)
-  //               Icon(
-  //                 isCorrectOption ? Icons.check : Icons.close,
-  //                 color: isCorrectOption ? Colors.white : Colors.black,
-  //               ),
-  //             const SizedBox(width: 10),
-  //             Text(
-  //               option,
-  //               style: TextStyle(
-  //                 fontSize: 24,
-  //                 color: isSelected && isCorrectOption
-  //                     ? Colors.white
-  //                     : Colors.black,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     )
-  //         .animate()
-  //         .scaleXY(
-  //           begin: 1,
-  //           end: isSelected ? 1.05 : 1,
-  //           duration: 200.ms,
-  //         )
-  //         .then()
-  //         .shakeX(
-  //           duration: 300.ms,
-  //           hz: 4,
-  //           amount: isSelected && !isCorrectOption ? 1 : 0,
-  //         ),
-  //   );
-  // }
-
   Widget _showCelebrationDialog(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -241,7 +197,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
       child: Stack(
         children: [
           Container(
-            color: Colors.white30,
+            color: Colors.black.withOpacity(0.5),
             child: Center(
               child: Card(
                 color: Colors.white,
@@ -267,7 +223,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context);
-                          _restartGame(); // Restart game with new random order
+                          _restartGame();
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.black,
@@ -275,6 +231,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                               borderRadius: BorderRadius.circular(50)),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 50, vertical: 20),
+                          elevation: 5,
                         ),
                         child: const Text(
                           'Restart!',
@@ -304,12 +261,17 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
   @override
   Widget build(BuildContext context) {
     if (allSpells.isEmpty || currentSpell == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+        ),
+      );
     }
 
     if (_showCelebration) return _showCelebrationDialog(context);
 
-    // Shuffle options for the current spell
     List<String> options = List.from(currentSpell!['options']);
 
     return Scaffold(
@@ -318,7 +280,7 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
         backgroundColor: Colors.black,
         elevation: 0,
         title: Text(
-          'Hakɛya ${allSpells.length - remainingSpells.length - 1}/${allSpells.length}', // Adjusted level count
+          'Hakɛya ${allSpells.length - remainingSpells.length - 1}/${allSpells.length}',
           style: const TextStyle(color: Colors.white),
         ),
         leading: IconButton(
@@ -330,9 +292,11 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
         children: [
           LinearProgressIndicator(
             value: (allSpells.length - remainingSpells.length - 1) /
-                allSpells.length, // Adjusted progress
+                allSpells.length,
             backgroundColor: Colors.grey[300],
             valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(4),
           ),
           Expanded(
             child: SingleChildScrollView(
@@ -341,35 +305,114 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(currentSpell!['image'], height: 200),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon:
-                              const Icon(Icons.volume_up, color: Colors.black),
-                          onPressed: () => _playAudio(currentSpell!['audio']),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          currentSpell!['image'],
+                          height: 200,
+                          fit: BoxFit.cover,
                         ),
-                        IconButton(
-                          icon:
-                              const Icon(Icons.lightbulb, color: Colors.black),
-                          onPressed: () =>
-                              setState(() => _showHint = !_showHint),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.black),
-                          onPressed: () => setState(
-                              () => _showWordCompletion = !_showWordCompletion),
-                        ),
-                      ],
+                      ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Jaabi ye ?',
-                      style: TextStyle(
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.volume_up,
+                                  color: Colors.white),
+                              onPressed: () =>
+                                  _playAudio(currentSpell!['audio']),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.lightbulb,
+                                  color: Colors.white),
+                              onPressed: () =>
+                                  setState(() => _showHint = !_showHint),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.white),
+                              onPressed: () => setState(() =>
+                                  _showWordCompletion = !_showWordCompletion),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: const Text(
+                        'Jaabi ye ?',
+                        style: TextStyle(
                           fontSize: 24,
                           color: Colors.black,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     ...options.map((option) => Padding(
@@ -377,23 +420,37 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                           child: _buildOption(option),
                         )),
                     if (_showHint)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         child: Text(
                           currentSpell!['hint'],
                           style: const TextStyle(
-                              color: Colors.black, fontSize: 18),
+                            color: Colors.black,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
                     if (_showWordCompletion)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 20),
+                      Container(
+                        padding: const EdgeInsets.all(15),
+                        margin: const EdgeInsets.only(top: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         child: Column(
                           children: [
                             Text(
                               'a daminɛ ye: ${currentSpell!['partial']}',
                               style: const TextStyle(
-                                  color: Colors.black, fontSize: 18),
+                                color: Colors.black,
+                                fontSize: 18,
+                              ),
                             ),
                             const SizedBox(height: 10),
                             TextField(
@@ -406,14 +463,22 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                                 ),
                                 hintText: 'Daɲɛ sɛbɛn...',
                                 hintStyle: const TextStyle(color: Colors.grey),
-                                suffixIcon: IconButton(
-                                  icon: const Icon(Icons.check,
-                                      color: Colors.black),
-                                  onPressed: _checkTypedAnswer,
+                                suffixIcon: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: IconButton(
+                                    icon: const Icon(Icons.check,
+                                        color: Colors.white),
+                                    onPressed: _checkTypedAnswer,
+                                  ),
                                 ),
                               ),
                               style: const TextStyle(
-                                  color: Colors.black, fontSize: 20),
+                                color: Colors.black,
+                                fontSize: 20,
+                              ),
                             ),
                           ],
                         ),
@@ -423,13 +488,32 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
                         children: [
                           Lottie.asset('assets/animations/success.json',
                               width: 120, repeat: false),
-                          ElevatedButton(
-                            onPressed: _nextWord,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.white,
+                          Container(
+                            margin: const EdgeInsets.only(top: 20),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(50),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                ),
+                              ],
                             ),
-                            child: const Text('Dangan'),
+                            child: ElevatedButton(
+                              onPressed: _nextWord,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 30,
+                                  vertical: 15,
+                                ),
+                              ),
+                              child: const Text('Dangan'),
+                            ),
                           ),
                         ],
                       ),

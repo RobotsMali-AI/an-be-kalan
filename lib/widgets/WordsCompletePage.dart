@@ -256,9 +256,9 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
       margin: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: char.isEmpty ? Colors.grey[200] : Colors.white,
-        border: Border.all(color: Colors.black),
+        border: Border.all(color: Colors.black, width: 2),
         boxShadow: isCorrect
-            ? [const BoxShadow(color: Colors.black26, blurRadius: 4)]
+            ? [BoxShadow(color: Colors.black.withOpacity(0.2), blurRadius: 4)]
             : [],
       ),
       child: Center(
@@ -289,12 +289,25 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
               duration: const Duration(milliseconds: 100),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border.all(color: Colors.black),
+                border: Border.all(color: Colors.black, width: 2),
                 borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
               child: Center(
-                child: Text(char,
-                    style: const TextStyle(fontSize: 20, color: Colors.black)),
+                child: Text(
+                  char,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ),
           ),
@@ -310,7 +323,7 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
       child: Stack(
         children: [
           Container(
-            color: Colors.white30,
+            color: Colors.black.withOpacity(0.5),
             child: Center(
               child: Card(
                 color: Colors.white,
@@ -335,21 +348,33 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 50,
-                            vertical: 20,
-                          ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(50),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 5,
+                              spreadRadius: 1,
+                            ),
+                          ],
                         ),
-                        child: const Text(
-                          'Laban!',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 50,
+                              vertical: 20,
+                            ),
+                          ),
+                          child: const Text(
+                            'Laban!',
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
                         ),
                       ),
                     ],
@@ -367,7 +392,11 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
   Widget build(BuildContext context) {
     if (words.isEmpty) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+        ),
       );
     }
 
@@ -378,22 +407,31 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('Daɲɛ dafali',
-            style: TextStyle(color: Colors.white, fontSize: 24)),
+        title: const Text(
+          'Daɲɛ dafali',
+          style: TextStyle(color: Colors.white, fontSize: 24),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text('Hakɛ: ${completedWords.length}',
-                style: const TextStyle(color: Colors.white)),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            margin: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'Hakɛ: ${completedWords.length}',
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
       body: Container(
-        color: Colors.grey[100],
+        color: Colors.white,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -402,18 +440,37 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
               child: _isCorrect
                   ? Lottie.asset('assets/animations/success.json',
                       width: 150, repeat: false, key: UniqueKey())
-                  : Image.asset(gameWords[currentIndex]['image'],
-                      height: MediaQuery.of(context).size.height * 0.4,
-                      key: UniqueKey()),
+                  : Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.asset(
+                          gameWords[currentIndex]['image'],
+                          height: MediaQuery.of(context).size.height * 0.4,
+                          fit: BoxFit.cover,
+                          key: UniqueKey(),
+                        ),
+                      ),
+                    ),
             ),
             const SizedBox(height: 16),
             GestureDetector(
               onTap: () => setState(() => _showHint = !_showHint),
               child: Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.black.withOpacity(0.05),
+                  border: Border.all(color: Colors.black, width: 2),
+                  borderRadius: BorderRadius.circular(15),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -421,11 +478,11 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
                     const Icon(Icons.lightbulb_outline, color: Colors.black),
                     const SizedBox(width: 8),
                     Text(
-                        _showHint
-                            ? gameWords[currentIndex]['hint']
-                            : 'bilasirali',
-                        style:
-                            const TextStyle(fontSize: 18, color: Colors.black)),
+                      _showHint
+                          ? gameWords[currentIndex]['hint']
+                          : 'bilasirali',
+                      style: const TextStyle(fontSize: 18, color: Colors.black),
+                    ),
                   ],
                 ),
               ),
@@ -438,36 +495,80 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (!_isCorrect)
-                  ElevatedButton(
-                    onPressed: () => setState(() => userInput =
-                        userInput.isNotEmpty
-                            ? userInput.substring(0, userInput.length - 1)
-                            : ''),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black),
-                    child: const Text('Sigini jɔɔsi'),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 5,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () => setState(() => userInput =
+                          userInput.isNotEmpty
+                              ? userInput.substring(0, userInput.length - 1)
+                              : ''),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                      ),
+                      child: const Text('Sigini jɔɔsi'),
+                    ),
                   ),
-                // if (!_isCorrect)
-                //   ElevatedButton(
-                //     onPressed: _giveHint,
-                //     style: ElevatedButton.styleFrom(
-                //         backgroundColor: Colors.white,
-                //         foregroundColor: Colors.black),
-                //     child: const Text('Bilasirali'),
-                //   ),
-                IconButton(
-                  icon: const Icon(Icons.volume_up,
-                      color: Colors.black, size: 30),
-                  onPressed: () => _playAudio(gameWords[currentIndex]['audio']),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 5,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.volume_up,
+                        color: Colors.white, size: 30),
+                    onPressed: () =>
+                        _playAudio(gameWords[currentIndex]['audio']),
+                  ),
                 ),
                 if (_isCorrect)
-                  ElevatedButton(
-                    onPressed: _nextWord,
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black),
-                    child: const Text('Dangan'),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 5,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: _nextWord,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 15,
+                        ),
+                      ),
+                      child: const Text('Dangan'),
+                    ),
                   ),
               ],
             ),
@@ -475,10 +576,23 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
         ),
       ),
       floatingActionButton: !_isCorrect
-          ? FloatingActionButton(
-              backgroundColor: Colors.white,
-              onPressed: _checkWord,
-              child: const Icon(Icons.check, color: Colors.black),
+          ? Container(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 5,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+              child: FloatingActionButton(
+                backgroundColor: Colors.transparent,
+                onPressed: _checkWord,
+                child: const Icon(Icons.check, color: Colors.white),
+              ),
             )
           : null,
     );

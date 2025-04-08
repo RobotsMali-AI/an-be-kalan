@@ -1,515 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:audioplayers/audioplayers.dart';
-// import 'dart:convert';
-// import 'package:flutter/services.dart';
-// import 'package:literacy_app/models/alphabet_model.dart';
-// import 'package:google_fonts/google_fonts.dart';
-
-// class AlphabetPage extends StatefulWidget {
-//   @override
-//   _AlphabetPageState createState() => _AlphabetPageState();
-// }
-
-// class _AlphabetPageState extends State<AlphabetPage> {
-//   List<AlphabetItem> alphabetList = [];
-//   int currentIndex = 0;
-//   bool isLoading = true;
-//   late PageController pageController;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     pageController = PageController(initialPage: currentIndex);
-//     loadData();
-//   }
-
-//   Future<void> loadData() async {
-//     try {
-//       String jsonString =
-//           await rootBundle.loadString('assets/jsons/alphabet.json');
-//       print(jsonString);
-//       List<dynamic> jsonData = json.decode(jsonString);
-//       alphabetList =
-//           jsonData.map((item) => AlphabetItem.fromJson(item)).toList();
-//       setState(() {
-//         isLoading = false;
-//       });
-//     } catch (e) {
-//       // Handle potential errors (e.g., JSON file not found)
-//       print('Error loading JSON: $e');
-//       setState(() {
-//         isLoading = false;
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (isLoading) {
-//       return const Scaffold(
-//         body: Center(child: CircularProgressIndicator()),
-//       );
-//     } else {
-//       return Scaffold(
-//         appBar: AppBar(
-//           title: const Text('Learn the Alphabet'),
-//           backgroundColor: Colors.teal,
-//         ),
-//         body: Column(
-//           children: [
-//             Expanded(
-//               child: PageView.builder(
-//                 controller: pageController,
-//                 itemCount: alphabetList.length,
-//                 itemBuilder: (context, index) {
-//                   AlphabetItem item = alphabetList[index];
-//                   return Column(
-//                     children: [
-//                       Expanded(
-//                         flex: 4,
-//                         child: Container(
-//                           margin: const EdgeInsets.all(16.0),
-//                           decoration: BoxDecoration(
-//                             borderRadius: BorderRadius.circular(10),
-//                             boxShadow: [
-//                               BoxShadow(
-//                                 color: Colors.grey.withOpacity(0.5),
-//                                 spreadRadius: 5,
-//                                 blurRadius: 7,
-//                                 offset: const Offset(0, 3),
-//                               ),
-//                             ],
-//                             image: DecorationImage(
-//                               image: AssetImage(item.image),
-//                               fit: BoxFit.cover,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                       Expanded(
-//                         flex: 2,
-//                         child: Column(
-//                           mainAxisAlignment: MainAxisAlignment.center,
-//                           children: [
-//                             Text(
-//                               item.letter,
-//                               style: const TextStyle(
-//                                 fontSize: 48,
-//                                 fontWeight: FontWeight.bold,
-//                                 color: Colors.teal,
-//                               ),
-//                             ),
-//                             Row(
-//                               children: [
-//                                 const Spacer(),
-//                                 Text(
-//                                   item.letter,
-//                                   style: const TextStyle(
-//                                     fontSize: 48,
-//                                     fontFamily: 'Caveat VariableFont',
-//                                     fontWeight: FontWeight.bold,
-//                                     color: Colors.teal,
-//                                   ),
-//                                 ),
-//                                 const Spacer(),
-//                                 Text(
-//                                   item.letter.toUpperCase(),
-//                                   style: const TextStyle(
-//                                     fontSize: 48,
-//                                     fontWeight: FontWeight.bold,
-//                                     color: Colors.teal,
-//                                   ),
-//                                 ),
-//                                 Spacer(),
-//                               ],
-//                             ),
-//                             const SizedBox(height: 16),
-//                             IconButton(
-//                               icon: const Icon(Icons.volume_up,
-//                                   size: 32, color: Colors.teal),
-//                               onPressed: () async {
-//                                 final player = AudioPlayer();
-//                                 await player.play(AssetSource(item.audio));
-//                               },
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   );
-//                 },
-//                 onPageChanged: (index) {
-//                   setState(() {
-//                     currentIndex = index;
-//                   });
-//                 },
-//               ),
-//             ),
-//             Padding(
-//               padding: const EdgeInsets.all(16.0),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                 children: [
-//                   ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       foregroundColor: Colors.teal,
-//                       padding: const EdgeInsets.symmetric(
-//                           horizontal: 20, vertical: 10),
-//                     ),
-//                     onPressed: currentIndex > 0
-//                         ? () {
-//                             pageController.previousPage(
-//                               duration: const Duration(milliseconds: 300),
-//                               curve: Curves.easeIn,
-//                             );
-//                           }
-//                         : null,
-//                     child:
-//                         const Text('Précédent', style: TextStyle(fontSize: 16)),
-//                   ),
-//                   ElevatedButton(
-//                     style: ElevatedButton.styleFrom(
-//                       foregroundColor: Colors.teal,
-//                       padding: const EdgeInsets.symmetric(
-//                           horizontal: 20, vertical: 10),
-//                     ),
-//                     onPressed: currentIndex < alphabetList.length - 1
-//                         ? () {
-//                             pageController.nextPage(
-//                               duration: const Duration(milliseconds: 300),
-//                               curve: Curves.easeIn,
-//                             );
-//                           }
-//                         : null,
-//                     child:
-//                         const Text('Suivant', style: TextStyle(fontSize: 16)),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       );
-//     }
-//   }
-
-//   @override
-//   void dispose() {
-//     pageController.dispose();
-//     super.dispose();
-//   }
-// }
-// import 'package:flutter/material.dart';
-// import 'package:audioplayers/audioplayers.dart';
-// import 'dart:convert';
-// import 'package:flutter/services.dart';
-// import 'package:literacy_app/models/alphabet_model.dart';
-
-// class AlphabetPage extends StatefulWidget {
-//   @override
-//   _AlphabetPageState createState() => _AlphabetPageState();
-// }
-
-// class _AlphabetPageState extends State<AlphabetPage> {
-//   List<AlphabetItem> alphabetList = [];
-//   int currentIndex = 0;
-//   bool isLoading = true;
-//   late PageController pageController;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     pageController = PageController(initialPage: currentIndex);
-//     loadData();
-//   }
-
-//   Future<void> loadData() async {
-//     try {
-//       String jsonString =
-//           await rootBundle.loadString('assets/jsons/alphabet.json');
-//       List<dynamic> jsonData = json.decode(jsonString);
-//       alphabetList =
-//           jsonData.map((item) => AlphabetItem.fromJson(item)).toList();
-//       setState(() {
-//         isLoading = false;
-//       });
-//     } catch (e) {
-//       print('Error loading JSON: $e');
-//       setState(() {
-//         isLoading = false;
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (isLoading) {
-//       return const Scaffold(
-//         body: Center(child: CircularProgressIndicator()),
-//       );
-//     }
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Learn the Alphabet'),
-//         backgroundColor: Colors.teal,
-//       ),
-//       body: Column(
-//         children: [
-//           Expanded(
-//             child: PageView.builder(
-//               controller: pageController,
-//               itemCount: alphabetList.length,
-//               itemBuilder: (context, index) {
-//                 return AlphabetCard(item: alphabetList[index]);
-//               },
-//               onPageChanged: (index) {
-//                 setState(() {
-//                   currentIndex = index;
-//                 });
-//               },
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//               children: [
-//                 ElevatedButton(
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.teal,
-//                     foregroundColor: Colors.white,
-//                     padding: const EdgeInsets.symmetric(
-//                         horizontal: 20, vertical: 10),
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                   ),
-//                   onPressed: currentIndex > 0
-//                       ? () {
-//                           pageController.previousPage(
-//                             duration: const Duration(milliseconds: 300),
-//                             curve: Curves.easeIn,
-//                           );
-//                         }
-//                       : null,
-//                   child: const Icon(Icons.arrow_back, size: 24),
-//                 ),
-//                 ElevatedButton(
-//                   style: ElevatedButton.styleFrom(
-//                     backgroundColor: Colors.teal,
-//                     foregroundColor: Colors.white,
-//                     padding: const EdgeInsets.symmetric(
-//                         horizontal: 20, vertical: 10),
-//                     shape: RoundedRectangleBorder(
-//                       borderRadius: BorderRadius.circular(10),
-//                     ),
-//                   ),
-//                   onPressed: currentIndex < alphabetList.length - 1
-//                       ? () {
-//                           pageController.nextPage(
-//                             duration: const Duration(milliseconds: 300),
-//                             curve: Curves.easeIn,
-//                           );
-//                         }
-//                       : null,
-//                   child: const Icon(Icons.arrow_forward, size: 24),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     pageController.dispose();
-//     super.dispose();
-//   }
-// }
-
-// class AlphabetCard extends StatefulWidget {
-//   final AlphabetItem item;
-
-//   const AlphabetCard({required this.item});
-
-//   @override
-//   _AlphabetCardState createState() => _AlphabetCardState();
-// }
-
-// class _AlphabetCardState extends State<AlphabetCard>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _controller;
-//   late Animation<double> _fadeAnimation;
-//   late Animation<double> _scaleAnimation;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = AnimationController(
-//       duration: const Duration(milliseconds: 500),
-//       vsync: this,
-//     );
-//     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
-//     _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-//       CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
-//     );
-//     _controller.forward();
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: [
-//         Expanded(
-//           flex: 4,
-//           child: FadeTransition(
-//             opacity: _fadeAnimation,
-//             child: GestureDetector(
-//               onTap: () async {
-//                 final player = AudioPlayer();
-//                 await player.play(AssetSource(widget.item.audio));
-//               },
-//               child: Stack(
-//                 children: [
-//                   Container(
-//                     margin: const EdgeInsets.all(16.0),
-//                     decoration: BoxDecoration(
-//                       borderRadius: BorderRadius.circular(10),
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.grey.withOpacity(0.5),
-//                           spreadRadius: 5,
-//                           blurRadius: 7,
-//                           offset: const Offset(0, 3),
-//                         ),
-//                       ],
-//                       image: DecorationImage(
-//                         image: AssetImage(widget.item.image),
-//                         fit: BoxFit.cover,
-//                       ),
-//                     ),
-//                   ),
-//                   Positioned(
-//                     bottom: 10,
-//                     right: 10,
-//                     child: Container(
-//                       padding: const EdgeInsets.all(8),
-//                       decoration: BoxDecoration(
-//                         color: Colors.teal.withOpacity(0.7),
-//                         shape: BoxShape.circle,
-//                       ),
-//                       child: const Icon(
-//                         Icons.volume_up,
-//                         color: Colors.white,
-//                         size: 24,
-//                       ),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//         Expanded(
-//           flex: 2,
-//           child: FadeTransition(
-//             opacity: _fadeAnimation,
-//             child: Container(
-//               decoration: BoxDecoration(
-//                 gradient: LinearGradient(
-//                   colors: [Colors.teal.shade50, Colors.white],
-//                   begin: Alignment.topLeft,
-//                   end: Alignment.bottomRight,
-//                 ),
-//                 borderRadius: BorderRadius.circular(10),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.grey.withOpacity(0.5),
-//                     spreadRadius: 5,
-//                     blurRadius: 7,
-//                     offset: const Offset(0, 3),
-//                   ),
-//                 ],
-//               ),
-//               child: Padding(
-//                 padding: const EdgeInsets.all(16.0),
-//                 child: ScaleTransition(
-//                   scale: _scaleAnimation,
-//                   child: Column(
-//                     mainAxisAlignment: MainAxisAlignment.center,
-//                     children: [
-//                       Text(
-//                         widget.item.letter,
-//                         style: TextStyle(
-//                           fontSize: 48,
-//                           fontWeight: FontWeight.bold,
-//                           color: Colors.teal.shade700,
-//                           shadows: [
-//                             Shadow(
-//                               blurRadius: 3.0,
-//                               color: Colors.black.withOpacity(0.5),
-//                               offset: const Offset(2.0, 2.0),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                       Row(
-//                         children: [
-//                           const Spacer(),
-//                           Text(
-//                             widget.item.letter,
-//                             style: TextStyle(
-//                               fontSize: 48,
-//                               fontFamily: 'Caveat VariableFont',
-//                               fontWeight: FontWeight.bold,
-//                               color: Colors.teal.shade500,
-//                               shadows: [
-//                                 Shadow(
-//                                   blurRadius: 3.0,
-//                                   color: Colors.black.withOpacity(0.5),
-//                                   offset: const Offset(2.0, 2.0),
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-//                           const Spacer(),
-//                           Text(
-//                             widget.item.letter.toUpperCase(),
-//                             style: TextStyle(
-//                               fontSize: 48,
-//                               fontWeight: FontWeight.bold,
-//                               color: Colors.teal.shade900,
-//                               shadows: [
-//                                 Shadow(
-//                                   blurRadius: 3.0,
-//                                   color: Colors.black.withOpacity(0.5),
-//                                   offset: const Offset(2.0, 2.0),
-//                                 ),
-//                               ],
-//                             ),
-//                           ),
-//                           const Spacer(),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:convert';
@@ -530,10 +18,9 @@ class _AlphabetPageState extends State<AlphabetPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize PageController with viewportFraction set to 1.0
     pageController = PageController(
       initialPage: currentIndex,
-      viewportFraction: 1.0, // Each page fills the entire screen width
+      viewportFraction: 1.0,
     );
     loadData();
   }
@@ -560,21 +47,64 @@ class _AlphabetPageState extends State<AlphabetPage> {
   Widget build(BuildContext context) {
     if (isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+          ),
+        ),
       );
     }
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Learn the Alphabet'),
-        backgroundColor: Colors.teal,
+        elevation: 0,
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        title: const Text(
+          'Learn the Alphabet',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.2,
+            color: Colors.white,
+          ),
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(20),
+          ),
+        ),
       ),
       body: Column(
         children: [
+          // Progress indicator
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: LinearProgressIndicator(
+              value: (currentIndex + 1) / alphabetList.length,
+              backgroundColor: Colors.grey.shade200,
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+              minHeight: 8,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          // Page counter
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              '${currentIndex + 1} / ${alphabetList.length}',
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+          // Main content
           Expanded(
             child: PageView.builder(
               controller: pageController,
               itemCount: alphabetList.length,
-              // Disable swipe gestures
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 return AlphabetCard(item: alphabetList[index]);
@@ -586,55 +116,87 @@ class _AlphabetPageState extends State<AlphabetPage> {
               },
             ),
           ),
-          Padding(
+          // Navigation buttons
+          Container(
             padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                _buildNavigationButton(
+                  icon: Icons.arrow_back_ios_new,
                   onPressed: currentIndex > 0
                       ? () {
                           pageController.previousPage(
                             duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeIn,
+                            curve: Curves.easeInOut,
                           );
                         }
                       : null,
-                  child: const Icon(Icons.arrow_back, size: 24),
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
+                _buildNavigationButton(
+                  icon: Icons.arrow_forward_ios,
                   onPressed: currentIndex < alphabetList.length - 1
                       ? () {
                           pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeIn,
+                            curve: Curves.easeInOut,
                           );
                         }
                       : null,
-                  child: const Icon(Icons.arrow_forward, size: 24),
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationButton({
+    required IconData icon,
+    VoidCallback? onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: onPressed != null ? Colors.black : Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: onPressed != null
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : [],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(15),
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 15,
+            ),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -660,104 +222,148 @@ class _AlphabetCardState extends State<AlphabetCard>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
+  bool isPlaying = false;
+  final AudioPlayer _player = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(_controller);
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
     );
     _controller.forward();
+
+    _player.onPlayerStateChanged.listen((state) {
+      if (mounted) {
+        setState(() {
+          isPlaying = state == PlayerState.playing;
+        });
+      }
+    });
+  }
+
+  Future<void> playAudio() async {
+    if (isPlaying) {
+      await _player.stop();
+    } else {
+      await _player.play(AssetSource(widget.item.audio));
+    }
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _player.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          flex: 4,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: GestureDetector(
-              onTap: () async {
-                final player = AudioPlayer();
-                await player.play(AssetSource(widget.item.audio));
-              },
-              child: Stack(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.5),
-                          spreadRadius: 5,
-                          blurRadius: 7,
-                          offset: const Offset(0, 3),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 4,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          widget.item.image,
+                          fit: BoxFit.cover,
+                        ),
+                        // Gradient overlay
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.4),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Audio button
+                        Positioned(
+                          bottom: 16,
+                          right: 16,
+                          child: GestureDetector(
+                            onTap: playAudio,
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.8),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                child: Icon(
+                                  isPlaying ? Icons.stop : Icons.volume_up,
+                                  color: Colors.white,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
-                      image: DecorationImage(
-                        image: AssetImage(widget.item.image),
-                        fit: BoxFit.cover,
-                      ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 10,
-                    right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.teal.withOpacity(0.7),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.volume_up,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
-        ),
-        Expanded(
-          flex: 2,
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.teal.shade50, Colors.white],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+          const SizedBox(height: 20),
+          Expanded(
+            flex: 2,
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 15,
+                      spreadRadius: 5,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
                 ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
                 child: ScaleTransition(
                   scale: _scaleAnimation,
                   child: Column(
@@ -765,40 +371,47 @@ class _AlphabetCardState extends State<AlphabetCard>
                     children: [
                       Text(
                         widget.item.letter,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 48,
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal.shade700,
+                          color: Colors.black87,
                         ),
                       ),
                       Container(
-                        height: 10,
-                        color: Colors.teal.shade200,
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        height: 3,
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.grey.shade300,
+                              Colors.black87,
+                              Colors.grey.shade300,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(1.5),
+                        ),
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const Spacer(),
                           Text(
                             widget.item.letter,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 48,
                               fontFamily: 'Caveat VariableFont',
                               fontWeight: FontWeight.bold,
-                              color: Colors.teal.shade500,
+                              color: Colors.black54,
                             ),
                           ),
-                          const Spacer(),
                           Text(
                             widget.item.letter.toUpperCase(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 48,
                               fontWeight: FontWeight.bold,
-                              color: Colors.teal.shade900,
+                              color: Colors.black87,
                             ),
                           ),
-                          const Spacer(),
                         ],
                       ),
                     ],
@@ -807,8 +420,8 @@ class _AlphabetCardState extends State<AlphabetCard>
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

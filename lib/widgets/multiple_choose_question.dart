@@ -541,20 +541,20 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
     if (!isAnswered) return Colors.white;
     final correctAnswers = currentQuestion.correct;
     if (selectedAnswers.contains(option)) {
-      return correctAnswers.contains(option) ? Colors.green : Colors.red;
+      return correctAnswers.contains(option)
+          ? Colors.black.withOpacity(0.1)
+          : Colors.black.withOpacity(0.05);
     } else {
       return correctAnswers.contains(option)
-          ? Colors.green.withOpacity(0.3)
+          ? Colors.black.withOpacity(0.1)
           : Colors.white;
     }
   }
 
   Color _getTextColor(String option) {
-    if (!isAnswered) return Colors.black;
+    if (!isAnswered) return Colors.black87;
     final tileColor = _getTileColor(option);
-    return (tileColor == Colors.green || tileColor == Colors.red)
-        ? Colors.white
-        : Colors.black;
+    return Colors.black87;
   }
 
   bool _isOverallCorrect() {
@@ -569,12 +569,12 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.2),
-              spreadRadius: 10,
-              blurRadius: 20,
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -582,31 +582,57 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Lottie.asset('assets/animations/celebration.json', width: 200),
-            const SizedBox(height: 20),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Lottie.asset(
+                'assets/animations/celebration.json',
+                width: 200,
+              ),
+            ),
+            const SizedBox(height: 24),
             const Text(
               "Baara ka bon kosɛbɛ!",
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.black87,
+                letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             Text(
               "I ye hakɛ $correctCount/${widget.questions.length} dafa ani $correctCount XP sɔrɔ!",
-              style: const TextStyle(fontSize: 18, color: Colors.black),
+              style: const TextStyle(
+                fontSize: 20,
+                color: Colors.black87,
+                height: 1.5,
+              ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 40,
+                  vertical: 16,
+                ),
+                elevation: 0,
               ),
               onPressed: () {
                 Navigator.pop(context);
@@ -614,7 +640,10 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
               },
               child: const Text(
                 "YAY!",
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -632,42 +661,56 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
       appBar: AppBar(
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
+        elevation: 0,
         title: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.black,
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
               Container(
                 width: 60,
                 height: 60,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Center(
                   child: Text(
                     '${currentQuestionIndex + 1}/${widget.questions.length}',
                     style: const TextStyle(
                       color: Colors.black,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   widget.title,
                   style: const TextStyle(
-                    fontSize: 22,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
+                    letterSpacing: 1.2,
                   ),
                 ),
               ),
@@ -676,13 +719,7 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
         ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.2),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.grey[200]!],
-          ),
-        ),
+        color: Colors.white,
         child: Column(
           children: [
             Expanded(
@@ -698,22 +735,23 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                         padding: const EdgeInsets.all(25),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
+                          borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.1),
-                              blurRadius: 20,
-                              spreadRadius: 5,
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
                         child: Text(
                           currentQuestion.question,
                           style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            height: 1.3,
-                            color: Colors.black,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            height: 1.5,
+                            color: Colors.black87,
+                            letterSpacing: 1.1,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -729,22 +767,25 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                             duration: const Duration(milliseconds: 300),
                             decoration: BoxDecoration(
                               color: _getTileColor(option),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
                             child: CheckboxListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
                               title: Text(
                                 option,
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.w500,
                                   color: _getTextColor(option),
+                                  height: 1.5,
                                 ),
                               ),
                               value: selectedAnswers.contains(option),
@@ -767,18 +808,29 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                       }),
                       const SizedBox(height: 20),
                       if (isAnswered)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
                           child: Text(
                             _isOverallCorrect()
                                 ? "Baara ɲuman!"
                                 : "Baara jugu!",
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: _isOverallCorrect()
-                                  ? Colors.green
-                                  : Colors.red,
+                                  ? Colors.black
+                                  : Colors.black87,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -790,28 +842,38 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                               selectedAnswers.isNotEmpty ? _checkAnswers : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
-                            shape: const StadiumBorder(),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 40,
                               vertical: 16,
                             ),
+                            elevation: 0,
                           ),
                           child: const Text(
                             "Ka jɛ",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       if (isAnswered)
                         ElevatedButton(
                           onPressed: _nextQuestion,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                _isOverallCorrect() ? Colors.green : Colors.red,
-                            shape: const StadiumBorder(),
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 40,
                               vertical: 16,
                             ),
+                            elevation: 0,
                           ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
@@ -819,12 +881,14 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
                               Text(
                                 "Nata",
                                 style: TextStyle(
-                                    fontSize: 18, color: Colors.white),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              SizedBox(width: 10),
+                              SizedBox(width: 12),
                               Icon(
                                 Icons.arrow_forward,
-                                size: 20,
+                                size: 24,
                                 color: Colors.white,
                               ),
                             ],
