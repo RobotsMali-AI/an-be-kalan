@@ -240,14 +240,31 @@ class _AuthGateState extends State<AuthGate> {
             password: passwordController.text,
           );
         } on FirebaseAuthException catch (e) {
+          if (e.code == 'user-not-found') {
+            setState(() {
+              error = 'Aw ye imɛli ladɛrɛsi sɛbɛn min bɛnnen don';
+            });
+          } else if (e.code == 'wrong-password') {
+            setState(() {
+              error = 'Aw ye kɔdi sɛbɛn min bɛnnen don';
+            });
+          } else if (e.code == "network-request-failed") {
+            setState(() {
+              error = "Interneti ma soro";
+            });
+          } else {
+            setState(() {
+              error = '${e.message}';
+            });
+          }
           setState(() {
-            error = '${e.message}';
+            error;
             setIsLoading();
             //showSnackbar(context, e.message ?? 'An error occurred');
           });
         } catch (e) {
           setState(() {
-            error = '$e';
+            error;
             setIsLoading();
             //showSnackbar(context, e.toString());
           });
@@ -271,8 +288,17 @@ class _AuthGateState extends State<AuthGate> {
               xpLog: []);
           await apiFirebaseService.saveUserData(userAuth.user!.uid, user);
         } on FirebaseAuthException catch (e) {
+          if (e.code == "email-already-in-use") {
+            setState(() {
+              error = "Ni imɛli ladɛrɛsi talen don";
+            });
+          } else if (e.code == "weak-password") {
+            setState(() {
+              error = "Ni kɔdi ka dogon";
+            });
+          }
           setState(() {
-            error = '${e.message}';
+            error;
             setIsLoading();
             //showSnackbar(context, e.message ?? 'An error occurred');
           });
@@ -305,6 +331,17 @@ class _AuthGateState extends State<AuthGate> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
+
+        final user = users.Users(
+            uid: credential.idToken,
+            downloadBooks: [],
+            xp: 0,
+            completedBooks: [],
+            favoriteBooks: [],
+            inProgressBooks: [],
+            totalReadingTime: 0,
+            xpLog: []);
+        await apiFirebaseService.saveUserData(credential.idToken ?? "", user);
 
         // Once signed in, return the UserCredential
         await auth.signInWithCredential(credential);

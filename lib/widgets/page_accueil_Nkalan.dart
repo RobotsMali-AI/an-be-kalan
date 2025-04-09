@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:literacy_app/widgets/ChooseContextPage.dart';
 import 'package:literacy_app/widgets/ChooseCorrectSpellPage.dart';
 import 'package:literacy_app/widgets/WordsCompletePage.dart';
-import 'package:literacy_app/widgets/alphabtPage.dart';
 
 class AcceuilNkalan extends StatelessWidget {
   const AcceuilNkalan({super.key});
@@ -29,12 +28,12 @@ class AcceuilNkalan extends StatelessWidget {
             'assets/imJeu1.jpg', // Replace with actual grayscale image path
         'page': const ChooseContextPage(),
       },
-      {
-        'title': 'Kalan',
-        'image':
-            'assets/imJeu1.jpg', // Replace with actual grayscale image path
-        'page': AlphabetPage(),
-      },
+      // {
+      //   'title': 'Kalan',
+      //   'image':
+      //       'assets/imJeu1.jpg', // Replace with actual grayscale image path
+      //   'page': AlphabetPage(),
+      // },
     ];
 
     return Scaffold(

@@ -18,7 +18,7 @@ class OneImageMultipleWordsPage extends StatefulWidget {
 
 class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
-  late List<OneImageMultipleWordsQuestion> levels;
+  late List<int> questionOrder; // List to store shuffled indices
   int currentLevel = 0;
   String? selectedOption;
   bool hasChecked = false;
@@ -27,7 +27,9 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
   @override
   void initState() {
     super.initState();
-    levels = widget.list;
+    // Initialize the question order with shuffled indices
+    questionOrder = List.generate(widget.list.length, (index) => index)
+      ..shuffle();
   }
 
   @override
@@ -42,7 +44,7 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
       hasChecked = true;
     });
 
-    final currentQuestion = levels[currentLevel];
+    final currentQuestion = widget.list[questionOrder[currentLevel]];
     if (selectedOption == currentQuestion.answer) {
       correctAnswers++;
       widget.user.xp += 1;
@@ -54,7 +56,7 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
 
   // Proceed to the next question or show the final dialog
   void _nextQuestion() async {
-    if (currentLevel < levels.length - 1) {
+    if (currentLevel < widget.list.length - 1) {
       setState(() {
         currentLevel++;
         hasChecked = false;
@@ -88,7 +90,7 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'I ye hakɛw $correctAnswers/${levels.length} dafa. I ye dɔnniya sɔrɔ $correctAnswers!',
+                    'I ye hakɛw $correctAnswers/${widget.list.length} dafa. I ye dɔnniya sɔrɔ $correctAnswers!',
                     style: const TextStyle(fontSize: 16, color: Colors.black87),
                     textAlign: TextAlign.center,
                   ),
@@ -136,7 +138,7 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final currentQuestion = levels[currentLevel];
+    final currentQuestion = widget.list[questionOrder[currentLevel]];
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -238,7 +240,7 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
                             borderRadius: BorderRadius.circular(8)),
                       ),
                       child: Text(
-                        currentLevel < levels.length - 1 ? 'Nata' : 'Dafa',
+                        currentLevel < widget.list.length - 1 ? 'Nata' : 'Dafa',
                         style: const TextStyle(fontSize: 18),
                       ),
                     ),
