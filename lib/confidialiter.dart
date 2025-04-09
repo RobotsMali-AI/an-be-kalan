@@ -85,7 +85,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
         //             SharedPreferences prefs =
         //                 await SharedPreferences.getInstance();
         //             await prefs.setBool('hasSeenConfidialiter', true);
-        //             Navigator.pushReplacement(
+        //             Navigator.pushReplaceme   nt(
         //               context,
         //               MaterialPageRoute(
         //                   builder: (context) => LiteracyAppEntry(

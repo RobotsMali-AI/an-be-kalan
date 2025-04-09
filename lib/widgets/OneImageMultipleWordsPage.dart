@@ -70,52 +70,80 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
         context: context,
         barrierDismissible: false,
         builder: (context) => Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          child: SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.emoji_events, color: Colors.amber, size: 64),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Aw ni ce!',
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: const Icon(
+                    Icons.emoji_events,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Aw ni ce!',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'I ye hakɛw $correctAnswers/${widget.list.length} dafa. I ye dɔnniya sɔrɔ $correctAnswers!',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'N sɔnna',
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'I ye hakɛw $correctAnswers/${widget.list.length} dafa. I ye dɔnniya sɔrɔ $correctAnswers!',
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Return to previous screen
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Text(
-                      'N sɔnna',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -128,11 +156,11 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
     if (!hasChecked) {
       return Colors.white;
     } else if (option == answer) {
-      return Colors.green.withOpacity(0.2); // Correct answer
+      return Colors.black.withOpacity(0.1);
     } else if (option == selectedOption) {
-      return Colors.red.withOpacity(0.2); // Wrong answer selected
+      return Colors.black.withOpacity(0.05);
     } else {
-      return Colors.white; // No feedback
+      return Colors.white;
     }
   }
 
@@ -144,12 +172,19 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         automaticallyImplyLeading: false,
+        elevation: 0,
         title: Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.black,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -158,13 +193,27 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
                 'Hakɛ ${currentLevel + 1}',
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.close, color: Colors.white),
-                onPressed: () => Navigator.pop(context),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
             ],
           ),
@@ -174,21 +223,51 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
         children: [
           Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              Container(
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
                 child: Text(
                   currentQuestion.question,
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                    height: 1.5,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
               Expanded(
                 flex: 2,
-                child: Center(
-                  child: Image.network(
-                    currentQuestion.image,
-                    fit: BoxFit.contain,
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      currentQuestion.image,
+                      fit: BoxFit.contain,
+                    ),
                   ),
                 ),
               ),
@@ -209,44 +288,72 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
             bottom: 16,
             left: 16,
             right: 16,
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: hasChecked || selectedOption == null
-                        ? null
-                        : _checkSelection,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: const Text('Sɛgɛsɛgɛli',
-                        style: TextStyle(fontSize: 18)),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                ),
-                if (hasChecked) ...[
-                  const SizedBox(width: 16),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _nextQuestion,
+                      onPressed: hasChecked || selectedOption == null
+                          ? null
+                          : _checkSelection,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
                       ),
-                      child: Text(
-                        currentLevel < widget.list.length - 1 ? 'Nata' : 'Dafa',
-                        style: const TextStyle(fontSize: 18),
+                      child: const Text(
+                        'Sɛgɛsɛgɛli',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
+                  if (hasChecked) ...[
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: _nextQuestion,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.black,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          currentLevel < widget.list.length - 1
+                              ? 'Nata'
+                              : 'Dafa',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ],
@@ -259,26 +366,54 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage> {
     final bool isSelected = selectedOption == option;
     final Color backgroundColor = _getBackgroundColor(option, answer);
 
-    return Card(
-      elevation:
-          isSelected && !hasChecked ? 4 : 2, // Higher elevation when selected
-      color: backgroundColor,
+    return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: ListTile(
-        leading: hasChecked
-            ? Icon(
-                option == answer ? Icons.check : Icons.close,
-                color: option == answer ? Colors.green : Colors.red,
-              )
-            : Icon(
-                isSelected
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_unchecked,
-                color: isSelected ? Colors.black : Colors.grey,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        leading: Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
               ),
+            ],
+          ),
+          child: hasChecked
+              ? Icon(
+                  option == answer ? Icons.check : Icons.close,
+                  color: Colors.white,
+                  size: 24,
+                )
+              : Icon(
+                  isSelected
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_unchecked,
+                  color: Colors.white,
+                  size: 24,
+                ),
+        ),
         title: Text(
           option,
-          style: const TextStyle(fontSize: 18, color: Colors.black),
+          style: const TextStyle(
+            fontSize: 20,
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         onTap: hasChecked
             ? null

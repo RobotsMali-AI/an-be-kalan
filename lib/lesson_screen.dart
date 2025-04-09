@@ -716,15 +716,15 @@ class LessonScreenState extends State<LessonScreen> {
   Widget buildAudioSection() {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -733,33 +733,59 @@ class LessonScreenState extends State<LessonScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              IconButton(
-                icon: Icon(
-                  isPlaying ? Icons.pause : Icons.play_arrow,
+              Container(
+                decoration: BoxDecoration(
                   color: Colors.black,
-                  size: 36,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                onPressed: togglePlayback,
+                child: IconButton(
+                  icon: Icon(
+                    isPlaying ? Icons.pause : Icons.play_arrow,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                  onPressed: togglePlayback,
+                ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 16),
               Text(
                 formatDuration(_currentPosition),
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const Text(
                 ' / ',
-                style: TextStyle(fontSize: 16, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               Text(
                 formatDuration(_audioDuration),
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 12),
           SliderTheme(
             data: SliderTheme.of(context).copyWith(
               activeTrackColor: Colors.black,
-              inactiveTrackColor: Colors.blue.shade100,
+              inactiveTrackColor: Colors.grey.shade200,
               thumbColor: Colors.black,
               overlayColor: Colors.black.withOpacity(0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
@@ -795,21 +821,47 @@ class LessonScreenState extends State<LessonScreen> {
 
   Widget buildFAB() {
     if (isRecording) {
-      return FloatingActionButton(
-        key: const ValueKey('stop'),
-        heroTag: 'stopFAB',
-        onPressed: stopRecording,
-        backgroundColor: Colors.black,
-        child: const Icon(Icons.stop, color: Colors.white),
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          key: const ValueKey('stop'),
+          heroTag: 'stopFAB',
+          onPressed: stopRecording,
+          backgroundColor: Colors.black,
+          child: const Icon(Icons.stop, color: Colors.white),
+        ),
       );
     } else if (hasTranscription) {
       if (lastPage && currentSentenceIndex == currentSentences.length - 1) {
-        return FloatingActionButton(
-          key: const ValueKey('end'),
-          heroTag: 'endFAB',
-          onPressed: () => endLesson(context),
-          backgroundColor: Colors.black,
-          child: const Icon(Icons.check, color: Colors.white),
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            key: const ValueKey('end'),
+            heroTag: 'endFAB',
+            onPressed: () => endLesson(context),
+            backgroundColor: Colors.black,
+            child: const Icon(Icons.check, color: Colors.white),
+          ),
         );
       } else {
         return FloatingHintButton(
@@ -819,12 +871,25 @@ class LessonScreenState extends State<LessonScreen> {
         );
       }
     } else {
-      return FloatingActionButton(
-        key: const ValueKey('mic'),
-        heroTag: 'micFAB',
-        onPressed: startRecording,
-        backgroundColor: Colors.black,
-        child: const Icon(Icons.mic, color: Colors.white),
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.black,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          key: const ValueKey('mic'),
+          heroTag: 'micFAB',
+          onPressed: startRecording,
+          backgroundColor: Colors.black,
+          child: const Icon(Icons.mic, color: Colors.white),
+        ),
       );
     }
   }
@@ -832,38 +897,28 @@ class LessonScreenState extends State<LessonScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+        ),
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
-          ),
-        ),
+        elevation: 0,
         centerTitle: true,
         title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.grey.withOpacity(0.8),
-                Colors.black.withOpacity(0.9),
-              ],
-            ),
+            color: Colors.black,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 4,
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
@@ -871,29 +926,38 @@ class LessonScreenState extends State<LessonScreen> {
           child: Text(
             widget.bookTitle,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () => bookmarkCurrentPageAndExit(context),
-            icon: const Icon(Icons.close, color: Colors.white, size: 30),
+          Container(
+            margin: const EdgeInsets.only(right: 8),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: IconButton(
+              onPressed: () => bookmarkCurrentPageAndExit(context),
+              icon: const Icon(Icons.close, color: Colors.white, size: 28),
+            ),
           ),
         ],
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.white],
-          ),
-        ),
+        color: Colors.white,
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -903,26 +967,31 @@ class LessonScreenState extends State<LessonScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
                         child: widget.isOffLine == false
                             ? CachedNetworkImage(
                                 imageUrl: currentImageUrl,
                                 placeholder: (context, url) => const Center(
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.black),
+                                  ),
                                 ),
                                 errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
+                                    const Icon(Icons.error,
+                                        color: Colors.black),
                                 fit: BoxFit.contain,
                                 width: MediaQuery.of(context).size.width,
                                 height:
@@ -937,17 +1006,17 @@ class LessonScreenState extends State<LessonScreen> {
                               ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
                           ),
                         ],
                       ),
@@ -958,8 +1027,9 @@ class LessonScreenState extends State<LessonScreen> {
                           text: TextSpan(
                             text: '',
                             style: const TextStyle(
-                              fontSize: 24,
+                              fontSize: 28,
                               color: Colors.black87,
+                              height: 1.5,
                             ),
                             children: currentTextSpans,
                           ),
@@ -967,28 +1037,41 @@ class LessonScreenState extends State<LessonScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    FloatingActionButton(
-                      mini: true,
-                      backgroundColor: Colors.black,
-                      tooltip: 'Listen to the sentence',
-                      onPressed: () async {
-                        try {
-                          if (widget.isOffLine) {
-                            await _sentencePlayer
-                                .setSource(DeviceFileSource(currentAudio));
-                          } else {
-                            await _sentencePlayer
-                                .setSource(UrlSource(currentAudio));
+                    const SizedBox(height: 24),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: FloatingActionButton(
+                        mini: true,
+                        backgroundColor: Colors.black,
+                        tooltip: 'Listen to the sentence',
+                        onPressed: () async {
+                          try {
+                            if (widget.isOffLine) {
+                              await _sentencePlayer
+                                  .setSource(DeviceFileSource(currentAudio));
+                            } else {
+                              await _sentencePlayer
+                                  .setSource(UrlSource(currentAudio));
+                            }
+                            await _sentencePlayer.play(UrlSource(currentAudio));
+                          } catch (e) {
+                            print('Error playing sentence audio: $e');
                           }
-                          await _sentencePlayer.play(UrlSource(currentAudio));
-                        } catch (e) {
-                          print('Error playing sentence audio: $e');
-                        }
-                      },
-                      child: const Icon(Icons.volume_up, color: Colors.white),
+                        },
+                        child: const Icon(Icons.volume_up, color: Colors.white),
+                      ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     if (hasRecording) buildAudioSection(),
                     const SizedBox(height: 80),
                   ],
@@ -998,29 +1081,43 @@ class LessonScreenState extends State<LessonScreen> {
             Positioned(
               bottom: 20,
               left: 20,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 60,
-                    height: 60,
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.grey.shade300,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.black),
-                      value: currentPage / (bookData!.content.length),
-                      strokeWidth: 6,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                  Text(
-                    '$currentPage',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                  ],
+                ),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.grey.shade200,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.black),
+                        value: currentPage / (bookData!.content.length),
+                        strokeWidth: 6,
+                      ),
                     ),
-                  ),
-                ],
+                    Text(
+                      '$currentPage',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             Positioned(
