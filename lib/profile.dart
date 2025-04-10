@@ -383,7 +383,7 @@ class _ProfilePageState extends State<ProfilePage> {
               icon: const Icon(Icons.feedback, color: Colors.black),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FeedbackScreen()),
+                MaterialPageRoute(builder: (context) => const FeedbackScreen()),
               ),
               tooltip: 'Lafili',
             ),

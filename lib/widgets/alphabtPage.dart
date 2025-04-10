@@ -63,7 +63,7 @@ class _AlphabetPageState extends State<AlphabetPage> {
         centerTitle: true,
         backgroundColor: Colors.black,
         title: const Text(
-          'Learn the Alphabet',
+          'Sigini kalan',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -213,7 +213,7 @@ class _AlphabetPageState extends State<AlphabetPage> {
 class AlphabetCard extends StatefulWidget {
   final AlphabetItem item;
 
-  const AlphabetCard({required this.item});
+  const AlphabetCard({super.key, required this.item});
 
   @override
   _AlphabetCardState createState() => _AlphabetCardState();
