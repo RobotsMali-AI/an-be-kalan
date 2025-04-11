@@ -253,7 +253,7 @@ class _AlphabetCardState extends State<AlphabetCard>
     if (isPlaying) {
       await _player.stop();
     } else {
-      await _player.play(AssetSource(widget.item.audio));
+      await _player.play(AssetSource(widget.item.audio1));
     }
   }
 

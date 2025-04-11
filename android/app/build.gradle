@@ -17,12 +17,12 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '6'
+    flutterVersionCode = '9'
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
-    flutterVersionName = '1.5.1'
+    flutterVersionName = '1.5.4'
 }
 
 android {
@@ -72,4 +72,5 @@ flutter {
 
 dependencies {
     implementation 'com.google.android.play:integrity:1.4.0' // Latest Play Integrity API
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
 }
