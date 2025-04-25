@@ -81,6 +81,14 @@ class _AuthGateState extends State<AuthGate> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // Add App Logo
+                          const Text(
+                            'An be Kalan',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 20),
                             child: Image.asset(

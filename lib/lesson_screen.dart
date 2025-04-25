@@ -73,46 +73,97 @@ class LessonScreenState extends State<LessonScreen> {
 
   List<double> accuracies = [];
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   setupLesson();
+  //   setupAudioSession();
+
+  //   // Configure AudioPlayer
+  //   _audioPlayer.setReleaseMode(ReleaseMode.stop);
+
+  //   _audioPlayer.onPositionChanged.listen((Duration position) {
+  //     setState(() {
+  //       _currentPosition = position;
+  //     });
+  //   });
+
+  //   _audioPlayer.onPlayerStateChanged.listen((PlayerState playerState) {
+  //     if (playerState == PlayerState.completed) {
+  //       setState(() {
+  //         isPlaying = false;
+  //         _currentPosition = _audioDuration;
+  //       });
+  //     } else if (mounted) {
+  //       setState(() {
+  //         isPlaying = playerState == PlayerState.playing;
+  //       });
+  //     }
+  //   });
+
+  //   _audioPlayer.onDurationChanged.listen((Duration d) {
+  //     setState(() {
+  //       _audioDuration = d;
+  //     });
+  //   });
+  // }
   @override
   void initState() {
     super.initState();
     setupLesson();
     setupAudioSession();
 
-    // Configure AudioPlayer
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
     _audioPlayer.onPositionChanged.listen((Duration position) {
-      setState(() {
-        _currentPosition = position;
-      });
-    });
-
-    _audioPlayer.onPlayerStateChanged.listen((PlayerState playerState) {
-      if (playerState == PlayerState.completed) {
+      if (mounted) {
         setState(() {
-          isPlaying = false;
-          _currentPosition = _audioDuration;
-        });
-      } else if (mounted) {
-        setState(() {
-          isPlaying = playerState == PlayerState.playing;
+          _currentPosition = position;
         });
       }
     });
 
+    _audioPlayer.onPlayerStateChanged.listen((PlayerState playerState) {
+      if (mounted) {
+        if (playerState == PlayerState.completed) {
+          setState(() {
+            isPlaying = false;
+            _currentPosition = _audioDuration;
+          });
+        } else {
+          setState(() {
+            isPlaying = playerState == PlayerState.playing;
+          });
+        }
+      }
+    });
+
     _audioPlayer.onDurationChanged.listen((Duration d) {
-      setState(() {
-        _audioDuration = d;
-      });
+      if (mounted) {
+        setState(() {
+          _audioDuration = d;
+        });
+      }
     });
   }
 
+  // Future<void> setupLesson() async {
+  //   Book? response = !widget.isOffLine
+  //       ? await context.read<ApiFirebaseService>().getBook(widget.bookTitle)
+  //       : await context.read<DatabaseHelper>().getBook(widget.bookTitle);
+  //   if (response != null) {
+  //     setState(() {
+  //       bookData = response;
+  //       _loading = false;
+  //     });
+  //     setupInitialPageAndSentence();
+  //   }
+  // }
   Future<void> setupLesson() async {
     Book? response = !widget.isOffLine
         ? await context.read<ApiFirebaseService>().getBook(widget.bookTitle)
         : await context.read<DatabaseHelper>().getBook(widget.bookTitle);
-    if (response != null) {
+    if (response != null && mounted) {
       setState(() {
         bookData = response;
         _loading = false;
@@ -198,9 +249,24 @@ class LessonScreenState extends State<LessonScreen> {
     }
   }
 
+  // Future<void> stopRecording() async {
+  //   _filePath = await _audioRecorder.stop();
+  //   if (_filePath != null) {
+  //     setState(() {
+  //       isRecording = false;
+  //       hasRecording = true;
+  //       _currentPosition = Duration.zero;
+  //       isPlaying = false;
+  //     });
+  //     await _audioPlayer.setSource(DeviceFileSource(_filePath!));
+  //     // Duration will be updated via onDurationChanged
+  //     sendAudioToASR();
+  //   }
+  // }
+
   Future<void> stopRecording() async {
     _filePath = await _audioRecorder.stop();
-    if (_filePath != null) {
+    if (_filePath != null && mounted) {
       setState(() {
         isRecording = false;
         hasRecording = true;
@@ -208,17 +274,39 @@ class LessonScreenState extends State<LessonScreen> {
         isPlaying = false;
       });
       await _audioPlayer.setSource(DeviceFileSource(_filePath!));
-      // Duration will be updated via onDurationChanged
       sendAudioToASR();
     }
   }
 
+  // Future<void> togglePlayback() async {
+  //   if (isPlaying) {
+  //     await _audioPlayer.pause();
+  //     setState(() {
+  //       isPlaying = false;
+  //     });
+  //   } else {
+  //     if (_audioPlayer.state == PlayerState.stopped) {
+  //       await _audioPlayer.setSource(DeviceFileSource(_filePath!));
+  //     }
+  //     if (_currentPosition >= _audioDuration) {
+  //       _currentPosition = Duration.zero;
+  //     }
+  //     await _audioPlayer.seek(_currentPosition);
+  //     await _audioPlayer.resume();
+  //     setState(() {
+  //       isPlaying = true;
+  //     });
+  //   }
+  // }
+
   Future<void> togglePlayback() async {
     if (isPlaying) {
       await _audioPlayer.pause();
-      setState(() {
-        isPlaying = false;
-      });
+      if (mounted) {
+        setState(() {
+          isPlaying = false;
+        });
+      }
     } else {
       if (_audioPlayer.state == PlayerState.stopped) {
         await _audioPlayer.setSource(DeviceFileSource(_filePath!));
@@ -228,9 +316,11 @@ class LessonScreenState extends State<LessonScreen> {
       }
       await _audioPlayer.seek(_currentPosition);
       await _audioPlayer.resume();
-      setState(() {
-        isPlaying = true;
-      });
+      if (mounted) {
+        setState(() {
+          isPlaying = true;
+        });
+      }
     }
   }
 
@@ -260,49 +350,165 @@ class LessonScreenState extends State<LessonScreen> {
         .update(user.toFirestore());
   }
 
+  // void sendAudioToASR() async {
+  //   setState(() => _sending = true);
+  //   String? transcription =
+  //       await context.read<ApiFirebaseService>().inferenceASRModel(_filePath!);
+  //   if (transcription != null) {
+  //     List<TextSpan> highlightedSpans = getHighlightedTextSpans(transcription);
+  //     setState(() {
+  //       hasTranscription = true;
+  //       currentTextSpans = highlightedSpans;
+  //       _sending = false;
+  //     });
+  //   } else {
+  //     setState(() => _sending = false);
+  //   }
+  // }
   void sendAudioToASR() async {
-    setState(() => _sending = true);
+    if (mounted) setState(() => _sending = true);
     String? transcription =
         await context.read<ApiFirebaseService>().inferenceASRModel(_filePath!);
-    if (transcription != null) {
+    if (transcription != null && mounted) {
       List<TextSpan> highlightedSpans = getHighlightedTextSpans(transcription);
       setState(() {
         hasTranscription = true;
         currentTextSpans = highlightedSpans;
         _sending = false;
       });
-    } else {
+    } else if (mounted) {
       setState(() => _sending = false);
     }
   }
 
+  // List<TextSpan> getHighlightedTextSpans(String transcription) {
+  //   String originalDisplay = currentSentence;
+  //   String originalCompare =
+  //       currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+  //   String transcriptionCompare =
+  //       transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+
+  //   List<TextSpan> highlightedSpans = [];
+  //   int matching = 0;
+  //   int compareIndex = 0;
+
+  //   for (int i = 0; i < originalDisplay.length; i++) {
+  //     String char = originalDisplay[i];
+  //     bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
+
+  //     if (isLetterOrSpace) {
+  //       bool isCorrect = compareIndex < transcriptionCompare.length &&
+  //           originalCompare[compareIndex] == transcriptionCompare[compareIndex];
+  //       if (isCorrect) matching++;
+  //       highlightedSpans.add(TextSpan(
+  //         text: char,
+  //         style: TextStyle(
+  //           color: isCorrect ? Colors.green : Colors.red,
+  //         ),
+  //       ));
+  //       compareIndex++;
+  //     } else {
+  //       highlightedSpans.add(TextSpan(
+  //         text: char,
+  //         style: TextStyle(color: Colors.red),
+  //       ));
+  //     }
+  //   }
+
+  //   double accuracy =
+  //       originalCompare.isEmpty ? 0 : matching / originalCompare.length;
+  //   double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
+  //   accuracies.add(adjustedAccuracy);
+
+  //   return highlightedSpans;
+  // }
+
+  // Map<String, dynamic> computeAlignmentAndDistance(String ref, String hyp) {
+  //   int m = ref.length, n = hyp.length;
+  //   // Create dp table.
+  //   List<List<int>> dp = List.generate(
+  //       m + 1, (_) => List.filled(n + 1, 0, growable: false),
+  //       growable: false);
+
+  //   for (int i = 0; i <= m; i++) {
+  //     dp[i][0] = i;
+  //   }
+  //   for (int j = 0; j <= n; j++) {
+  //     dp[0][j] = j;
+  //   }
+  //   for (int i = 1; i <= m; i++) {
+  //     for (int j = 1; j <= n; j++) {
+  //       int cost = ref[i - 1] == hyp[j - 1] ? 0 : 1;
+  //       dp[i][j] = min(
+  //           dp[i - 1][j] + 1, min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost));
+  //     }
+  //   }
+
+  //   // Backtrace to compute the alignment (only for reference characters).
+  //   List<String> alignment = [];
+  //   int i = m, j = n;
+  //   while (i > 0 || j > 0) {
+  //     // Check diagonal move.
+  //     if (i > 0 &&
+  //         j > 0 &&
+  //         dp[i][j] == dp[i - 1][j - 1] + (ref[i - 1] == hyp[j - 1] ? 0 : 1)) {
+  //       alignment.add(ref[i - 1] == hyp[j - 1] ? "match" : "substitution");
+  //       i--;
+  //       j--;
+  //     }
+  //     // Check deletion.
+  //     else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
+  //       alignment.add("deletion");
+  //       i--;
+  //     }
+  //     // Check insertion.
+  //     else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
+  //       // For insertion, we don't record an operation for a reference character.
+  //       j--;
+  //     }
+  //   }
+  //   alignment = alignment.reversed.toList();
+  //   return {"alignment": alignment, "editDistance": dp[m][n]};
+  // }
+
   List<TextSpan> getHighlightedTextSpans(String transcription) {
-    String originalDisplay = currentSentence;
-    String originalCompare =
-        currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+    String correctSentence = currentSentence;
+    String correctCompare =
+        correctSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
     String transcriptionCompare =
         transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
 
+    // Get alignment operations for correctSentence
+    Map<String, dynamic> result =
+        computeAlignmentAndDistance(correctCompare, transcriptionCompare);
+    List<String> alignment = result['alignment'];
+
+    // Build highlighted spans for correctSentence (original text)
     List<TextSpan> highlightedSpans = [];
+    int q = 0; // Index into alignment
     int matching = 0;
-    int compareIndex = 0;
-
-    for (int i = 0; i < originalDisplay.length; i++) {
-      String char = originalDisplay[i];
-      bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
-
-      if (isLetterOrSpace) {
-        bool isCorrect = compareIndex < transcriptionCompare.length &&
-            originalCompare[compareIndex] == transcriptionCompare[compareIndex];
-        if (isCorrect) matching++;
-        highlightedSpans.add(TextSpan(
-          text: char,
-          style: TextStyle(
-            color: isCorrect ? Colors.green : Colors.red,
-          ),
-        ));
-        compareIndex++;
+    for (int i = 0; i < correctSentence.length; i++) {
+      String char = correctSentence[i];
+      if (RegExp(r'[\w\s]').hasMatch(char)) {
+        if (q < alignment.length) {
+          String op = alignment[q];
+          bool isCorrect = op == 'match';
+          if (isCorrect) matching++;
+          highlightedSpans.add(TextSpan(
+            text: char,
+            style: TextStyle(color: isCorrect ? Colors.green : Colors.red),
+          ));
+          if (op != 'insertion')
+            q++; // Move alignment index only if not an insertion in transcription
+        } else {
+          // Beyond transcription length, assume incorrect
+          highlightedSpans.add(TextSpan(
+            text: char,
+            style: TextStyle(color: Colors.red),
+          ));
+        }
       } else {
+        // Non-word characters (e.g., punctuation) remain unchanged in color or red
         highlightedSpans.add(TextSpan(
           text: char,
           style: TextStyle(color: Colors.red),
@@ -310,60 +516,58 @@ class LessonScreenState extends State<LessonScreen> {
       }
     }
 
+    // Compute accuracy
     double accuracy =
-        originalCompare.isEmpty ? 0 : matching / originalCompare.length;
+        correctCompare.isEmpty ? 0 : matching / correctCompare.length;
     double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
     accuracies.add(adjustedAccuracy);
 
     return highlightedSpans;
   }
 
+// Alignment function to track operations for correctSentence
   Map<String, dynamic> computeAlignmentAndDistance(String ref, String hyp) {
     int m = ref.length, n = hyp.length;
-    // Create dp table.
-    List<List<int>> dp = List.generate(
-        m + 1, (_) => List.filled(n + 1, 0, growable: false),
-        growable: false);
+    List<List<int>> dp = List.generate(m + 1, (_) => List.filled(n + 1, 0));
 
-    for (int i = 0; i <= m; i++) {
-      dp[i][0] = i;
-    }
-    for (int j = 0; j <= n; j++) {
-      dp[0][j] = j;
-    }
+    // Initialize DP table
+    for (int i = 0; i <= m; i++) dp[i][0] = i; // Deletions
+    for (int j = 0; j <= n; j++) dp[0][j] = j; // Insertions
+
+    // Fill DP table
     for (int i = 1; i <= m; i++) {
       for (int j = 1; j <= n; j++) {
         int cost = ref[i - 1] == hyp[j - 1] ? 0 : 1;
         dp[i][j] = min(
-            dp[i - 1][j] + 1, min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost));
+          dp[i - 1][j] + 1, // Deletion
+          min(
+              dp[i][j - 1] + 1, // Insertion
+              dp[i - 1][j - 1] + cost), // Substitution
+        );
       }
     }
 
-    // Backtrace to compute the alignment (only for reference characters).
+    // Backtrace to determine operations for ref (correctSentence)
     List<String> alignment = [];
     int i = m, j = n;
     while (i > 0 || j > 0) {
-      // Check diagonal move.
       if (i > 0 &&
           j > 0 &&
           dp[i][j] == dp[i - 1][j - 1] + (ref[i - 1] == hyp[j - 1] ? 0 : 1)) {
-        alignment.add(ref[i - 1] == hyp[j - 1] ? "match" : "substitution");
+        alignment.add(ref[i - 1] == hyp[j - 1] ? 'match' : 'substitution');
         i--;
         j--;
-      }
-      // Check deletion.
-      else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
-        alignment.add("deletion");
+      } else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
+        alignment.add('deletion');
         i--;
-      }
-      // Check insertion.
-      else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
-        // For insertion, we don't record an operation for a reference character.
+      } else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
+        // Insertion in transcription, skip for ref
+        alignment.add('insertion');
         j--;
       }
     }
     alignment = alignment.reversed.toList();
-    return {"alignment": alignment, "editDistance": dp[m][n]};
+    return {'alignment': alignment, 'editDistance': dp[m][n]};
   }
 
   // List<TextSpan> getHighlightedTextSpans(String transcription) {
@@ -462,6 +666,25 @@ class LessonScreenState extends State<LessonScreen> {
       _currentPosition = Duration.zero;
       currentTextSpans = [TextSpan(text: currentSentence)];
     });
+  }
+
+  Future<void> saveProgress() async {
+    Duration duration = DateTime.now().difference(startTime!);
+    readingTime += duration.inSeconds;
+    setState(() => _sending = true);
+    await context.read<ApiFirebaseService>().bookmark(
+          widget.uid,
+          BookUser(
+            lastAccessed: DateTime.now(),
+            title: widget.bookTitle,
+            bookmark: currentPage.toString(),
+            readingTime: readingTime,
+            totalPages: bookData!.content.length,
+            accuracies: accuracies,
+          ),
+          widget.userdata,
+        );
+    setState(() => _sending = false);
   }
 
   Future<void> bookmarkCurrentPageAndExit(BuildContext context) async {
@@ -707,9 +930,12 @@ class LessonScreenState extends State<LessonScreen> {
 
   @override
   void dispose() {
+    if (isRecording) {
+      _audioRecorder.stop();
+    }
     _audioRecorder.dispose();
     _audioPlayer.dispose();
-    _sentencePlayer.dispose(); // Dispose of the sentence player
+    _sentencePlayer.dispose();
     super.dispose();
   }
 
@@ -904,244 +1130,255 @@ class LessonScreenState extends State<LessonScreen> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.black,
-        elevation: 0,
-        centerTitle: true,
-        title: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Text(
-            widget.bookTitle,
-            style: const TextStyle(
-              fontSize: 24,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 8),
+    return PopScope(
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) {
+          // Perform any synchronous operations here
+          // Note: Avoid asynchronous operations in this callback
+          saveProgress();
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.black,
+          elevation: 0,
+          centerTitle: true,
+          title: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.black,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.2),
-                  blurRadius: 4,
+                  blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: IconButton(
-              onPressed: () => bookmarkCurrentPageAndExit(context),
-              icon: const Icon(Icons.close, color: Colors.white, size: 28),
+            child: Text(
+              widget.bookTitle,
+              style: const TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
-        ],
-      ),
-      body: Container(
-        color: Colors.white,
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 12,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: widget.isOffLine == false
-                            ? CachedNetworkImage(
-                                imageUrl: currentImageUrl,
-                                placeholder: (context, url) => const Center(
-                                  child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.black),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error,
-                                        color: Colors.black),
-                                fit: BoxFit.contain,
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.38,
-                              )
-                            : Image.memory(
-                                base64Decode(currentImageUrl),
-                                fit: BoxFit.contain,
-                                width: MediaQuery.of(context).size.width,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.38,
-                              ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: RichText(
-                          key: ValueKey(currentSentence),
-                          text: TextSpan(
-                            text: '',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              color: Colors.black87,
-                              height: 1.5,
+          actions: [
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                onPressed: () => bookmarkCurrentPageAndExit(context),
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+              ),
+            ),
+          ],
+        ),
+        body: Container(
+          color: Colors.white,
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 12,
+                              offset: const Offset(0, 6),
                             ),
-                            children: currentTextSpans,
-                          ),
-                          textAlign: TextAlign.center,
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: widget.isOffLine == false
+                              ? CachedNetworkImage(
+                                  imageUrl: currentImageUrl,
+                                  placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.black),
+                                    ),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error,
+                                          color: Colors.black),
+                                  fit: BoxFit.contain,
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.38,
+                                )
+                              : Image.memory(
+                                  base64Decode(currentImageUrl),
+                                  fit: BoxFit.contain,
+                                  width: MediaQuery.of(context).size.width,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.38,
+                                ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
+                      const SizedBox(height: 24),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: RichText(
+                            key: ValueKey(currentSentence),
+                            text: TextSpan(
+                              text: '',
+                              style: const TextStyle(
+                                fontSize: 28,
+                                color: Colors.black87,
+                                height: 1.5,
+                              ),
+                              children: currentTextSpans,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                        ],
+                        ),
                       ),
-                      child: FloatingActionButton(
-                        mini: true,
-                        backgroundColor: Colors.black,
-                        tooltip: 'Listen to the sentence',
-                        onPressed: () async {
-                          try {
-                            if (widget.isOffLine) {
+                      const SizedBox(height: 24),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: FloatingActionButton(
+                          mini: true,
+                          backgroundColor: Colors.black,
+                          tooltip: 'Listen to the sentence',
+                          onPressed: () async {
+                            try {
+                              if (widget.isOffLine) {
+                                await _sentencePlayer
+                                    .setSource(DeviceFileSource(currentAudio));
+                              } else {
+                                await _sentencePlayer
+                                    .setSource(UrlSource(currentAudio));
+                              }
                               await _sentencePlayer
-                                  .setSource(DeviceFileSource(currentAudio));
-                            } else {
-                              await _sentencePlayer
-                                  .setSource(UrlSource(currentAudio));
+                                  .play(UrlSource(currentAudio));
+                            } catch (e) {
+                              print('Error playing sentence audio: $e');
                             }
-                            await _sentencePlayer.play(UrlSource(currentAudio));
-                          } catch (e) {
-                            print('Error playing sentence audio: $e');
-                          }
-                        },
-                        child: const Icon(Icons.volume_up, color: Colors.white),
+                          },
+                          child:
+                              const Icon(Icons.volume_up, color: Colors.white),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 24),
-                    if (hasRecording) buildAudioSection(),
-                    const SizedBox(height: 80),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 20,
-              left: 20,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 60,
-                      height: 60,
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.grey.shade200,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.black),
-                        value: currentPage / (bookData!.content.length),
-                        strokeWidth: 6,
-                      ),
-                    ),
-                    Text(
-                      '$currentPage',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 20,
-              right: 20,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 300),
-                transitionBuilder: (child, animation) => ScaleTransition(
-                  scale: animation,
-                  child: child,
-                ),
-                child: buildFAB(),
-              ),
-            ),
-            if (_sending)
-              Container(
-                color: Colors.black.withOpacity(0.3),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                      const SizedBox(height: 24),
+                      if (hasRecording) buildAudioSection(),
+                      const SizedBox(height: 80),
+                    ],
                   ),
                 ),
               ),
-          ],
+              Positioned(
+                bottom: 20,
+                left: 20,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(
+                          backgroundColor: Colors.grey.shade200,
+                          valueColor:
+                              const AlwaysStoppedAnimation<Color>(Colors.black),
+                          value: currentPage / (bookData!.content.length),
+                          strokeWidth: 6,
+                        ),
+                      ),
+                      Text(
+                        '$currentPage',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 20,
+                right: 20,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) => ScaleTransition(
+                    scale: animation,
+                    child: child,
+                  ),
+                  child: buildFAB(),
+                ),
+              ),
+              if (_sending)
+                Container(
+                  color: Colors.black.withOpacity(0.3),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
