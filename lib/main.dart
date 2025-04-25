@@ -109,7 +109,7 @@ class LiteracyAppEntry extends StatelessWidget {
                       }
                       return hasSeenConfidialiter == true
                           ? const AuthGate()
-                          : PrivacyPolicyPage();
+                          : const PrivacyPolicyPage();
                     },
                   ),
                 ),

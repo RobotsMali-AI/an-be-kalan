@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:literacy_app/models/alphabet_model.dart';
 
 class AlphabetPage extends StatefulWidget {
+  const AlphabetPage({super.key});
+
   @override
   _AlphabetPageState createState() => _AlphabetPageState();
 }
@@ -61,7 +63,7 @@ class _AlphabetPageState extends State<AlphabetPage> {
         centerTitle: true,
         backgroundColor: Colors.black,
         title: const Text(
-          'Learn the Alphabet',
+          'Sigini kalan',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -81,7 +83,7 @@ class _AlphabetPageState extends State<AlphabetPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: LinearProgressIndicator(
-              value: (currentIndex + 1) / alphabetList.length,
+              value: (currentIndex + 1),
               backgroundColor: Colors.grey.shade200,
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
               minHeight: 8,
@@ -211,7 +213,7 @@ class _AlphabetPageState extends State<AlphabetPage> {
 class AlphabetCard extends StatefulWidget {
   final AlphabetItem item;
 
-  const AlphabetCard({required this.item});
+  const AlphabetCard({super.key, required this.item});
 
   @override
   _AlphabetCardState createState() => _AlphabetCardState();
@@ -272,74 +274,77 @@ class _AlphabetCardState extends State<AlphabetCard>
         children: [
           Expanded(
             flex: 4,
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(
-                          widget.item.image,
-                          fit: BoxFit.cover,
-                        ),
-                        // Gradient overlay
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.4),
-                              ],
-                            ),
-                          ),
-                        ),
-                        // Audio button
-                        Positioned(
-                          bottom: 16,
-                          right: 16,
-                          child: GestureDetector(
-                            onTap: playAudio,
-                            child: Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.8),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 200),
-                                child: Icon(
-                                  isPlaying ? Icons.stop : Icons.volume_up,
-                                  color: Colors.white,
-                                  size: 28,
-                                ),
-                              ),
-                            ),
-                          ),
+            child: GestureDetector(
+              onTap: playAudio,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
                         ),
                       ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset(
+                            widget.item.image,
+                            fit: BoxFit.cover,
+                          ),
+                          // Gradient overlay
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.4),
+                                ],
+                              ),
+                            ),
+                          ),
+                          //   // Audio button
+                          //   Positioned(
+                          //     bottom: 16,
+                          //     right: 16,
+                          //     child: GestureDetector(
+                          //       onTap: playAudio,
+                          //       child: Container(
+                          //         padding: const EdgeInsets.all(12),
+                          //         decoration: BoxDecoration(
+                          //           color: Colors.black.withOpacity(0.8),
+                          //           shape: BoxShape.circle,
+                          //           boxShadow: [
+                          //             BoxShadow(
+                          //               color: Colors.black.withOpacity(0.3),
+                          //               blurRadius: 8,
+                          //               offset: const Offset(0, 4),
+                          //             ),
+                          //           ],
+                          //         ),
+                          //         child: AnimatedSwitcher(
+                          //           duration: const Duration(milliseconds: 200),
+                          //           child: Icon(
+                          //             isPlaying ? Icons.stop : Icons.volume_up,
+                          //             color: Colors.white,
+                          //             size: 28,
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ),
+                          //   ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -369,12 +374,15 @@ class _AlphabetCardState extends State<AlphabetCard>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        widget.item.letter,
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                      GestureDetector(
+                        onTap: playAudio,
+                        child: Text(
+                          widget.item.letter,
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                       Container(
@@ -382,34 +390,34 @@ class _AlphabetCardState extends State<AlphabetCard>
                         width: MediaQuery.of(context).size.width * 0.6,
                         margin: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.grey.shade300,
-                              Colors.black87,
-                              Colors.grey.shade300,
-                            ],
-                          ),
+                          color: Colors.blueGrey,
                           borderRadius: BorderRadius.circular(1.5),
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Text(
-                            widget.item.letter,
-                            style: const TextStyle(
-                              fontSize: 48,
-                              fontFamily: 'Caveat VariableFont',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black54,
+                          GestureDetector(
+                            onTap: playAudio,
+                            child: Text(
+                              widget.item.letter,
+                              style: const TextStyle(
+                                fontSize: 48,
+                                fontFamily: 'Caveat VariableFont',
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black54,
+                              ),
                             ),
                           ),
-                          Text(
-                            widget.item.letter.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 48,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                          GestureDetector(
+                            onTap: playAudio,
+                            child: Text(
+                              widget.item.letter.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 48,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
                           ),
                         ],

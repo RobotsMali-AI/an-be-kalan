@@ -511,7 +511,7 @@ class LessonScreenState extends State<LessonScreen> {
         // Non-word characters (e.g., punctuation) remain unchanged in color or red
         highlightedSpans.add(TextSpan(
           text: char,
-          style: TextStyle(color: Colors.red),
+          style: const TextStyle(color: Colors.red),
         ));
       }
     }

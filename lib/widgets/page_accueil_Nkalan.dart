@@ -33,7 +33,7 @@ class AcceuilNkalan extends StatelessWidget {
         'title': 'Kalan',
         'image':
             'assets/imJeu1.jpg', // Replace with actual grayscale image path
-        'page': AlphabetPage(),
+        'page': const AlphabetPage(),
       },
     ];
 

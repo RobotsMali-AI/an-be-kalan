@@ -96,7 +96,7 @@ class ApiFirebaseService with ChangeNotifier {
     } else {
       SnackBar(
         content: Text("Request failed with status code ${response.statusCode}"),
-        duration: Duration(seconds: 10),
+        duration: const Duration(seconds: 10),
       );
       return {
         "error": "Request failed with status code ${response.statusCode}"
@@ -227,7 +227,7 @@ class ApiFirebaseService with ChangeNotifier {
       print('Unsupported file format: $filePath');
       SnackBar(
         content: Text('Unsupported file format: $filePath'),
-        duration: Duration(seconds: 30),
+        duration: const Duration(seconds: 30),
       );
       return null;
     }
@@ -239,7 +239,7 @@ class ApiFirebaseService with ChangeNotifier {
     } catch (e) {
       SnackBar(
         content: Text('Failed to transcribe audio: $e'),
-        duration: Duration(seconds: 30),
+        duration: const Duration(seconds: 30),
       );
       return null;
     }
