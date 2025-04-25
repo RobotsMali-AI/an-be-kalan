@@ -32,7 +32,7 @@ target 'Runner' do
   use_modular_headers!
 
   # Add specific version for gRPC-Core that's compatible with Firebase
-  pod 'gRPC-Core', '1.62.0'
+  pod 'gRPC-Core', '1.69.0'
   
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
