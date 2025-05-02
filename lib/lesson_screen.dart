@@ -72,41 +72,6 @@ class LessonScreenState extends State<LessonScreen> {
   DateTime? startTime;
 
   List<double> accuracies = [];
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   setupLesson();
-  //   setupAudioSession();
-
-  //   // Configure AudioPlayer
-  //   _audioPlayer.setReleaseMode(ReleaseMode.stop);
-
-  //   _audioPlayer.onPositionChanged.listen((Duration position) {
-  //     setState(() {
-  //       _currentPosition = position;
-  //     });
-  //   });
-
-  //   _audioPlayer.onPlayerStateChanged.listen((PlayerState playerState) {
-  //     if (playerState == PlayerState.completed) {
-  //       setState(() {
-  //         isPlaying = false;
-  //         _currentPosition = _audioDuration;
-  //       });
-  //     } else if (mounted) {
-  //       setState(() {
-  //         isPlaying = playerState == PlayerState.playing;
-  //       });
-  //     }
-  //   });
-
-  //   _audioPlayer.onDurationChanged.listen((Duration d) {
-  //     setState(() {
-  //       _audioDuration = d;
-  //     });
-  //   });
-  // }
   @override
   void initState() {
     super.initState();
@@ -147,18 +112,6 @@ class LessonScreenState extends State<LessonScreen> {
     });
   }
 
-  // Future<void> setupLesson() async {
-  //   Book? response = !widget.isOffLine
-  //       ? await context.read<ApiFirebaseService>().getBook(widget.bookTitle)
-  //       : await context.read<DatabaseHelper>().getBook(widget.bookTitle);
-  //   if (response != null) {
-  //     setState(() {
-  //       bookData = response;
-  //       _loading = false;
-  //     });
-  //     setupInitialPageAndSentence();
-  //   }
-  // }
   Future<void> setupLesson() async {
     Book? response = !widget.isOffLine
         ? await context.read<ApiFirebaseService>().getBook(widget.bookTitle)
@@ -249,21 +202,6 @@ class LessonScreenState extends State<LessonScreen> {
     }
   }
 
-  // Future<void> stopRecording() async {
-  //   _filePath = await _audioRecorder.stop();
-  //   if (_filePath != null) {
-  //     setState(() {
-  //       isRecording = false;
-  //       hasRecording = true;
-  //       _currentPosition = Duration.zero;
-  //       isPlaying = false;
-  //     });
-  //     await _audioPlayer.setSource(DeviceFileSource(_filePath!));
-  //     // Duration will be updated via onDurationChanged
-  //     sendAudioToASR();
-  //   }
-  // }
-
   Future<void> stopRecording() async {
     _filePath = await _audioRecorder.stop();
     if (_filePath != null && mounted) {
@@ -277,27 +215,6 @@ class LessonScreenState extends State<LessonScreen> {
       sendAudioToASR();
     }
   }
-
-  // Future<void> togglePlayback() async {
-  //   if (isPlaying) {
-  //     await _audioPlayer.pause();
-  //     setState(() {
-  //       isPlaying = false;
-  //     });
-  //   } else {
-  //     if (_audioPlayer.state == PlayerState.stopped) {
-  //       await _audioPlayer.setSource(DeviceFileSource(_filePath!));
-  //     }
-  //     if (_currentPosition >= _audioDuration) {
-  //       _currentPosition = Duration.zero;
-  //     }
-  //     await _audioPlayer.seek(_currentPosition);
-  //     await _audioPlayer.resume();
-  //     setState(() {
-  //       isPlaying = true;
-  //     });
-  //   }
-  // }
 
   Future<void> togglePlayback() async {
     if (isPlaying) {
@@ -350,21 +267,6 @@ class LessonScreenState extends State<LessonScreen> {
         .update(user.toFirestore());
   }
 
-  // void sendAudioToASR() async {
-  //   setState(() => _sending = true);
-  //   String? transcription =
-  //       await context.read<ApiFirebaseService>().inferenceASRModel(_filePath!);
-  //   if (transcription != null) {
-  //     List<TextSpan> highlightedSpans = getHighlightedTextSpans(transcription);
-  //     setState(() {
-  //       hasTranscription = true;
-  //       currentTextSpans = highlightedSpans;
-  //       _sending = false;
-  //     });
-  //   } else {
-  //     setState(() => _sending = false);
-  //   }
-  // }
   void sendAudioToASR() async {
     if (mounted) setState(() => _sending = true);
     String? transcription =
@@ -380,96 +282,6 @@ class LessonScreenState extends State<LessonScreen> {
       setState(() => _sending = false);
     }
   }
-
-  // List<TextSpan> getHighlightedTextSpans(String transcription) {
-  //   String originalDisplay = currentSentence;
-  //   String originalCompare =
-  //       currentSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
-  //   String transcriptionCompare =
-  //       transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
-
-  //   List<TextSpan> highlightedSpans = [];
-  //   int matching = 0;
-  //   int compareIndex = 0;
-
-  //   for (int i = 0; i < originalDisplay.length; i++) {
-  //     String char = originalDisplay[i];
-  //     bool isLetterOrSpace = RegExp(r'[\w\s]').hasMatch(char);
-
-  //     if (isLetterOrSpace) {
-  //       bool isCorrect = compareIndex < transcriptionCompare.length &&
-  //           originalCompare[compareIndex] == transcriptionCompare[compareIndex];
-  //       if (isCorrect) matching++;
-  //       highlightedSpans.add(TextSpan(
-  //         text: char,
-  //         style: TextStyle(
-  //           color: isCorrect ? Colors.green : Colors.red,
-  //         ),
-  //       ));
-  //       compareIndex++;
-  //     } else {
-  //       highlightedSpans.add(TextSpan(
-  //         text: char,
-  //         style: TextStyle(color: Colors.red),
-  //       ));
-  //     }
-  //   }
-
-  //   double accuracy =
-  //       originalCompare.isEmpty ? 0 : matching / originalCompare.length;
-  //   double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
-  //   accuracies.add(adjustedAccuracy);
-
-  //   return highlightedSpans;
-  // }
-
-  // Map<String, dynamic> computeAlignmentAndDistance(String ref, String hyp) {
-  //   int m = ref.length, n = hyp.length;
-  //   // Create dp table.
-  //   List<List<int>> dp = List.generate(
-  //       m + 1, (_) => List.filled(n + 1, 0, growable: false),
-  //       growable: false);
-
-  //   for (int i = 0; i <= m; i++) {
-  //     dp[i][0] = i;
-  //   }
-  //   for (int j = 0; j <= n; j++) {
-  //     dp[0][j] = j;
-  //   }
-  //   for (int i = 1; i <= m; i++) {
-  //     for (int j = 1; j <= n; j++) {
-  //       int cost = ref[i - 1] == hyp[j - 1] ? 0 : 1;
-  //       dp[i][j] = min(
-  //           dp[i - 1][j] + 1, min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost));
-  //     }
-  //   }
-
-  //   // Backtrace to compute the alignment (only for reference characters).
-  //   List<String> alignment = [];
-  //   int i = m, j = n;
-  //   while (i > 0 || j > 0) {
-  //     // Check diagonal move.
-  //     if (i > 0 &&
-  //         j > 0 &&
-  //         dp[i][j] == dp[i - 1][j - 1] + (ref[i - 1] == hyp[j - 1] ? 0 : 1)) {
-  //       alignment.add(ref[i - 1] == hyp[j - 1] ? "match" : "substitution");
-  //       i--;
-  //       j--;
-  //     }
-  //     // Check deletion.
-  //     else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
-  //       alignment.add("deletion");
-  //       i--;
-  //     }
-  //     // Check insertion.
-  //     else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
-  //       // For insertion, we don't record an operation for a reference character.
-  //       j--;
-  //     }
-  //   }
-  //   alignment = alignment.reversed.toList();
-  //   return {"alignment": alignment, "editDistance": dp[m][n]};
-  // }
 
   List<TextSpan> getHighlightedTextSpans(String transcription) {
     String correctSentence = currentSentence;
@@ -570,59 +382,6 @@ class LessonScreenState extends State<LessonScreen> {
     return {'alignment': alignment, 'editDistance': dp[m][n]};
   }
 
-  // List<TextSpan> getHighlightedTextSpans(String transcription) {
-  //   String originalDisplay = currentSentence;
-  //   // Normalize by lowercasing and removing Unicode punctuation only.
-  //   String originalCompare = currentSentence
-  //       .toLowerCase()
-  //       .replaceAll(RegExp(r'\p{P}', unicode: true), '');
-  //   String transcriptionCompare = transcription
-  //       .toLowerCase()
-  //       .replaceAll(RegExp(r'\p{P}', unicode: true), '');
-
-  //   // Compute alignment and edit distance.
-  //   Map<String, dynamic> result =
-  //       computeAlignmentAndDistance(originalCompare, transcriptionCompare);
-  //   List<String> alignment = result["alignment"];
-  //   int editDistance = result["editDistance"];
-
-  //   List<TextSpan> highlightedSpans = [];
-  //   int alignmentIndex = 0;
-  //   int matchingCount = 0;
-  //   // Walk through the original display text.
-  //   for (int i = 0; i < originalDisplay.length; i++) {
-  //     String char = originalDisplay[i];
-  //     bool isLetterOrSpace = RegExp(r'\p{L}|\s', unicode: true).hasMatch(char);
-  //     if (isLetterOrSpace) {
-  //       // Get the next operation from the alignment list.
-  //       String op = alignment[alignmentIndex];
-  //       alignmentIndex++;
-  //       bool isCorrect = (op == "match");
-  //       if (isCorrect) matchingCount++;
-  //       highlightedSpans.add(TextSpan(
-  //         text: char,
-  //         style: TextStyle(color: isCorrect ? Colors.green : Colors.red),
-  //       ));
-  //     } else {
-  //       // For punctuation, simply do not highlight.
-  //       highlightedSpans.add(TextSpan(
-  //         text: char,
-  //         style: const TextStyle(
-  //             color: Colors.red), // Or Colors.black if you prefer no highlight
-  //       ));
-  //     }
-  //   }
-
-  //   int total = originalCompare.length;
-  //   // Compute CER-based accuracy: accuracy = 1 - (editDistance / total), but not below 0.
-  //   double accuracy = total == 0 ? 0 : max(0, 1 - (editDistance / total));
-  //   // Boost accuracy by 1.15 and cap at 1.0.
-  //   double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
-  //   accuracies.add(adjustedAccuracy);
-
-  //   return highlightedSpans;
-  // }
-
   void moveToNextSentence() {
     setState(() {
       currentSentenceIndex += 1;
@@ -671,7 +430,8 @@ class LessonScreenState extends State<LessonScreen> {
   Future<void> saveProgress() async {
     Duration duration = DateTime.now().difference(startTime!);
     readingTime += duration.inSeconds;
-    setState(() => _sending = true);
+    if (mounted) setState(() => _sending = true);
+
     await context.read<ApiFirebaseService>().bookmark(
           widget.uid,
           BookUser(
@@ -684,7 +444,7 @@ class LessonScreenState extends State<LessonScreen> {
           ),
           widget.userdata,
         );
-    setState(() => _sending = false);
+    if (mounted) setState(() => _sending = false);
   }
 
   Future<void> bookmarkCurrentPageAndExit(BuildContext context) async {
@@ -1132,7 +892,7 @@ class LessonScreenState extends State<LessonScreen> {
 
     return PopScope(
       onPopInvokedWithResult: (bool didPop, Object? result) {
-        if (didPop) {
+        if (didPop && lastPage == false) {
           // Perform any synchronous operations here
           // Note: Avoid asynchronous operations in this callback
           saveProgress();

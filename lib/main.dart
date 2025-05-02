@@ -71,7 +71,7 @@ class LiteracyAppEntry extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'An be Kalan',
-      theme: ThemeData(primarySwatch: Colors.purple),
+      theme: ThemeData(primarySwatch: Colors.purple, useMaterial3: true),
       home: Scaffold(
         body: LayoutBuilder(
           builder: (context, constraints) {

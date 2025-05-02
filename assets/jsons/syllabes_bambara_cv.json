@@ -1,0 +1,1031 @@
+[
+  {
+    "syll1": "a",
+    "syll2": "ŋi",
+    "syll3": "da",
+    "syll4": "yo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "e",
+    "syll2": "mɛ",
+    "syll3": "ju",
+    "syll4": "ke",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɛ",
+    "syll2": "ya",
+    "syll3": "yu",
+    "syll4": "se",
+    "audio": "audio"
+  },
+  {
+    "syll1": "i",
+    "syll2": "gi",
+    "syll3": "fu",
+    "syll4": "zo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "o",
+    "syll2": "la",
+    "syll3": "lɛ",
+    "syll4": "ma",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɔ",
+    "syll2": "te",
+    "syll3": "ha",
+    "syll4": "wu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "u",
+    "syll2": "je",
+    "syll3": "kɛ",
+    "syll4": "dɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ba",
+    "syll2": "kɔ",
+    "syll3": "tɛ",
+    "syll4": "ɲi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "be",
+    "syll2": "ŋo",
+    "syll3": "nɛ",
+    "syll4": "ko",
+    "audio": "audio"
+  },
+  {
+    "syll1": "bɛ",
+    "syll2": "wa",
+    "syll3": "ju",
+    "syll4": "pɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "bi",
+    "syll2": "he",
+    "syll3": "no",
+    "syll4": "so",
+    "audio": "audio"
+  },
+  {
+    "syll1": "bo",
+    "syll2": "zi",
+    "syll3": "so",
+    "syll4": "ɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "bɔ",
+    "syll2": "fo",
+    "syll3": "te",
+    "syll4": "ho",
+    "audio": "audio"
+  },
+  {
+    "syll1": "bu",
+    "syll2": "jɔ",
+    "syll3": "pa",
+    "syll4": "sa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ca",
+    "syll2": "fo",
+    "syll3": "so",
+    "syll4": "ŋi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ce",
+    "syll2": "tɛ",
+    "syll3": "ce",
+    "syll4": "ye",
+    "audio": "audio"
+  },
+  {
+    "syll1": "cɛ",
+    "syll2": "ɲo",
+    "syll3": "ru",
+    "syll4": "e",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ci",
+    "syll2": "ŋu",
+    "syll3": "so",
+    "syll4": "ku",
+    "audio": "audio"
+  },
+  {
+    "syll1": "co",
+    "syll2": "ye",
+    "syll3": "zu",
+    "syll4": "gɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "cɔ",
+    "syll2": "ge",
+    "syll3": "lɔ",
+    "syll4": "fa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "cu",
+    "syll2": "gu",
+    "syll3": "je",
+    "syll4": "ɲɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "da",
+    "syll2": "ku",
+    "syll3": "ɲu",
+    "syll4": "dɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "de",
+    "syll2": "so",
+    "syll3": "mɔ",
+    "syll4": "ro",
+    "audio": "audio"
+  },
+  {
+    "syll1": "dɛ",
+    "syll2": "kɛ",
+    "syll3": "ri",
+    "syll4": "ŋu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "di",
+    "syll2": "ku",
+    "syll3": "ŋɔ",
+    "syll4": "gɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "do",
+    "syll2": "li",
+    "syll3": "co",
+    "syll4": "ju",
+    "audio": "audio"
+  },
+  {
+    "syll1": "dɔ",
+    "syll2": "he",
+    "syll3": "ne",
+    "syll4": "jɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "du",
+    "syll2": "di",
+    "syll3": "a",
+    "syll4": "hɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fa",
+    "syll2": "ya",
+    "syll3": "dɛ",
+    "syll4": "mu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fe",
+    "syll2": "no",
+    "syll3": "hu",
+    "syll4": "yɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fɛ",
+    "syll2": "wɔ",
+    "syll3": "li",
+    "syll4": "zɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fi",
+    "syll2": "mi",
+    "syll3": "ce",
+    "syll4": "bu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fo",
+    "syll2": "di",
+    "syll3": "pɛ",
+    "syll4": "bi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fɔ",
+    "syll2": "te",
+    "syll3": "ɲo",
+    "syll4": "fɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "fu",
+    "syll2": "yɛ",
+    "syll3": "bi",
+    "syll4": "lɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ga",
+    "syll2": "po",
+    "syll3": "zɔ",
+    "syll4": "bu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ge",
+    "syll2": "ro",
+    "syll3": "fɛ",
+    "syll4": "di",
+    "audio": "audio"
+  },
+  {
+    "syll1": "gɛ",
+    "syll2": "so",
+    "syll3": "la",
+    "syll4": "ye",
+    "audio": "audio"
+  },
+  {
+    "syll1": "gi",
+    "syll2": "sa",
+    "syll3": "ŋɛ",
+    "syll4": "ye",
+    "audio": "audio"
+  },
+  {
+    "syll1": "go",
+    "syll2": "ɲo",
+    "syll3": "ɲɛ",
+    "syll4": "ka",
+    "audio": "audio"
+  },
+  {
+    "syll1": "gɔ",
+    "syll2": "pe",
+    "syll3": "e",
+    "syll4": "a",
+    "audio": "audio"
+  },
+  {
+    "syll1": "gu",
+    "syll2": "pɛ",
+    "syll3": "fɔ",
+    "syll4": "je",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ha",
+    "syll2": "ŋɔ",
+    "syll3": "ne",
+    "syll4": "a",
+    "audio": "audio"
+  },
+  {
+    "syll1": "he",
+    "syll2": "pu",
+    "syll3": "bo",
+    "syll4": "kɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "hɛ",
+    "syll2": "ŋu",
+    "syll3": "ko",
+    "syll4": "no",
+    "audio": "audio"
+  },
+  {
+    "syll1": "hi",
+    "syll2": "go",
+    "syll3": "bu",
+    "syll4": "lu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ho",
+    "syll2": "gi",
+    "syll3": "tu",
+    "syll4": "po",
+    "audio": "audio"
+  },
+  {
+    "syll1": "hɔ",
+    "syll2": "ka",
+    "syll3": "ro",
+    "syll4": "zo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "hu",
+    "syll2": "te",
+    "syll3": "lo",
+    "syll4": "se",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ja",
+    "syll2": "ne",
+    "syll3": "gɛ",
+    "syll4": "fa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "je",
+    "syll2": "ra",
+    "syll3": "ŋe",
+    "syll4": "zo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "jɛ",
+    "syll2": "na",
+    "syll3": "ɲa",
+    "syll4": "ju",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ji",
+    "syll2": "cu",
+    "syll3": "gu",
+    "syll4": "kɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "jo",
+    "syll2": "ma",
+    "syll3": "co",
+    "syll4": "ɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "jɔ",
+    "syll2": "co",
+    "syll3": "ka",
+    "syll4": "wo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ju",
+    "syll2": "ju",
+    "syll3": "ŋu",
+    "syll4": "sɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ka",
+    "syll2": "o",
+    "syll3": "lu",
+    "syll4": "kɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ke",
+    "syll2": "fi",
+    "syll3": "pu",
+    "syll4": "so",
+    "audio": "audio"
+  },
+  {
+    "syll1": "kɛ",
+    "syll2": "po",
+    "syll3": "ɔ",
+    "syll4": "ke",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ki",
+    "syll2": "cɔ",
+    "syll3": "mi",
+    "syll4": "ŋi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ko",
+    "syll2": "lɔ",
+    "syll3": "gu",
+    "syll4": "be",
+    "audio": "audio"
+  },
+  {
+    "syll1": "kɔ",
+    "syll2": "du",
+    "syll3": "ha",
+    "syll4": "si",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ku",
+    "syll2": "ke",
+    "syll3": "cɛ",
+    "syll4": "kɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "la",
+    "syll2": "jɔ",
+    "syll3": "do",
+    "syll4": "ŋɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "le",
+    "syll2": "bo",
+    "syll3": "ji",
+    "syll4": "rɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "lɛ",
+    "syll2": "me",
+    "syll3": "ɔ",
+    "syll4": "hi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "li",
+    "syll2": "pi",
+    "syll3": "ju",
+    "syll4": "he",
+    "audio": "audio"
+  },
+  {
+    "syll1": "lo",
+    "syll2": "ɲu",
+    "syll3": "e",
+    "syll4": "ɲo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "lɔ",
+    "syll2": "tɛ",
+    "syll3": "fo",
+    "syll4": "sa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "lu",
+    "syll2": "fu",
+    "syll3": "fɛ",
+    "syll4": "zɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ma",
+    "syll2": "lu",
+    "syll3": "kɔ",
+    "syll4": "tɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "me",
+    "syll2": "fa",
+    "syll3": "ni",
+    "syll4": "lɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "mɛ",
+    "syll2": "gɔ",
+    "syll3": "li",
+    "syll4": "no",
+    "audio": "audio"
+  },
+  {
+    "syll1": "mi",
+    "syll2": "zu",
+    "syll3": "ŋo",
+    "syll4": "ni",
+    "audio": "audio"
+  },
+  {
+    "syll1": "mo",
+    "syll2": "gɛ",
+    "syll3": "bu",
+    "syll4": "zi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "mɔ",
+    "syll2": "du",
+    "syll3": "mu",
+    "syll4": "re",
+    "audio": "audio"
+  },
+  {
+    "syll1": "mu",
+    "syll2": "pɔ",
+    "syll3": "wi",
+    "syll4": "i",
+    "audio": "audio"
+  },
+  {
+    "syll1": "na",
+    "syll2": "se",
+    "syll3": "sa",
+    "syll4": "jɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ne",
+    "syll2": "yu",
+    "syll3": "po",
+    "syll4": "si",
+    "audio": "audio"
+  },
+  {
+    "syll1": "nɛ",
+    "syll2": "wɔ",
+    "syll3": "wa",
+    "syll4": "dɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ni",
+    "syll2": "hɔ",
+    "syll3": "fɔ",
+    "syll4": "dɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "no",
+    "syll2": "cɔ",
+    "syll3": "ŋu",
+    "syll4": "fɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "nɔ",
+    "syll2": "ŋa",
+    "syll3": "fi",
+    "syll4": "si",
+    "audio": "audio"
+  },
+  {
+    "syll1": "nu",
+    "syll2": "so",
+    "syll3": "wu",
+    "syll4": "ŋo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲa",
+    "syll2": "be",
+    "syll3": "ma",
+    "syll4": "ɲa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲe",
+    "syll2": "fu",
+    "syll3": "lɛ",
+    "syll4": "bo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲɛ",
+    "syll2": "sa",
+    "syll3": "yi",
+    "syll4": "ɲɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲi",
+    "syll2": "lɔ",
+    "syll3": "gi",
+    "syll4": "re",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲo",
+    "syll2": "fa",
+    "syll3": "fu",
+    "syll4": "sɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲɔ",
+    "syll2": "hu",
+    "syll3": "ɲu",
+    "syll4": "i",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ɲu",
+    "syll2": "ci",
+    "syll3": "be",
+    "syll4": "ko",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋa",
+    "syll2": "ca",
+    "syll3": "mu",
+    "syll4": "jo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋe",
+    "syll2": "wa",
+    "syll3": "ŋi",
+    "syll4": "dɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋɛ",
+    "syll2": "kɔ",
+    "syll3": "he",
+    "syll4": "ti",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋi",
+    "syll2": "ju",
+    "syll3": "do",
+    "syll4": "lu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋo",
+    "syll2": "sɔ",
+    "syll3": "cɔ",
+    "syll4": "pa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋɔ",
+    "syll2": "jɔ",
+    "syll3": "ɲɛ",
+    "syll4": "mɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ŋu",
+    "syll2": "ɔ",
+    "syll3": "ɲi",
+    "syll4": "bɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "pa",
+    "syll2": "na",
+    "syll3": "nɔ",
+    "syll4": "to",
+    "audio": "audio"
+  },
+  {
+    "syll1": "pe",
+    "syll2": "ho",
+    "syll3": "ge",
+    "syll4": "fa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "pɛ",
+    "syll2": "rɔ",
+    "syll3": "ku",
+    "syll4": "pɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "pi",
+    "syll2": "fo",
+    "syll3": "nɔ",
+    "syll4": "di",
+    "audio": "audio"
+  },
+  {
+    "syll1": "po",
+    "syll2": "ŋa",
+    "syll3": "tɔ",
+    "syll4": "li",
+    "audio": "audio"
+  },
+  {
+    "syll1": "pɔ",
+    "syll2": "sɔ",
+    "syll3": "du",
+    "syll4": "fa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "pu",
+    "syll2": "kɔ",
+    "syll3": "dɔ",
+    "syll4": "bɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ra",
+    "syll2": "li",
+    "syll3": "ke",
+    "syll4": "rɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "re",
+    "syll2": "ba",
+    "syll3": "kɔ",
+    "syll4": "cɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "rɛ",
+    "syll2": "gu",
+    "syll3": "cɛ",
+    "syll4": "di",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ri",
+    "syll2": "do",
+    "syll3": "li",
+    "syll4": "ce",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ro",
+    "syll2": "ɲe",
+    "syll3": "he",
+    "syll4": "bi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "rɔ",
+    "syll2": "o",
+    "syll3": "bu",
+    "syll4": "wi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ru",
+    "syll2": "ku",
+    "syll3": "fi",
+    "syll4": "pu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "sa",
+    "syll2": "ta",
+    "syll3": "rɔ",
+    "syll4": "wa",
+    "audio": "audio"
+  },
+  {
+    "syll1": "se",
+    "syll2": "gɛ",
+    "syll3": "zi",
+    "syll4": "we",
+    "audio": "audio"
+  },
+  {
+    "syll1": "sɛ",
+    "syll2": "ni",
+    "syll3": "lɔ",
+    "syll4": "ha",
+    "audio": "audio"
+  },
+  {
+    "syll1": "si",
+    "syll2": "ŋi",
+    "syll3": "fa",
+    "syll4": "wɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "so",
+    "syll2": "cɔ",
+    "syll3": "tɛ",
+    "syll4": "po",
+    "audio": "audio"
+  },
+  {
+    "syll1": "sɔ",
+    "syll2": "ɲɔ",
+    "syll3": "ha",
+    "syll4": "lo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "su",
+    "syll2": "be",
+    "syll3": "da",
+    "syll4": "a",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ta",
+    "syll2": "wi",
+    "syll3": "rɛ",
+    "syll4": "ɲɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "te",
+    "syll2": "sa",
+    "syll3": "cɛ",
+    "syll4": "jɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "tɛ",
+    "syll2": "mi",
+    "syll3": "ru",
+    "syll4": "tu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ti",
+    "syll2": "re",
+    "syll3": "no",
+    "syll4": "se",
+    "audio": "audio"
+  },
+  {
+    "syll1": "to",
+    "syll2": "yɔ",
+    "syll3": "fe",
+    "syll4": "wi",
+    "audio": "audio"
+  },
+  {
+    "syll1": "tɔ",
+    "syll2": "si",
+    "syll3": "wo",
+    "syll4": "ba",
+    "audio": "audio"
+  },
+  {
+    "syll1": "tu",
+    "syll2": "tɛ",
+    "syll3": "ta",
+    "syll4": "le",
+    "audio": "audio"
+  },
+  {
+    "syll1": "wa",
+    "syll2": "la",
+    "syll3": "sɔ",
+    "syll4": "jo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "we",
+    "syll2": "fi",
+    "syll3": "dɛ",
+    "syll4": "zɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "wɛ",
+    "syll2": "ja",
+    "syll3": "ya",
+    "syll4": "i",
+    "audio": "audio"
+  },
+  {
+    "syll1": "wi",
+    "syll2": "gɛ",
+    "syll3": "rɛ",
+    "syll4": "ra",
+    "audio": "audio"
+  },
+  {
+    "syll1": "wo",
+    "syll2": "ji",
+    "syll3": "yɔ",
+    "syll4": "lo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "wɔ",
+    "syll2": "fo",
+    "syll3": "wɔ",
+    "syll4": "zo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "wu",
+    "syll2": "ŋɔ",
+    "syll3": "kɔ",
+    "syll4": "fɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ya",
+    "syll2": "ŋe",
+    "syll3": "ri",
+    "syll4": "jo",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ye",
+    "syll2": "je",
+    "syll3": "yɔ",
+    "syll4": "ke",
+    "audio": "audio"
+  },
+  {
+    "syll1": "yɛ",
+    "syll2": "lɛ",
+    "syll3": "ŋa",
+    "syll4": "ye",
+    "audio": "audio"
+  },
+  {
+    "syll1": "yi",
+    "syll2": "bɛ",
+    "syll3": "go",
+    "syll4": "kɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "yo",
+    "syll2": "ni",
+    "syll3": "si",
+    "syll4": "ɲe",
+    "audio": "audio"
+  },
+  {
+    "syll1": "yɔ",
+    "syll2": "yɔ",
+    "syll3": "pe",
+    "syll4": "su",
+    "audio": "audio"
+  },
+  {
+    "syll1": "yu",
+    "syll2": "lo",
+    "syll3": "be",
+    "syll4": "ŋɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "za",
+    "syll2": "bɔ",
+    "syll3": "gi",
+    "syll4": "ko",
+    "audio": "audio"
+  },
+  {
+    "syll1": "ze",
+    "syll2": "lɛ",
+    "syll3": "ŋɛ",
+    "syll4": "bɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "zɛ",
+    "syll2": "do",
+    "syll3": "mo",
+    "syll4": "mɔ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "zi",
+    "syll2": "so",
+    "syll3": "wɛ",
+    "syll4": "yɛ",
+    "audio": "audio"
+  },
+  {
+    "syll1": "zo",
+    "syll2": "nu",
+    "syll3": "ɛ",
+    "syll4": "be",
+    "audio": "audio"
+  },
+  {
+    "syll1": "zɔ",
+    "syll2": "wi",
+    "syll3": "di",
+    "syll4": "mu",
+    "audio": "audio"
+  },
+  {
+    "syll1": "zu",
+    "syll2": "ho",
+    "syll3": "na",
+    "syll4": "fɛ",
+    "audio": "audio"
+  }
+]

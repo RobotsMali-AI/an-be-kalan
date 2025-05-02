@@ -46,7 +46,7 @@ Future<void> resetPassword(BuildContext context) async {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Email de wajibiyalen don';
+                    return 'Imɛli de wajibiyalen don';
                   }
                   if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
                     return 'Aw ye bataki ci min bɛ se ka kɛ';

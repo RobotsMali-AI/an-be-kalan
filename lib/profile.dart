@@ -292,54 +292,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Future<void> _showFeedbackDialog() async {
-    final feedbackController = TextEditingController();
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Lafili'),
-        content: TextField(
-          controller: feedbackController,
-          decoration: const InputDecoration(hintText: 'I ka lafili sɛbɛn'),
-          maxLines: 5,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Ayi'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final feedback = feedbackController.text.trim();
-              if (feedback.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Aw ye lafili sɛbɛn')),
-                );
-              } else {
-                try {
-                  // await context
-                  //     .read<ApiFirebaseService>()
-                  //     .saveFeedback(widget.user.uid, feedback);
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Abarika! Aw ka lafili donna.')),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Ayiwa! Lafili ma se ka ci: $e')),
-                  );
-                }
-              }
-            },
-            child: const Text('Ci'),
-          ),
-        ],
-      ),
-    );
-    feedbackController.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final random = math.Random();
