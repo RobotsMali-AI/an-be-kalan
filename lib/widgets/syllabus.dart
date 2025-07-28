@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
 
 class SyllableSoundsScreen extends StatefulWidget {
   @override
@@ -54,125 +58,259 @@ class _SyllableSoundsScreenState extends State<SyllableSoundsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        title: Text('Syllable Sounds - Level $level'),
-        backgroundColor: Colors.black87,
-        foregroundColor: Colors.white,
-        elevation: 2,
+      appBar: UnifiedAppBar(
+        title: 'Sɛbɛnni kalan',
+        showLogo: false,
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            margin: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.bookBlue.withOpacity(0.2),
+                  AppColors.bookBlue.withOpacity(0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(
+                color: AppColors.bookBlue.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              'Hakɛ: $score | Cogoya: $level',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.bookBlue,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.grey[800]!, Colors.black],
-          ),
+          gradient: AppColors.backgroundGradient,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              'Score: $score',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 30),
-            IconButton(
-              icon: Icon(Icons.volume_up, color: Colors.white, size: 60),
-              onPressed: () {
-                if (correctSyllable != null) {
-                  _playSound(correctSyllable!['sound']!);
-                }
-              },
-            ),
-            Text(
-              'Tap to hear the syllable',
-              style: TextStyle(color: Colors.white70, fontSize: 18),
-            ),
-            SizedBox(height: 20),
-            if (resultMessage.isNotEmpty)
-              Padding(
-                padding: EdgeInsets.only(bottom: 10),
-                child: Text(
-                  resultMessage,
-                  style: TextStyle(
-                    color: isCorrect! ? Colors.greenAccent : Colors.redAccent,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            children: [
+              // Header section
+              AppCard(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.bookBlue.withOpacity(0.1),
+                        AppColors.bookBlue.withOpacity(0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.hearing,
+                        size: 48,
+                        color: AppColors.bookBlue,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'Sɛbɛnni lamɛnni',
+                        style: AppTextStyles.heading2.copyWith(
+                          color: AppColors.bookBlue,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Sɛbɛnni lamɛn ka a sugandi',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.wisdomTeal,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            SizedBox(height: 20),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+              const SizedBox(height: AppSpacing.lg),
+              // Audio button
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.bookBlue,
+                      AppColors.bookBlue.withOpacity(0.8)
+                    ],
+                  ),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.bookBlue.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.volume_up,
+                      color: AppColors.pureWhite, size: 60),
+                  onPressed: () {
+                    if (correctSyllable != null) {
+                      _playSound(correctSyllable!['sound']!);
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Sɛbɛnni lamɛnni kɛ',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.bookBlue,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              // Result message
+              if (resultMessage.isNotEmpty)
+                AppCard(
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: isCorrect!
+                            ? [
+                                AppColors.primaryGreen.withOpacity(0.2),
+                                AppColors.primaryGreen.withOpacity(0.1)
+                              ]
+                            : [
+                                AppColors.accentOrange.withOpacity(0.2),
+                                AppColors.accentOrange.withOpacity(0.1)
+                              ],
+                      ),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                    ),
+                    child: Text(
+                      resultMessage,
+                      style: AppTextStyles.heading3.copyWith(
+                        color: isCorrect!
+                            ? AppColors.primaryGreen
+                            : AppColors.accentOrange,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              if (resultMessage.isNotEmpty)
+                const SizedBox(height: AppSpacing.lg),
+              // Syllable grid
+              Expanded(
                 child: GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    crossAxisSpacing: 15,
-                    mainAxisSpacing: 15,
+                    crossAxisSpacing: AppSpacing.lg,
+                    mainAxisSpacing: AppSpacing.lg,
                     childAspectRatio: 1.0,
                   ),
                   itemCount: 4,
                   itemBuilder: (context, index) {
                     final syllable = currentSyllables[index];
                     final isSelected = selectedIndex == index;
-                    final tileColor = isSelected
-                        ? (isCorrect == true
-                            ? Colors.greenAccent
-                            : Colors.redAccent)
-                        : Colors.white;
                     final scale =
                         isSelected ? (isCorrect == true ? 1.1 : 0.9) : 1.0;
 
-                    return GestureDetector(
-                      onTap: () {
-                        if (selectedIndex == null) {
-                          setState(() {
-                            selectedIndex = index;
-                            isCorrect =
-                                syllable['text'] == correctSyllable!['text'];
-                            if (isCorrect!) {
-                              _playSound('success.mp3');
-                              score++;
-                              resultMessage = 'Correct!';
-                            } else {
-                              _playSound('wrong.mp3');
-                              resultMessage = 'Incorrect!';
-                            }
-                            Future.delayed(Duration(seconds: 1), () {
-                              startNewRound();
+                    return Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      child: InkWell(
+                        onTap: () {
+                          if (selectedIndex == null) {
+                            setState(() {
+                              selectedIndex = index;
+                              isCorrect =
+                                  syllable['text'] == correctSyllable!['text'];
+                              if (isCorrect!) {
+                                _playSound('success.mp3');
+                                score++;
+                                resultMessage = 'Tiɲɛ!';
+                              } else {
+                                _playSound('wrong.mp3');
+                                resultMessage = 'A tɛ tiɲɛ!';
+                              }
+                              Future.delayed(const Duration(seconds: 1), () {
+                                startNewRound();
+                              });
                             });
-                          });
-                        }
-                      },
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                        transform: Matrix4.identity()..scale(scale),
-                        decoration: BoxDecoration(
-                          color: tileColor,
-                          borderRadius: BorderRadius.circular(15),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.3),
-                              spreadRadius: 2,
-                              blurRadius: 8,
-                              offset: Offset(0, 4),
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          transform: Matrix4.identity()..scale(scale),
+                          decoration: BoxDecoration(
+                            gradient: isSelected
+                                ? (isCorrect == true
+                                    ? LinearGradient(colors: [
+                                        AppColors.primaryGreen,
+                                        AppColors.primaryGreen.withOpacity(0.8)
+                                      ])
+                                    : LinearGradient(colors: [
+                                        AppColors.accentOrange,
+                                        AppColors.accentOrange.withOpacity(0.8)
+                                      ]))
+                                : LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppColors.bookBlue.withOpacity(0.1),
+                                      AppColors.bookBlue.withOpacity(0.05),
+                                    ],
+                                  ),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            border: Border.all(
+                              color: isSelected
+                                  ? (isCorrect == true
+                                      ? AppColors.primaryGreen
+                                      : AppColors.accentOrange)
+                                  : AppColors.bookBlue.withOpacity(0.3),
+                              width: 2,
                             ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Text(
-                            syllable['text']!,
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? Colors.white : Colors.black87,
+                            boxShadow: [
+                              BoxShadow(
+                                color: isSelected
+                                    ? (isCorrect == true
+                                        ? AppColors.primaryGreen
+                                            .withOpacity(0.3)
+                                        : AppColors.accentOrange
+                                            .withOpacity(0.3))
+                                    : AppColors.bookBlue.withOpacity(0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              syllable['text']!,
+                              style: AppTextStyles.heading1.copyWith(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: isSelected
+                                    ? AppColors.pureWhite
+                                    : AppColors.bookBlue,
+                              ),
                             ),
                           ),
                         ),
@@ -181,9 +319,8 @@ class _SyllableSoundsScreenState extends State<SyllableSoundsScreen> {
                   },
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-          ],
+            ],
+          ),
         ),
       ),
     );

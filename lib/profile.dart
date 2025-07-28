@@ -1,40 +1,68 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:literacy_app/auth.dart';
-import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/backend_code/user_session_service.dart';
 import 'package:literacy_app/feedback.dart';
-import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/models/Users.dart';
-import 'package:provider/provider.dart';
-import 'dart:math' as math;
-
-const placeholderImage =
-    'https://drive.google.com/uc?export=download&id=1_egpUE2P2KJ3WVQ44iCT0ux6f_KdJVdO';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
+import 'package:literacy_app/tutorial_service.dart';
 
 class ProfilePage extends StatefulWidget {
   final Users userData;
-  final User user;
+  final UserSessionService userSession;
 
-  const ProfilePage({super.key, required this.user, required this.userData});
+  const ProfilePage(
+      {super.key, required this.userData, required this.userSession});
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController controller;
-  String? photoURL;
   bool showSaveButton = false;
   bool isLoading = false;
+
+  // GlobalKeys for tutorial targets
+  final GlobalKey _nameInputKey = GlobalKey();
+  final GlobalKey _statsKey = GlobalKey();
+  final GlobalKey _authBannerKey = GlobalKey();
+  final GlobalKey _avatarKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    photoURL = widget.user.photoURL; // Initialize with current user photo
-    controller = TextEditingController(text: widget.user.displayName);
+    controller = TextEditingController(
+        text: widget.userData.displayName ?? 'Kalan-folo');
     controller.addListener(_onNameChanged);
+    _checkAndShowTutorial();
+  }
+
+  Future<void> _checkAndShowTutorial() async {
+    if (mounted) {
+      // Small delay to ensure UI is rendered, then show tutorial immediately
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (mounted && !TutorialService.isTutorialShowing()) {
+          // Check if we should show tutorial
+          bool shouldShow = await TutorialService.shouldShowTutorial('profile');
+          if (shouldShow) {
+            // Additional small delay to ensure scroll positions are settled
+            await Future.delayed(const Duration(milliseconds: 300));
+            if (mounted) {
+              await TutorialService.showProfileTutorial(
+                context,
+                nameInputKey: _nameInputKey,
+                statsKey: _statsKey,
+                authBannerKey: _authBannerKey,
+                avatarKey: _avatarKey,
+              );
+            }
+          }
+        }
+      });
+    }
   }
 
   @override
@@ -45,570 +73,533 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _onNameChanged() {
-    setState(() {
-      showSaveButton = controller.text != widget.user.displayName &&
-          controller.text.isNotEmpty;
-    });
-  }
-
-  Future updateDisplayName() async {
-    await widget.user.updateDisplayName(controller.text);
-    setState(() {
-      showSaveButton = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Jiracogo tɔgɔ kura donna')),
-    );
-  }
-
-  Future<List<String>> fetchAvatarUrls() async {
-    try {
-      final storageRef = FirebaseStorage.instance.ref().child('avatars');
-      final listResult = await storageRef.listAll();
-      final urls = <String>[];
-      for (var item in listResult.items) {
-        final url = await item.getDownloadURL();
-        urls.add(url);
-      }
-      return urls;
-    } catch (e) {
-      print('Error fetching avatars: $e');
-      return [];
+    if (mounted) {
+      setState(() {
+        showSaveButton = controller.text != widget.userData.displayName &&
+            controller.text.isNotEmpty;
+      });
     }
   }
 
-  Future<void> _chooseAvatar() async {
-    showDialog(
+  Future updateDisplayName() async {
+    widget.userData.displayName = controller.text;
+    await widget.userSession.updateUserData(widget.userData);
+
+    if (mounted) {
+      setState(() {
+        showSaveButton = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Jiracogo tɔgɔ kura donna'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
+
+  Future<void> _signOut() async {
+    await widget.userSession.signOut();
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthGate()),
+      );
+    }
+  }
+
+  Future<void> _showAccountCreationDialog() async {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final nameController =
+        TextEditingController(text: widget.userData.displayName);
+    final formKey = GlobalKey<FormState>();
+
+    await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
-        return Dialog(
-          backgroundColor: Colors.transparent,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(24),
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Text(
+            'Jatebɔsɛbɛn dabɔ',
+            style: AppTextStyles.heading3,
+            textAlign: TextAlign.center,
+          ),
+          content: Form(
+            key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  'Aw ye aw ka ja ɲuman sugandi!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                    letterSpacing: 1.2,
-                  ),
+                Text(
+                  'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+                  style: AppTextStyles.bodySmall,
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: FutureBuilder<List<String>>(
-                    future: fetchAvatarUrls(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.black,
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text(
-                            'Ayiwa! Fɛn dɔ ma ɲɛ.',
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 18,
-                            ),
-                          ),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'Ja si tɛ yen sisan.',
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 18,
-                            ),
-                          ),
-                        );
-                      } else {
-                        final urls = snapshot.data!;
-                        return GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
-                          itemCount: urls.length,
-                          itemBuilder: (context, index) {
-                            final avatarUrl = urls[index];
-                            return GestureDetector(
-                              onTap: () async {
-                                try {
-                                  await widget.user.updatePhotoURL(avatarUrl);
-                                  if (!mounted) return;
-                                  setState(() {
-                                    photoURL = avatarUrl;
-                                  });
-                                  Navigator.pop(context);
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Ja kura donna!',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.black,
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Ayiwa! A ma se ka ja kura ye.',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.black,
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                              child: AnimatedScale(
-                                scale: 1.0,
-                                duration: const Duration(milliseconds: 200),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      avatarUrl,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
+                const SizedBox(height: AppSpacing.lg),
+                TextFormField(
+                  controller: nameController,
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: 'I ka tɔgɔ',
+                    prefixIcon: Icons.person,
                   ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                TextFormField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: 'Imɛli walima telefɔni nimɔrɔ',
+                    prefixIcon: Icons.email,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Imɛli walima telefɔni de wajibiyalen don';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AppSpacing.md),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: 'Kɔdi',
+                    prefixIcon: Icons.lock,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Kɔdi de wajibiyalen don';
+                    }
+                    if (value.length < 6) {
+                      return 'Kɔdi ka kan ka tɛmɛ 6 ye';
+                    }
+                    return null;
+                  },
                 ),
               ],
             ),
+          ),
+          actions: [
+            SecondaryButton(
+              text: 'Ka dankari',
+              onPressed: () => Navigator.of(context).pop(),
+              width: 120,
+              height: 48,
+            ),
+            PrimaryButton(
+              text: 'Jatebɔsɛbɛn dabɔ',
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final result = await widget.userSession.createAccount(
+                    emailOrPhone: emailController.text.trim(),
+                    password: passwordController.text,
+                    displayName: nameController.text.isNotEmpty
+                        ? nameController.text
+                        : null,
+                  );
+
+                  if (!mounted) return;
+
+                  Navigator.of(context).pop();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message']),
+                      backgroundColor: result['success']
+                          ? AppColors.success
+                          : AppColors.error,
+                    ),
+                  );
+
+                  if (result['success'] && mounted) {
+                    setState(() {});
+                  }
+                }
+              },
+              width: 140,
+              height: 48,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSignInDialog() async {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Text(
+            'I ka don a kɔnɔ',
+            style: AppTextStyles.heading3,
+            textAlign: TextAlign.center,
+          ),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Aw ye aw ka jatebɔsɛbɛn kunnafoniw sɛbɛn walasa ka don.',
+                  style: AppTextStyles.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                TextFormField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: 'Imɛli walima telefɔni nimɔrɔ',
+                    prefixIcon: Icons.email,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Imɛli walima telefɔni de wajibiyalen don';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: AppSpacing.md),
+                TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: 'Kɔdi',
+                    prefixIcon: Icons.lock,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Kɔdi de wajibiyalen don';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            SecondaryButton(
+              text: 'Ka dankari',
+              onPressed: () => Navigator.of(context).pop(),
+              width: 120,
+              height: 48,
+            ),
+            PrimaryButton(
+              text: 'A digi',
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  final result = await widget.userSession.signIn(
+                    emailOrPhone: emailController.text.trim(),
+                    password: passwordController.text,
+                  );
+
+                  if (!mounted) return;
+
+                  Navigator.of(context).pop();
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result['message']),
+                      backgroundColor: result['success']
+                          ? AppColors.success
+                          : AppColors.error,
+                    ),
+                  );
+
+                  if (result['success'] && mounted) {
+                    setState(() {});
+                  }
+                }
+              },
+              width: 120,
+              height: 48,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showAccountOptionsDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Text(
+            'Jatebɔsɛbɛn',
+            style: AppTextStyles.heading3,
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+                style: AppTextStyles.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: PrimaryButton(
+                      text: 'Jatebɔsɛbɛn dabɔ',
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showAccountCreationDialog();
+                      },
+                      height: 48,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: SecondaryButton(
+                      text: 'Don a kɔnɔ',
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showSignInDialog();
+                      },
+                      height: 48,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-  Future<void> _signOut() async {
-    if (widget.user.isAnonymous) {
-      await context.read<ApiFirebaseService>().deleteUserData(widget.user.uid);
-      await widget.user.delete();
-    }
-    await auth.signOut();
-    await GoogleSignIn().signOut();
-    if (mounted) {
-      Navigator.pop(context);
-    }
-  }
-
-  Future<void> _deleteAccount() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('I baana i ka jiracogo faga wa?'),
-        content: const Text('I ye i jiracogo faga. I tɛ se ka segin o la.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Ayi'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Ɛɛ'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      setState(() {
-        isLoading = true;
-      });
-      try {
-        await context
-            .read<ApiFirebaseService>()
-            .deleteUserData(widget.user.uid);
-        await widget.user.delete();
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const AuthGate()));
-        // After deletion, auth state listener should navigate to sign-in page
-      } catch (e) {
-        if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
-          print(e);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ayiwa! Jiracogo ma se ka faga: $e')),
-          );
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final random = math.Random();
-    final randomColor = Color.fromRGBO(
-      random.nextInt(256),
-      random.nextInt(256),
-      random.nextInt(256),
-      0.1,
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'N ka Profil',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.black,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              icon: const Icon(Icons.feedback, color: Colors.black),
+    return LoadingOverlay(
+      isLoading: isLoading,
+      message: 'Ka makɔnɔ...',
+      child: Scaffold(
+        backgroundColor: AppColors.offWhite,
+        appBar: UnifiedAppBar(
+          title: 'Profil',
+          actions: [
+            AppBarActionButton(
+              icon: Icons.feedback,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const FeedbackScreen()),
               ),
               tooltip: 'Lafili',
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(Icons.logout, color: Colors.black),
-              onPressed: _signOut,
-              tooltip: 'Ka bɔ',
-            ),
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: FocusScope.of(context).unfocus,
-        child: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white,
-                    Colors.grey.shade50,
-                  ],
-                ),
-              ),
-            ),
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 70,
-                          backgroundImage: NetworkImage(
-                            photoURL ?? placeholderImage,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [Colors.transparent, randomColor],
-                            stops: const [0.7, 1.0],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      onEditingComplete: updateDisplayName,
-                      textAlign: TextAlign.center,
-                      controller: controller,
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "I ka jiracogo tɔgɔ sɛbɛn",
-                        hintStyle: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 18,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ElevatedButton.icon(
-                          onPressed: _chooseAvatar,
-                          icon: const Icon(Icons.person, color: Colors.white),
-                          label: const Text(
-                            'Ja sugandi',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            elevation: 0,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ElevatedButton.icon(
-                          onPressed: _deleteAccount,
-                          icon: const Icon(Icons.delete, color: Colors.white),
-                          label: const Text(
-                            'Delete Account',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            elevation: 0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        _buildStatCard(
-                          title: "Dɔnniya",
-                          value: "${widget.userData.xp} XP",
-                          icon: Icons.star,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildStatCard(
-                          title: "Kalan waati bɛɛ lajɛlen",
-                          value: widget.userData.totalReadingTime.toString(),
-                          icon: Icons.timer,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildStatCard(
-                          title: "Gafew dafara",
-                          value: "${widget.userData.completedBooks.length}",
-                          icon: Icons.book,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isLoading)
-              Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                ),
+            if (!widget.userSession.isAuthenticated)
+              AppBarActionButton(
+                icon: Icons.account_circle,
+                onPressed: _showAccountOptionsDialog,
+                tooltip: 'Jatebɔsɛbɛn',
+                backgroundColor: AppColors.accentSurfaceLight,
+                iconColor: AppColors.accentOrange,
               ),
           ],
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                // Profile avatar section
+                _buildProfileAvatar(),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Name input section
+                _buildNameInput(),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Authentication status
+                if (!widget.userSession.isAuthenticated)
+                  _buildAuthenticationBanner(),
+
+                // Stats section
+                _buildStatsSection(),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required IconData icon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Row(
+  Widget _buildProfileAvatar() {
+    return AppCard(
+      key: _avatarKey,
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      child: Column(
         children: [
+          // App Logo as Profile Picture
           Container(
             decoration: BoxDecoration(
-              color: Colors.black,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(12),
-            child: Icon(icon, color: Colors.white, size: 24),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/logo.jpg',
+                height: 120,
+                width: 120,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
-          const SizedBox(width: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'I ni ce! 🦉',
+            style: AppTextStyles.heading2.copyWith(
+              color: AppColors.primaryGreen,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'An be kalan kɛrɛnkɛrɛnnenya',
+            style: AppTextStyles.subtitle,
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildNameInput() {
+    return AppCard(
+      key: _nameInputKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                'I ka jiracogo tɔgɔ',
+                style: AppTextStyles.heading4,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: controller,
+            onEditingComplete: updateDisplayName,
+            style: AppTextStyles.bodyLarge,
+            decoration: AppDecorations.getInputDecoration(
+              hintText: "I ka jiracogo tɔgɔ sɛbɛn",
+            ),
+          ),
+          if (showSaveButton) ...[
+            const SizedBox(height: AppSpacing.md),
+            PrimaryButton(
+              text: 'Mara',
+              onPressed: updateDisplayName,
+              width: double.infinity,
+              icon: Icons.save,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuthenticationBanner() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: InfoBanner(
+        key: _authBannerKey,
+        title: 'Kalan kɛ tɛmɛnni kɛ',
+        message:
+            'Aw ye jatebɔsɛbɛn dabɔ walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+        icon: Icons.info_outline,
+        color: AppColors.accentOrange,
+        buttonText: 'Jatebɔsɛbɛn dabɔ walima don',
+        onButtonPressed: _showAccountOptionsDialog,
+      ),
+    );
+  }
+
+  Widget _buildStatsSection() {
+    return Column(
+      key: _statsKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: Row(
+            children: [
+              Icon(
+                Icons.analytics,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                'I ka ɲɛtaa jateminɛ',
+                style: AppTextStyles.heading3,
+              ),
+            ],
+          ),
+        ),
+        StatCard(
+          title: "Dɔnniya",
+          value: "${widget.userData.xp} XP",
+          icon: Icons.star,
+          color: AppColors.accentOrange,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        StatCard(
+          title: "Kalan waati bɛɛ lajɛlen",
+          value: "${widget.userData.totalReadingTime} min",
+          icon: Icons.timer,
+          color: AppColors.wisdomTeal,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        StatCard(
+          title: "Gafew dafara",
+          value: "${widget.userData.completedBooks.length}",
+          icon: Icons.book,
+          color: AppColors.success,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        StatCard(
+          title: "Gafew bɛɛ kɛɛ la",
+          value: "${widget.userData.inProgressBooks.length}",
+          icon: Icons.bookmark,
+          color: AppColors.bookBlue,
+        ),
+      ],
     );
   }
 }

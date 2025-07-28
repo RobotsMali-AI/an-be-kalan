@@ -2,6 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.robotsmali.literacy_app">
     <uses-permission android:name="android.permission.INTERNET" />
+    
+    <!-- Explicitly remove AD-related permissions that may be added by dependencies -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
     <application
         android:label="An be Kalan"
         android:name="${applicationName}"

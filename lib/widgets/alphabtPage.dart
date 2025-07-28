@@ -3,6 +3,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:literacy_app/models/alphabet_model.dart';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
 
 class AlphabetPage extends StatefulWidget {
   const AlphabetPage({super.key});
@@ -48,118 +52,126 @@ class _AlphabetPageState extends State<AlphabetPage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: Center(
+            child: LoadingOverlay(
+              isLoading: true,
+              message: 'Sigini kalan...',
+              child: Container(),
+            ),
           ),
         ),
       );
     }
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: Colors.black,
-        title: const Text(
-          'Sigini kalan',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-            color: Colors.white,
-          ),
-        ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20),
-          ),
-        ),
+      appBar: UnifiedAppBar(
+        title: 'Sigini kalan',
+        showLogo: false,
       ),
-      body: Column(
-        children: [
-          // Progress indicator
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: LinearProgressIndicator(
-              value: (currentIndex + 1),
-              backgroundColor: Colors.grey.shade200,
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-              minHeight: 8,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          // Page counter
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text(
-              '${currentIndex + 1} / ${alphabetList.length}',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: Column(
+          children: [
+            // Progress indicator
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: AppCard(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ɲɛtaa',
+                          style: AppTextStyles.heading4.copyWith(
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                        Text(
+                          '${currentIndex + 1} / ${alphabetList.length}',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.wisdomTeal,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    LinearProgressIndicator(
+                      value: (currentIndex + 1) / alphabetList.length,
+                      backgroundColor: AppColors.lightGrey,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          // Main content
-          Expanded(
-            child: PageView.builder(
-              controller: pageController,
-              itemCount: alphabetList.length,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return AlphabetCard(item: alphabetList[index]);
-              },
-              onPageChanged: (index) {
-                setState(() {
-                  currentIndex = index;
-                });
-              },
-            ),
-          ),
-          // Navigation buttons
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, -5),
+            // Main content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                child: PageView.builder(
+                  controller: pageController,
+                  itemCount: alphabetList.length,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return AlphabetCard(item: alphabetList[index]);
+                  },
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentIndex = index;
+                    });
+                  },
                 ),
-              ],
+              ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavigationButton(
-                  icon: Icons.arrow_back_ios_new,
-                  onPressed: currentIndex > 0
-                      ? () {
-                          pageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : null,
+            // Navigation buttons
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: AppDecorations.primaryCard.copyWith(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppRadius.xl),
                 ),
-                _buildNavigationButton(
-                  icon: Icons.arrow_forward_ios,
-                  onPressed: currentIndex < alphabetList.length - 1
-                      ? () {
-                          pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        }
-                      : null,
-                ),
-              ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavigationButton(
+                    icon: Icons.arrow_back_ios_new,
+                    onPressed: currentIndex > 0
+                        ? () {
+                            pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                  ),
+                  _buildNavigationButton(
+                    icon: Icons.arrow_forward_ios,
+                    onPressed: currentIndex < alphabetList.length - 1
+                        ? () {
+                            pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -169,32 +181,26 @@ class _AlphabetPageState extends State<AlphabetPage> {
     VoidCallback? onPressed,
   }) {
     return Container(
-      decoration: BoxDecoration(
-        color: onPressed != null ? Colors.black : Colors.grey.shade300,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: onPressed != null
-            ? [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ]
-            : [],
+      width: 120,
+      height: 56,
+      decoration: AppDecorations.primaryButtonDecoration.copyWith(
+        gradient: onPressed != null
+            ? AppColors.primaryGradient
+            : LinearGradient(
+                colors: [AppColors.lightGrey, AppColors.lightGrey]),
       ),
       child: Material(
         color: Colors.transparent,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         child: InkWell(
           onTap: onPressed,
-          borderRadius: BorderRadius.circular(15),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 15,
-            ),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: Center(
             child: Icon(
               icon,
-              color: Colors.white,
+              color: onPressed != null
+                  ? AppColors.pureWhite
+                  : AppColors.mediumGrey,
               size: 24,
             ),
           ),

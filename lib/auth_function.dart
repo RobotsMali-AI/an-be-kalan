@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:literacy_app/widgets/snackbar.dart';
 
-import 'main.dart';
-
 Future<void> resetPassword(BuildContext context) async {
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -67,9 +65,8 @@ Future<void> resetPassword(BuildContext context) async {
           ElevatedButton(
             onPressed: () async {
               if (formKey.currentState!.validate()) {
-                final email = emailController.text.trim();
                 try {
-                  await auth.sendPasswordResetEmail(email: email);
+                  // await auth.sendPasswordResetEmail(email: email);
                   Navigator.of(context).pop(); // Close the dialog
                   showSnackbar(context, 'Password reset Imɛli cilen don.');
                 } catch (e) {

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: androidx.media3:media3-exoplayer-smoothstreaming:1.4.1@aar" external-system-id="GRADLE">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/8.11.1/transforms/e32a5f4a9297b57b45303a330cf3a4bb/transformed/jetified-media3-exoplayer-smoothstreaming-1.4.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/8.11.1/transforms/e32a5f4a9297b57b45303a330cf3a4bb/transformed/jetified-media3-exoplayer-smoothstreaming-1.4.1/AndroidManifest.xml" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/androidx.media3/media3-exoplayer-smoothstreaming/1.4.1/e13617f9f2246cc666d0c24599873b0acf9fc4c/media3-exoplayer-smoothstreaming-1.4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

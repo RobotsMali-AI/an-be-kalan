@@ -6,6 +6,10 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
 
 class TrueFalseQuestionPage extends StatefulWidget {
   final List<Trueorfalse> questions;
@@ -82,97 +86,223 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
       context: context,
       builder: (_) => Dialog(
         backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(AppSpacing.lg),
         child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
+          decoration: AppDecorations.primaryCard.copyWith(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppColors.wisdomTeal.withOpacity(0.1),
+                AppColors.accentOrange.withOpacity(0.1),
+              ],
+            ),
           ),
-          padding: const EdgeInsets.all(25),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.star, size: 60, color: Colors.black)
-                  .animate()
-                  .rotate(duration: 700.ms),
-              const SizedBox(height: 20),
-              const Text("Score Dafalen!",
-                  style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black)),
-              const SizedBox(height: 10),
-              Text(
-                "Correct Answers: $_correctCount / ${widget.questions.length}",
-                style: const TextStyle(fontSize: 18, color: Colors.black),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "XP Gained: $_correctCount",
-                style: const TextStyle(fontSize: 18, color: Colors.black),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: const StadiumBorder(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Logo with celebration animation
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.wisdomTeal.withOpacity(0.2),
+                        AppColors.accentOrange.withOpacity(0.2),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.wisdomTeal.withOpacity(0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/logo.jpg',
+                      width: 120,
+                      height: 120,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },
-                child: const Text("KABAKOMA!",
-                    style: TextStyle(color: Colors.white)),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.lg),
+                // Star icon
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.wisdomTeal, AppColors.accentOrange],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Icon(
+                    Icons.star,
+                    size: 60,
+                    color: AppColors.pureWhite,
+                  ),
+                ).animate().rotate(duration: 700.ms),
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  "Score Dafalen!",
+                  style: AppTextStyles.heading1.copyWith(
+                    color: AppColors.wisdomTeal,
+                    fontSize: 28,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  "Tiɲɛ jaabi: $_correctCount / ${widget.questions.length}",
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.accentOrange,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  "XP sɔrɔlen: $_correctCount",
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.primaryGreen,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.wisdomTeal, AppColors.accentOrange],
+                    ),
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.wisdomTeal.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: AppColors.pureWhite,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ),
+                    child: Text(
+                      "KABAKOMA!",
+                      style: AppTextStyles.buttonText.copyWith(
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Color _getButtonColor(String answer) {
-    if (selectedAnswer == null) return Colors.black;
-    if (answer == selectedAnswer) {
-      return isCorrect! ? Colors.grey.shade700 : Colors.grey.shade500;
-    }
-    if (answer ==
-        (widget.questions[questionOrder[currentIndex]].answers
-            ? 'Sɛbɛ'
-            : 'Nkalon')) {
-      return Colors.grey.shade700;
-    }
-    return Colors.grey.shade300;
-  }
-
   Widget _buildAnswerButton(String answer, IconData icon) {
     final isSelected = selectedAnswer == answer;
+    final isCorrect = answer ==
+        (widget.questions[questionOrder[currentIndex]].answers
+            ? 'Sɛbɛ'
+            : 'Nkalon');
+
     return SizedBox(
       width: 150,
-      child: ElevatedButton(
-        onPressed: selectedAnswer == null ? () => _checkAnswer(answer) : null,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _getButtonColor(answer),
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 5,
-          shadowColor: Colors.black.withOpacity(0.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (isSelected)
-              Icon(icon, size: 24)
-                  .animate()
-                  .scale(duration: _buttonAnimDuration),
-            if (isSelected) const SizedBox(width: 10),
-            Text(answer,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: selectedAnswer == null
+                ? [AppColors.wisdomTeal, AppColors.wisdomTeal.withOpacity(0.8)]
+                : (isSelected
+                    ? (this.isCorrect!
+                        ? [
+                            AppColors.primaryGreen,
+                            AppColors.primaryGreen.withOpacity(0.8)
+                          ]
+                        : [
+                            AppColors.accentOrange,
+                            AppColors.accentOrange.withOpacity(0.8)
+                          ])
+                    : (isCorrect
+                        ? [
+                            AppColors.primaryGreen,
+                            AppColors.primaryGreen.withOpacity(0.8)
+                          ]
+                        : [
+                            AppColors.lightGrey,
+                            AppColors.lightGrey.withOpacity(0.8)
+                          ])),
+          ),
+          borderRadius: BorderRadius.circular(50),
+          boxShadow: [
+            BoxShadow(
+              color: (selectedAnswer == null
+                      ? AppColors.wisdomTeal
+                      : (isSelected
+                          ? (this.isCorrect!
+                              ? AppColors.primaryGreen
+                              : AppColors.accentOrange)
+                          : (isCorrect
+                              ? AppColors.primaryGreen
+                              : AppColors.lightGrey)))
+                  .withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
           ],
+        ),
+        child: ElevatedButton(
+          onPressed: selectedAnswer == null ? () => _checkAnswer(answer) : null,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.transparent,
+            foregroundColor: AppColors.pureWhite,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(50),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isSelected)
+                Icon(icon, size: 24, color: AppColors.pureWhite)
+                    .animate()
+                    .scale(duration: _buttonAnimDuration),
+              if (isSelected) const SizedBox(width: AppSpacing.sm),
+              Text(
+                answer,
+                style: AppTextStyles.buttonText.copyWith(
+                  color: AppColors.pureWhite,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     )
@@ -184,137 +314,171 @@ class _TrueFalseQuestionPageState extends State<TrueFalseQuestionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                const SizedBox(height: 50),
-                // Header
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                        colors: [Colors.grey.shade300, Colors.white]),
-                    borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(30)),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 45,
-                        height: 45,
-                        decoration: const BoxDecoration(
-                            color: Colors.black, shape: BoxShape.circle),
-                        child: Center(
-                          child: Text(
-                              '${currentIndex + 1}/${widget.questions.length}',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      const SizedBox(width: 15),
-                      const Text('Tiɲɛ don walima Nkalon',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black)),
-                      const Spacer(),
-                    ],
-                  ),
-                ).animate().slideY(begin: -1).fadeIn(),
-
-                // Main Content
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(25),
-                    child: Column(
-                      children: [
-                        // Question Card
-                        Container(
-                          margin: const EdgeInsets.only(top: 40, bottom: 50),
-                          padding: const EdgeInsets.all(25),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(25),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 20,
-                                  spreadRadius: 5),
-                            ],
-                          ),
-                          child: Text(
-                            widget.questions[questionOrder[currentIndex]]
-                                .question,
-                            style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w600,
-                                height: 1.4,
-                                color: Colors.black),
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                            .animate(delay: 300.ms)
-                            .scaleXY(curve: Curves.elasticOut),
-
-                        // Answer Buttons
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildAnswerButton('Sɛbɛ', Icons.check_circle),
-                            const SizedBox(width: 30),
-                            _buildAnswerButton('Nkalon', Icons.cancel),
-                          ],
-                        ),
-
-                        const Spacer(),
-
-                        // Next Button
-                        if (selectedAnswer != null)
-                          ElevatedButton.icon(
-                            onPressed: _nextQuestion,
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: const StadiumBorder(),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 35, vertical: 16),
-                                elevation: 5),
-                            icon: const Icon(Icons.arrow_forward,
-                                    color: Colors.white)
-                                .animate(onPlay: (c) => c.repeat())
-                                .shake(delay: 2.seconds, hz: 2),
-                            label: const Text('Nata',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18)),
-                          ).animate().slideY(begin: 1).fadeIn(),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            // Confetti
-            Align(
-              alignment: Alignment.topCenter,
-              child: ConfettiWidget(
-                confettiController: _confettiController,
-                blastDirectionality: BlastDirectionality.explosive,
-                colors: const [
-                  Colors.black,
-                  Colors.grey,
-                  Colors.white,
+      appBar: UnifiedAppBar(
+        title: 'Tiɲɛ don walima Nkalon',
+        showLogo: false,
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            margin: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.wisdomTeal.withOpacity(0.2),
+                  AppColors.wisdomTeal.withOpacity(0.1),
                 ],
-                emissionFrequency: 0.05,
-                numberOfParticles: 20,
-                maxBlastForce: 20,
+              ),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(
+                color: AppColors.wisdomTeal.withOpacity(0.3),
+                width: 1,
               ),
             ),
-          ],
+            child: Text(
+              '${currentIndex + 1}/${widget.questions.length}',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.wisdomTeal,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  // Main Content
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      child: Column(
+                        children: [
+                          // Question Card
+                          AppCard(
+                            child: Container(
+                              margin: const EdgeInsets.only(
+                                  top: AppSpacing.xl, bottom: AppSpacing.xl),
+                              padding: const EdgeInsets.all(AppSpacing.xl),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    AppColors.wisdomTeal.withOpacity(0.1),
+                                    AppColors.wisdomTeal.withOpacity(0.05),
+                                  ],
+                                ),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.lg),
+                              ),
+                              child: Text(
+                                widget.questions[questionOrder[currentIndex]]
+                                    .question,
+                                style: AppTextStyles.heading2.copyWith(
+                                  color: AppColors.wisdomTeal,
+                                  height: 1.4,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )
+                              .animate(delay: 300.ms)
+                              .scaleXY(curve: Curves.elasticOut),
+
+                          const SizedBox(height: AppSpacing.xl),
+
+                          // Answer Buttons
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildAnswerButton('Sɛbɛ', Icons.check_circle),
+                              const SizedBox(width: AppSpacing.xl),
+                              _buildAnswerButton('Nkalon', Icons.cancel),
+                            ],
+                          ),
+
+                          const Spacer(),
+
+                          // Next Button
+                          if (selectedAnswer != null)
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.wisdomTeal,
+                                    AppColors.accentOrange
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(50),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color:
+                                        AppColors.wisdomTeal.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: _nextQuestion,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: AppColors.pureWhite,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.xl,
+                                    vertical: AppSpacing.md,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                ),
+                                icon: Icon(
+                                  Icons.arrow_forward,
+                                  color: AppColors.pureWhite,
+                                )
+                                    .animate(onPlay: (c) => c.repeat())
+                                    .shake(delay: 2.seconds, hz: 2),
+                                label: Text(
+                                  'Nata',
+                                  style: AppTextStyles.buttonText.copyWith(
+                                    color: AppColors.pureWhite,
+                                  ),
+                                ),
+                              ),
+                            ).animate().slideY(begin: 1).fadeIn(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Confetti
+              Align(
+                alignment: Alignment.topCenter,
+                child: ConfettiWidget(
+                  confettiController: _confettiController,
+                  blastDirectionality: BlastDirectionality.explosive,
+                  colors: [
+                    AppColors.wisdomTeal,
+                    AppColors.accentOrange,
+                    AppColors.primaryGreen,
+                  ],
+                  emissionFrequency: 0.05,
+                  numberOfParticles: 20,
+                  maxBlastForce: 20,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

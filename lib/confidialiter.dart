@@ -118,6 +118,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                   builder: (context) => LiteracyAppEntry(
                         hasSeenConfidialiter:
                             prefs.getBool('hasSeenConfidialiter'),
+                        hasSeenOnboarding: prefs.getBool('hasSeenOnboarding'),
                       )),
             );
           },
@@ -130,25 +131,5 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
             style: TextStyle(color: Colors.white),
           ),
         ));
-  }
-
-  Widget _buildSectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16),
-      child: Text(
-        title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildSectionContent(String content) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Text(
-        content,
-        style: const TextStyle(fontSize: 16),
-      ),
-    );
   }
 }
