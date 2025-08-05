@@ -377,58 +377,60 @@ class _AlphabetCardState extends State<AlphabetCard>
                 ),
                 child: ScaleTransition(
                   scale: _scaleAnimation,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: playAudio,
-                        child: Text(
-                          widget.item.letter,
-                          style: const TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        height: 3,
-                        width: MediaQuery.of(context).size.width * 0.6,
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey,
-                          borderRadius: BorderRadius.circular(1.5),
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          GestureDetector(
-                            onTap: playAudio,
-                            child: Text(
-                              widget.item.letter,
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontFamily: 'Caveat VariableFont',
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black54,
-                              ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap: playAudio,
+                          child: Text(
+                            widget.item.letter,
+                            style: const TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: playAudio,
-                            child: Text(
-                              widget.item.letter.toUpperCase(),
-                              style: const TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                        ),
+                        Container(
+                          height: 3,
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: Colors.blueGrey,
+                            borderRadius: BorderRadius.circular(1.5),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: playAudio,
+                              child: Text(
+                                widget.item.letter,
+                                style: const TextStyle(
+                                  fontSize: 48,
+                                  fontFamily: 'Caveat VariableFont',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black54,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                            GestureDetector(
+                              onTap: playAudio,
+                              child: Text(
+                                widget.item.letter.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -10,6 +10,7 @@ import 'package:literacy_app/widgets/common/unified_app_bar.dart';
 import 'package:literacy_app/theme/app_colors.dart';
 import 'package:literacy_app/theme/app_styles.dart';
 import 'package:literacy_app/widgets/common/app_widgets.dart';
+import 'package:confetti/confetti.dart';
 
 class MultipleChoiceQuestionPage extends StatefulWidget {
   final List<Question> questions;
@@ -38,6 +39,10 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
   late List<int> questionOrder; // Added for shuffling
   late Animation<Offset> _shakeAnimation;
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final ConfettiController _confettiController =
+      ConfettiController(duration: const Duration(seconds: 2));
+  int maxStreak = 0;
+  int streak = 0;
 
   final _questionAnimDuration = 500.ms;
   final _optionAnimInterval = 100.ms;
@@ -195,121 +200,213 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
   }
 
   Widget _buildCelebrationDialog() {
+    final accuracy = (correctCount / widget.questions.length * 100).round();
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(AppSpacing.lg),
       child: Container(
-        decoration: AppDecorations.primaryCard.copyWith(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.wisdomTeal.withOpacity(0.1),
-              AppColors.primaryGreen.withOpacity(0.1),
+              AppColors.primaryGreen.withOpacity(0.95),
+              AppColors.wisdomTeal.withOpacity(0.95),
             ],
           ),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryGreen.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Logo with celebration animation
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.primaryGreen.withOpacity(0.2),
-                      AppColors.wisdomTeal.withOpacity(0.2),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryGreen.withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(
-                    'assets/logo.jpg',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: 1.57,
+                particleDrag: 0.05,
+                emissionFrequency: 0.05,
+                numberOfParticles: 20,
+                gravity: 0.05,
+                shouldLoop: false,
+                colors: const [
+                  Colors.yellow,
+                  Colors.orange,
+                  Colors.pink,
+                  Colors.blue,
+                  Colors.green,
+                ],
               ),
-              const SizedBox(height: AppSpacing.lg),
-              // Celebration animation
-              Lottie.asset(
-                'assets/animations/celebration.json',
-                width: 100,
-                height: 100,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Text(
-                "Baara ka bon kosɛbɛ!",
-                style: AppTextStyles.heading1.copyWith(
-                  color: AppColors.primaryGreen,
-                  fontSize: 28,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                "I ye hakɛ $correctCount/${widget.questions.length} dafa ani $correctCount XP sɔrɔ!",
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.wisdomTeal,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.primaryGreen, AppColors.wisdomTeal],
-                  ),
-                  borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primaryGreen.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: AppColors.pureWhite,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.xl,
-                      vertical: AppSpacing.md,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                  ),
-                  child: Text(
-                    "Laban!",
-                    style: AppTextStyles.buttonText.copyWith(
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
                       color: AppColors.pureWhite,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.charcoal.withOpacity(0.2),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
                     ),
-                  ),
-                ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/logo.jpg',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ).animate().scale(
+                        duration: 600.ms,
+                        curve: Curves.elasticOut,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _getPerformanceIcon(accuracy),
+                      color: AppColors.pureWhite,
+                      size: 36,
+                    ),
+                  ).animate().scale(
+                        delay: 300.ms,
+                        duration: 500.ms,
+                        curve: Curves.elasticOut,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    _getPerformanceMessage(accuracy)['title']!,
+                    style: AppTextStyles.heading2.copyWith(
+                      color: AppColors.pureWhite,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(
+                        delay: 600.ms,
+                        duration: 400.ms,
+                      ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    _getPerformanceMessage(accuracy)['subtitle']!,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.pureWhite.withOpacity(0.9),
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(
+                        delay: 800.ms,
+                        duration: 400.ms,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildStatItem(
+                            'Tiɲɛ',
+                            '$correctCount/${widget.questions.length}',
+                            Icons.check_circle),
+                        _buildStatItem(
+                            'Ɲɛnamaya', '$accuracy%', Icons.trending_up),
+                        _buildStatItem('XP',
+                            '+${correctCount * _calculateXP()}', Icons.star),
+                        if (maxStreak > 1)
+                          _buildStatItem('Jɛka', '$maxStreak',
+                              Icons.local_fire_department),
+                      ],
+                    ),
+                  ).animate().slideY(
+                        delay: 1000.ms,
+                        begin: 0.3,
+                        duration: 500.ms,
+                        curve: Curves.easeOut,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primaryGreen,
+                          AppColors.wisdomTeal,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryGreen.withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: AppColors.pureWhite,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl,
+                          vertical: AppSpacing.lg,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.home,
+                            color: AppColors.pureWhite,
+                            size: 20,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            'N sɔnna',
+                            style: AppTextStyles.buttonText.copyWith(
+                              color: AppColors.pureWhite,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ).animate().fadeIn(
+                        delay: 1200.ms,
+                        duration: 400.ms,
+                      ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -587,10 +684,84 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
     );
   }
 
+  int _calculateXP() {
+    int baseXP = 1;
+    if (streak >= 3) baseXP += 1;
+    if (streak >= 5) baseXP += 1;
+    return baseXP;
+  }
+
+  Widget _buildStatItem(String label, String value, IconData icon) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: AppColors.pureWhite, size: 20),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          value,
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: AppColors.pureWhite,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.pureWhite.withOpacity(0.8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Map<String, String> _getPerformanceMessage(int accuracy) {
+    if (accuracy >= 90) {
+      return {
+        'title': 'Barika da!',
+        'subtitle': 'I ye baara ɲuman kɛ kosɛbɛ!',
+      };
+    } else if (accuracy >= 70) {
+      return {
+        'title': 'Aw ni ce!',
+        'subtitle': 'I ye ɲɛnamaya ɲuman sɔrɔ!',
+      };
+    } else if (accuracy >= 50) {
+      return {
+        'title': 'Ka ɲɛ!',
+        'subtitle': 'I bɛ ɲɛtaa sɔrɔ, kɛ ka taa ɲɛ!',
+      };
+    } else {
+      return {
+        'title': 'Kalan kɛ!',
+        'subtitle': 'Segin ka kɛ, i bɛna ɲɛ!',
+      };
+    }
+  }
+
+  IconData _getPerformanceIcon(int accuracy) {
+    if (accuracy >= 90) return Icons.emoji_events;
+    if (accuracy >= 70) return Icons.thumb_up;
+    if (accuracy >= 50) return Icons.trending_up;
+    return Icons.school;
+  }
+
+  void _resetGame() {
+    setState(() {
+      currentQuestionIndex = 0;
+      selectedAnswers = [];
+      isAnswered = false;
+      correctCount = 0;
+      streak = 0;
+      maxStreak = 0;
+    });
+    questionOrder.shuffle();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
     _audioPlayer.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 }

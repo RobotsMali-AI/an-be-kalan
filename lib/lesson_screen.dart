@@ -80,6 +80,7 @@ class LessonScreenState extends State<LessonScreen> {
   String currentImageUrl = '';
 
   int readingTime = 0;
+  int currentSessionTime = 0;
   DateTime? startTime;
 
   List<double> accuracies = [];
@@ -523,7 +524,8 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> saveProgress() async {
     Duration duration = DateTime.now().difference(startTime!);
-    readingTime += duration.inSeconds;
+    currentSessionTime = duration.inSeconds;
+    int totalReadingTime = readingTime + currentSessionTime;
     if (mounted) setState(() => _sending = true);
 
     await context.read<ApiFirebaseService>().bookmark(
@@ -532,7 +534,7 @@ class LessonScreenState extends State<LessonScreen> {
             lastAccessed: DateTime.now(),
             title: widget.bookTitle,
             bookmark: currentPage.toString(),
-            readingTime: readingTime,
+            readingTime: totalReadingTime,
             totalPages: bookData!.content.length,
             accuracies: accuracies,
           ),
@@ -543,7 +545,8 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> bookmarkCurrentPageAndExit(BuildContext context) async {
     Duration duration = DateTime.now().difference(startTime!);
-    readingTime += duration.inSeconds;
+    currentSessionTime = duration.inSeconds;
+    int totalReadingTime = readingTime + currentSessionTime;
     setState(() => _sending = true);
     await context.read<ApiFirebaseService>().bookmark(
           widget.uid,
@@ -551,7 +554,7 @@ class LessonScreenState extends State<LessonScreen> {
             lastAccessed: DateTime.now(),
             title: widget.bookTitle,
             bookmark: currentPage.toString(),
-            readingTime: readingTime,
+            readingTime: totalReadingTime,
             totalPages: bookData!.content.length,
             accuracies: accuracies,
           ),
@@ -563,7 +566,8 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> endLesson(BuildContext context) async {
     Duration duration = DateTime.now().difference(startTime!);
-    readingTime += duration.inSeconds;
+    currentSessionTime = duration.inSeconds;
+    int totalReadingTime = readingTime + currentSessionTime;
 
     if (!mounted) return; // Check if widget is still mounted
 
@@ -577,7 +581,7 @@ class LessonScreenState extends State<LessonScreen> {
                   totalPages: bookData!.content.length,
                   title: widget.bookTitle,
                   bookmark: currentPage.toString(),
-                  readingTime: readingTime,
+                  readingTime: totalReadingTime,
                   accuracies: accuracies),
               widget.userdata,
             );
@@ -589,7 +593,7 @@ class LessonScreenState extends State<LessonScreen> {
             totalPages: bookData!.content.length,
             title: widget.bookTitle,
             bookmark: currentPage.toString(),
-            readingTime: readingTime,
+            readingTime: totalReadingTime,
             accuracies: accuracies),
         widget.uid);
 
@@ -604,7 +608,7 @@ class LessonScreenState extends State<LessonScreen> {
         .expand((pageContent) => pageContent.sentences)
         .map((sentence) => sentence.text.split(' ').length)
         .reduce((sum, count) => sum + count);
-    double readingTimeInMinutes = readingTime / 60.0;
+    double readingTimeInMinutes = totalReadingTime / 60.0;
     String wordPerMin = readingTimeInMinutes > 0
         ? (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2)
         : "0.00";
@@ -1038,36 +1042,79 @@ class LessonScreenState extends State<LessonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return Scaffold(
+    return PopScope(
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop && lastPage == false) {
+          saveProgress();
+        }
+      },
+      child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
             gradient: AppColors.backgroundGradient,
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+          child: SafeArea(
+            child: Stack(
               children: [
-                CircularProgressIndicator(
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppColors.primaryGreen),
-                  strokeWidth: 3,
-                ),
-                const SizedBox(height: AppSpacing.xl),
-                Text(
-                  'Kalan labɛn...',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    color: AppColors.primaryGreen,
-                    fontWeight: FontWeight.w600,
+                _buildMainContent(),
+                // Loading dialog overlay
+                if (_loading)
+                  Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.all(AppSpacing.xl),
+                        padding: const EdgeInsets.all(AppSpacing.xl),
+                        decoration: BoxDecoration(
+                          color: AppColors.pureWhite,
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryGreen.withOpacity(0.2),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.primaryGreen),
+                              strokeWidth: 3,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            Text(
+                              'Kalan labɛn...',
+                              style: AppTextStyles.bodyLarge.copyWith(
+                                color: AppColors.primaryGreen,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'Aw ka kuma bɛ bamanankan kan na',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.mediumGrey,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
               ],
             ),
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
+  Widget _buildMainContent() {
     return PopScope(
       onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop && lastPage == false) {

@@ -336,30 +336,61 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage>
                           curve: Curves.easeOut,
                         ),
                     const SizedBox(height: AppSpacing.lg),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: SecondaryButton(
-                            text: 'Segin ka kɛ',
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _resetGame();
-                            },
-                            icon: Icons.refresh,
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primaryGreen,
+                            AppColors.wisdomTeal,
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withOpacity(0.4),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: AppColors.pureWhite,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.xl,
+                            vertical: AppSpacing.lg,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
                           ),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: PrimaryButton(
-                            text: 'N sɔnna',
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                            icon: Icons.home,
-                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.home,
+                              color: AppColors.pureWhite,
+                              size: 20,
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text(
+                              'N sɔnna',
+                              style: AppTextStyles.buttonText.copyWith(
+                                color: AppColors.pureWhite,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ).animate().fadeIn(
                           delay: 1200.ms,
                           duration: 400.ms,

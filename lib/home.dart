@@ -185,45 +185,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     }
   }
 
-  // Override setState to preserve tab index during rebuilds
-  @override
-  void setState(VoidCallback fn) {
-    final currentTabIndex = _selectedTabIndex;
-    super.setState(fn);
-
-    // Restore tab index if it was changed during the rebuild
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted &&
-          _selectedTabIndex != currentTabIndex &&
-          currentTabIndex == 3) {
-        // Only preserve if we were on profile tab (index 3)
-        setState(() {
-          _selectedTabIndex = currentTabIndex;
-        });
-      }
-    });
-  }
-
-  // Add keyboard visibility tracking
-  bool _isKeyboardVisible = false;
-
-  void _onKeyboardVisibilityChanged(bool isVisible) {
-    if (_isKeyboardVisible != isVisible) {
-      _isKeyboardVisible = isVisible;
-      // Don't change tabs when keyboard appears/disappears
-      if (isVisible && _selectedTabIndex == 3) {
-        // Ensure we stay on profile tab when keyboard appears
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted && _selectedTabIndex != 3) {
-            setState(() {
-              _selectedTabIndex = 3;
-            });
-          }
-        });
-      }
-    }
-  }
-
   Future<void> _checkAndShowTutorial() async {
     await TutorialService.initializeFirstLaunchSequence();
 
@@ -415,16 +376,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               currentIndex: _selectedTabIndex,
               navKeys: _navKeys,
               onTap: (index) {
-                // Don't change tabs if a dialog is currently showing
-                if (ModalRoute.of(context)?.isCurrent == true) {
-                  setState(() {
-                    _selectedTabIndex = index;
-                  });
-                  // Trigger tutorial check for new page
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _checkAndShowPageTutorial();
-                  });
-                }
+                setState(() {
+                  _selectedTabIndex = index;
+                });
+                // Trigger tutorial check for new page
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _checkAndShowPageTutorial();
+                });
               },
             ),
           );
