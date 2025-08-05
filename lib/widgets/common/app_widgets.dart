@@ -42,15 +42,28 @@ class PrimaryButton extends StatelessWidget {
                       strokeWidth: 2,
                     ),
                   )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(icon, color: AppColors.pureWhite, size: 20),
-                        const SizedBox(width: AppSpacing.sm),
+                : Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (icon != null) ...[
+                          Icon(icon, color: AppColors.pureWhite, size: 20),
+                          const SizedBox(width: AppSpacing.sm),
+                        ],
+                        Flexible(
+                          child: Text(
+                            text,
+                            style: AppTextStyles.buttonText,
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                          ),
+                        ),
                       ],
-                      Text(text, style: AppTextStyles.buttonText),
-                    ],
+                    ),
                   ),
           ),
         ),
@@ -110,20 +123,30 @@ class SecondaryButton extends StatelessWidget {
                       strokeWidth: 2,
                     ),
                   )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(icon, color: AppColors.primaryGreen, size: 20),
-                        const SizedBox(width: AppSpacing.sm),
-                      ],
-                      Text(
-                        text,
-                        style: AppTextStyles.buttonText.copyWith(
-                          color: AppColors.primaryGreen,
+                : Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (icon != null) ...[
+                          Icon(icon, color: AppColors.primaryGreen, size: 20),
+                          const SizedBox(width: AppSpacing.sm),
+                        ],
+                        Flexible(
+                          child: Text(
+                            text,
+                            style: AppTextStyles.buttonText.copyWith(
+                              color: AppColors.primaryGreen,
+                            ),
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
           ),
         ),

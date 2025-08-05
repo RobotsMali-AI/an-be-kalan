@@ -163,11 +163,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _onUserSessionChanged() {
     if (mounted && _userSession!.currentUser != user) {
+      // Preserve the current tab index before rebuilding
+      final currentTabIndex = _selectedTabIndex;
+
       setState(() {
         user = _userSession!.currentUser;
       });
+
+      // Restore the tab index after the rebuild
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _selectedTabIndex != currentTabIndex) {
+          setState(() {
+            _selectedTabIndex = currentTabIndex;
+          });
+        }
+      });
+
       if (user != null) {
         initUserData();
+      }
+    }
+  }
+
+  // Override setState to preserve tab index during rebuilds
+  @override
+  void setState(VoidCallback fn) {
+    final currentTabIndex = _selectedTabIndex;
+    super.setState(fn);
+
+    // Restore tab index if it was changed during the rebuild
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted &&
+          _selectedTabIndex != currentTabIndex &&
+          currentTabIndex == 3) {
+        // Only preserve if we were on profile tab (index 3)
+        setState(() {
+          _selectedTabIndex = currentTabIndex;
+        });
+      }
+    });
+  }
+
+  // Add keyboard visibility tracking
+  bool _isKeyboardVisible = false;
+
+  void _onKeyboardVisibilityChanged(bool isVisible) {
+    if (_isKeyboardVisible != isVisible) {
+      _isKeyboardVisible = isVisible;
+      // Don't change tabs when keyboard appears/disappears
+      if (isVisible && _selectedTabIndex == 3) {
+        // Ensure we stay on profile tab when keyboard appears
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _selectedTabIndex != 3) {
+            setState(() {
+              _selectedTabIndex = 3;
+            });
+          }
+        });
       }
     }
   }
@@ -267,9 +319,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       );
     }
 
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        viewInsets: EdgeInsets.zero, // Prevent keyboard from affecting layout
+      ),
+      child: _buildMainContent(),
+    );
+  }
+
+  Widget _buildMainContent() {
     return Scaffold(
       backgroundColor: AppColors.offWhite,
       extendBody: true,
+      resizeToAvoidBottomInset: false, // Prevent keyboard from affecting layout
       body: Consumer2<ApiFirebaseService, UserSessionService>(
           builder: (context, apiFirebaseService, userSession, _) {
         if (apiFirebaseService.books.isEmpty) {
@@ -318,21 +380,25 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
         return NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
+            // Only handle scroll notifications, ignore other notifications
             if (scrollNotification is ScrollUpdateNotification) {
               final scrollDelta = scrollNotification.scrollDelta ?? 0.0;
 
-              if (scrollDelta > 0 && _isNavVisible) {
-                // Scrolling down - hide navigation
-                setState(() {
-                  _isNavVisible = false;
-                });
-                _navAnimationController.reverse();
-              } else if (scrollDelta < 0 && !_isNavVisible) {
-                // Scrolling up - show navigation
-                setState(() {
-                  _isNavVisible = true;
-                });
-                _navAnimationController.forward();
+              // Only handle scroll events if we're not in a dialog
+              if (ModalRoute.of(context)?.isCurrent == true) {
+                if (scrollDelta > 0 && _isNavVisible) {
+                  // Scrolling down - hide navigation
+                  setState(() {
+                    _isNavVisible = false;
+                  });
+                  _navAnimationController.reverse();
+                } else if (scrollDelta < 0 && !_isNavVisible) {
+                  // Scrolling up - show navigation
+                  setState(() {
+                    _isNavVisible = true;
+                  });
+                  _navAnimationController.forward();
+                }
               }
             }
             return false;
@@ -349,13 +415,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               currentIndex: _selectedTabIndex,
               navKeys: _navKeys,
               onTap: (index) {
-                setState(() {
-                  _selectedTabIndex = index;
-                });
-                // Trigger tutorial check for new page
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _checkAndShowPageTutorial();
-                });
+                // Don't change tabs if a dialog is currently showing
+                if (ModalRoute.of(context)?.isCurrent == true) {
+                  setState(() {
+                    _selectedTabIndex = index;
+                  });
+                  // Trigger tutorial check for new page
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _checkAndShowPageTutorial();
+                  });
+                }
               },
             ),
           );

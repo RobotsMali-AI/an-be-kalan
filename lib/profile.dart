@@ -115,118 +115,217 @@ class _ProfilePageState extends State<ProfilePage> {
         TextEditingController(text: widget.userData.displayName);
     final formKey = GlobalKey<FormState>();
 
+    // Focus nodes for field switching
+    final nameFocusNode = FocusNode();
+    final emailFocusNode = FocusNode();
+    final passwordFocusNode = FocusNode();
+
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
+        return Dialog(
           backgroundColor: AppColors.pureWhite,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          title: Text(
-            'Jatebɔsɛbɛn dabɔ',
-            style: AppTextStyles.heading3,
-            textAlign: TextAlign.center,
-          ),
-          content: Form(
-            key: formKey,
+          child: Container(
+            constraints: const BoxConstraints(maxHeight: 600),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
-                  style: AppTextStyles.bodySmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                TextFormField(
-                  controller: nameController,
-                  decoration: AppDecorations.getInputDecoration(
-                    hintText: 'I ka tɔgɔ',
-                    prefixIcon: Icons.person,
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(AppRadius.lg),
+                      topRight: Radius.circular(AppRadius.lg),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.person_add_rounded,
+                        size: 48,
+                        color: AppColors.primaryGreen,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'Jatebɔsɛbɛn dabɔ',
+                        style: AppTextStyles.heading3.copyWith(
+                          color: AppColors.primaryGreen,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati',
+                        style: AppTextStyles.bodySmall,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: AppDecorations.getInputDecoration(
-                    hintText: 'Imɛli walima telefɔni nimɔrɔ',
-                    prefixIcon: Icons.email,
+
+                // Form content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: nameController,
+                            focusNode: nameFocusNode,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(emailFocusNode);
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: 'I ka tɔgɔ',
+                              prefixIcon: Icons.person,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: emailController,
+                            focusNode: emailFocusNode,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocusNode);
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: 'Imɛli walima telefɔni nimɔrɔ',
+                              prefixIcon: Icons.email,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Imɛli walima telefɔni de wajibiyalen don';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: passwordController,
+                            focusNode: passwordFocusNode,
+                            obscureText: true,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) {
+                              _submitAccountCreation(
+                                formKey,
+                                emailController,
+                                passwordController,
+                                nameController,
+                              );
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: 'Kɔdi',
+                              prefixIcon: Icons.lock,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Kɔdi de wajibiyalen don';
+                              }
+                              if (value.length < 6) {
+                                return 'Kɔdi ka kan ka tɛmɛ 6 ye';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Imɛli walima telefɔni de wajibiyalen don';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: AppDecorations.getInputDecoration(
-                    hintText: 'Kɔdi',
-                    prefixIcon: Icons.lock,
+
+                // Actions
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(AppRadius.lg),
+                      bottomRight: Radius.circular(AppRadius.lg),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Kɔdi de wajibiyalen don';
-                    }
-                    if (value.length < 6) {
-                      return 'Kɔdi ka kan ka tɛmɛ 6 ye';
-                    }
-                    return null;
-                  },
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SecondaryButton(
+                          text: 'Ka dankari',
+                          onPressed: () => Navigator.of(context).pop(),
+                          height: 48,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: PrimaryButton(
+                          text: 'Jatebɔsɛbɛn dabɔ',
+                          onPressed: () => _submitAccountCreation(
+                            formKey,
+                            emailController,
+                            passwordController,
+                            nameController,
+                          ),
+                          height: 48,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          actions: [
-            SecondaryButton(
-              text: 'Ka dankari',
-              onPressed: () => Navigator.of(context).pop(),
-              width: 120,
-              height: 48,
-            ),
-            PrimaryButton(
-              text: 'Jatebɔsɛbɛn dabɔ',
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  final result = await widget.userSession.createAccount(
-                    emailOrPhone: emailController.text.trim(),
-                    password: passwordController.text,
-                    displayName: nameController.text.isNotEmpty
-                        ? nameController.text
-                        : null,
-                  );
-
-                  if (!mounted) return;
-
-                  Navigator.of(context).pop();
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(result['message']),
-                      backgroundColor: result['success']
-                          ? AppColors.success
-                          : AppColors.error,
-                    ),
-                  );
-
-                  if (result['success'] && mounted) {
-                    setState(() {});
-                  }
-                }
-              },
-              width: 140,
-              height: 48,
-            ),
-          ],
         );
       },
     );
+
+    // Clean up focus nodes
+    nameFocusNode.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+  }
+
+  Future<void> _submitAccountCreation(
+    GlobalKey<FormState> formKey,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    TextEditingController nameController,
+  ) async {
+    if (formKey.currentState!.validate()) {
+      final result = await widget.userSession.createAccount(
+        emailOrPhone: emailController.text.trim(),
+        password: passwordController.text,
+        displayName:
+            nameController.text.isNotEmpty ? nameController.text : null,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor:
+              result['success'] ? AppColors.success : AppColors.error,
+        ),
+      );
+
+      if (result['success'] && mounted) {
+        // Don't call setState here as it might cause tab reset
+        // The user session change will trigger a rebuild naturally
+      }
+    }
   }
 
   Future<void> _showSignInDialog() async {
@@ -234,104 +333,191 @@ class _ProfilePageState extends State<ProfilePage> {
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
+    // Focus nodes for field switching
+    final emailFocusNode = FocusNode();
+    final passwordFocusNode = FocusNode();
+
     await showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
+        return Dialog(
           backgroundColor: AppColors.pureWhite,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          title: Text(
-            'I ka don a kɔnɔ',
-            style: AppTextStyles.heading3,
-            textAlign: TextAlign.center,
-          ),
-          content: Form(
-            key: formKey,
+          child: Container(
+            constraints: const BoxConstraints(maxHeight: 500),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Aw ye aw ka jatebɔsɛbɛn kunnafoniw sɛbɛn walasa ka don.',
-                  style: AppTextStyles.bodySmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                TextFormField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  decoration: AppDecorations.getInputDecoration(
-                    hintText: 'Imɛli walima telefɔni nimɔrɔ',
-                    prefixIcon: Icons.email,
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.wisdomTeal.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(AppRadius.lg),
+                      topRight: Radius.circular(AppRadius.lg),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Imɛli walima telefɔni de wajibiyalen don';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                TextFormField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: AppDecorations.getInputDecoration(
-                    hintText: 'Kɔdi',
-                    prefixIcon: Icons.lock,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.login_rounded,
+                        size: 48,
+                        color: AppColors.wisdomTeal,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        'I ka don a kɔnɔ',
+                        style: AppTextStyles.heading3.copyWith(
+                          color: AppColors.wisdomTeal,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        'Aw ye aw ka jatebɔsɛbɛn kunnafoniw sɛbɛn walasa ka don',
+                        style: AppTextStyles.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Kɔdi de wajibiyalen don';
-                    }
-                    return null;
-                  },
+                ),
+
+                // Form content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: emailController,
+                            focusNode: emailFocusNode,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocusNode);
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: 'Imɛli walima telefɔni nimɔrɔ',
+                              prefixIcon: Icons.email,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Imɛli walima telefɔni de wajibiyalen don';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: passwordController,
+                            focusNode: passwordFocusNode,
+                            obscureText: true,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) {
+                              _submitSignIn(
+                                formKey,
+                                emailController,
+                                passwordController,
+                              );
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: 'Kɔdi',
+                              prefixIcon: Icons.lock,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Kɔdi de wajibiyalen don';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Actions
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(AppRadius.lg),
+                      bottomRight: Radius.circular(AppRadius.lg),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SecondaryButton(
+                          text: 'Ka dankari',
+                          onPressed: () => Navigator.of(context).pop(),
+                          height: 48,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: PrimaryButton(
+                          text: 'A digi',
+                          onPressed: () => _submitSignIn(
+                            formKey,
+                            emailController,
+                            passwordController,
+                          ),
+                          height: 48,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          actions: [
-            SecondaryButton(
-              text: 'Ka dankari',
-              onPressed: () => Navigator.of(context).pop(),
-              width: 120,
-              height: 48,
-            ),
-            PrimaryButton(
-              text: 'A digi',
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  final result = await widget.userSession.signIn(
-                    emailOrPhone: emailController.text.trim(),
-                    password: passwordController.text,
-                  );
-
-                  if (!mounted) return;
-
-                  Navigator.of(context).pop();
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(result['message']),
-                      backgroundColor: result['success']
-                          ? AppColors.success
-                          : AppColors.error,
-                    ),
-                  );
-
-                  if (result['success'] && mounted) {
-                    setState(() {});
-                  }
-                }
-              },
-              width: 120,
-              height: 48,
-            ),
-          ],
         );
       },
     );
+
+    // Clean up focus nodes
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+  }
+
+  Future<void> _submitSignIn(
+    GlobalKey<FormState> formKey,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+  ) async {
+    if (formKey.currentState!.validate()) {
+      final result = await widget.userSession.signIn(
+        emailOrPhone: emailController.text.trim(),
+        password: passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor:
+              result['success'] ? AppColors.success : AppColors.error,
+        ),
+      );
+
+      if (result['success'] && mounted) {
+        // Don't call setState here as it might cause tab reset
+        // The user session change will trigger a rebuild naturally
+      }
+    }
   }
 
   Future<void> _showAccountOptionsDialog() async {
@@ -355,6 +541,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
                 style: AppTextStyles.bodySmall,
                 textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
               ),
               const SizedBox(height: AppSpacing.lg),
               Row(
@@ -389,6 +577,94 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _showSignOutDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.logout,
+                color: AppColors.error,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Ka bɔ',
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            'I baana i ka jatebɔsɛbɛn bɔ wa? I tɛ se ka segin o la.',
+            style: AppTextStyles.bodyMedium,
+            textAlign: TextAlign.center,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+          ),
+          actions: [
+            SecondaryButton(
+              text: 'Ka dankari',
+              onPressed: () => Navigator.of(context).pop(),
+              width: 120,
+              height: 48,
+            ),
+            Container(
+              width: 120,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.error.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await widget.userSession.signOut();
+                    if (mounted) {
+                      // Don't call setState here as it might cause tab reset
+                      // The user session change will trigger a rebuild naturally
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('I bɔra ka ɲɛ!'),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                  child: Center(
+                    child: Text(
+                      'Ka bɔ',
+                      style: AppTextStyles.buttonText.copyWith(
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
@@ -398,6 +674,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: AppColors.offWhite,
         appBar: UnifiedAppBar(
           title: 'Profil',
+          showLogo: false,
           actions: [
             AppBarActionButton(
               icon: Icons.feedback,
@@ -414,6 +691,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 tooltip: 'Jatebɔsɛbɛn',
                 backgroundColor: AppColors.accentSurfaceLight,
                 iconColor: AppColors.accentOrange,
+              ),
+            if (widget.userSession.isAuthenticated)
+              AppBarActionButton(
+                icon: Icons.logout,
+                onPressed: _showSignOutDialog,
+                tooltip: 'Ka bɔ',
+                backgroundColor: AppColors.error.withOpacity(0.1),
+                iconColor: AppColors.error,
               ),
           ],
         ),
@@ -436,6 +721,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 // Authentication status
                 if (!widget.userSession.isAuthenticated)
                   _buildAuthenticationBanner(),
+
+                // Sign out section for authenticated users
+                if (widget.userSession.isAuthenticated) _buildSignOutSection(),
 
                 // Stats section
                 _buildStatsSection(),
@@ -546,6 +834,82 @@ class _ProfilePageState extends State<ProfilePage> {
         color: AppColors.accentOrange,
         buttonText: 'Jatebɔsɛbɛn dabɔ walima don',
         onButtonPressed: _showAccountOptionsDialog,
+      ),
+    );
+  }
+
+  Widget _buildSignOutSection() {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.logout,
+                color: AppColors.error,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                'Jatebɔsɛbɛn',
+                style: AppTextStyles.heading4.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'I baana i ka jatebɔsɛbɛn bɔ wa? I tɛ se ka segin o la.',
+            style: AppTextStyles.bodyMedium,
+            textAlign: TextAlign.left,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Container(
+            width: double.infinity,
+            height: 48,
+            decoration: BoxDecoration(
+              color: AppColors.error,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.error.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                onTap: _showSignOutDialog,
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.logout,
+                        color: AppColors.pureWhite,
+                        size: 20,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        'Ka bɔ',
+                        style: AppTextStyles.buttonText.copyWith(
+                          color: AppColors.pureWhite,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
