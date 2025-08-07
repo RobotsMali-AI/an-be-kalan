@@ -665,6 +665,164 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<void> _showDeleteAccountDialog() async {
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.delete_forever,
+                color: AppColors.error,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Jatebɔsɛbɛn bɔ',
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'I baana i ka jatebɔsɛbɛn bɔ wa? O baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la. I tɛ se ka segin o la.',
+                style: AppTextStyles.bodyMedium,
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Form(
+                key: formKey,
+                child: TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) {
+                    _handleDeleteAccount(passwordController.text, formKey);
+                  },
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: 'Kɔdi sɛbɛn walasa ka jatebɔsɛbɛn bɔ',
+                    prefixIcon: Icons.lock,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Kɔdi de wajibiyalen don';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            SecondaryButton(
+              text: 'Ka dankari',
+              onPressed: () => Navigator.of(context).pop(),
+              width: 120,
+              height: 48,
+            ),
+            Container(
+              width: 120,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.error.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: () {
+                    _handleDeleteAccount(passwordController.text, formKey);
+                    Navigator.of(context).pop();
+                  },
+                  child: Center(
+                    child: Text(
+                      'Bɔ',
+                      style: AppTextStyles.buttonText.copyWith(
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Clean up controller
+    //passwordController.dispose();
+  }
+
+  Future<void> _handleDeleteAccount(
+      String password, GlobalKey<FormState> formKey) async {
+    if (formKey.currentState!.validate()) {
+      // Close dialog first
+      //Navigator.of(context).pop();
+
+      try {
+        final result = await widget.userSession.deleteAccount(
+          password: password,
+        );
+
+        if (!mounted) return;
+
+        // Show result message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor:
+                result['success'] ? AppColors.success : AppColors.error,
+          ),
+        );
+
+        // Only navigate if deletion was successful
+        if (result['success'] && mounted) {
+          // Small delay to ensure SnackBar is shown
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AuthGate()),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Fɛn dɔ ma ɲɛ: $e'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LoadingOverlay(
@@ -839,6 +997,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildSignOutSection() {
+    // Check if user has a password (authenticated account)
+    final hasPassword = widget.userData.password != null &&
+        widget.userData.password!.isNotEmpty;
+
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -868,47 +1030,138 @@ class _ProfilePageState extends State<ProfilePage> {
             overflow: TextOverflow.visible,
           ),
           const SizedBox(height: AppSpacing.lg),
-          Container(
-            width: double.infinity,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.error,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.error.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+          // Show both buttons only if user has password
+          if (hasPassword) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.accentOrange,
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.error.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        onTap: _showSignOutDialog,
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.logout,
+                                color: AppColors.pureWhite,
+                                size: 20,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Ka bɔ',
+                                style: AppTextStyles.buttonText.copyWith(
+                                  color: AppColors.pureWhite,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.error,
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      border: Border.all(
+                        color: AppColors.error,
+                        width: 1,
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        onTap: _showDeleteAccountDialog,
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.delete_forever,
+                                color: AppColors.pureWhite,
+                                size: 20,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Bɔ',
+                                style: AppTextStyles.buttonText.copyWith(
+                                  color: AppColors.pureWhite,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
+          ] else ...[
+            // Show only sign out button for users without password
+            Container(
+              width: double.infinity,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.error,
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                onTap: _showSignOutDialog,
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.logout,
-                        color: AppColors.pureWhite,
-                        size: 20,
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Text(
-                        'Ka bɔ',
-                        style: AppTextStyles.buttonText.copyWith(
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.error.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: _showSignOutDialog,
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.logout,
                           color: AppColors.pureWhite,
+                          size: 20,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          'Ka bɔ',
+                          style: AppTextStyles.buttonText.copyWith(
+                            color: AppColors.pureWhite,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

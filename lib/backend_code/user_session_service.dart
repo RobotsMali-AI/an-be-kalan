@@ -14,10 +14,27 @@ class UserSessionService with ChangeNotifier {
   Users? _currentUser;
   String? _currentUserId;
   bool _isAuthenticated = false;
+  bool _disposed = false;
 
   Users? get currentUser => _currentUser;
   String? get currentUserId => _currentUserId;
   bool get isAuthenticated => _isAuthenticated;
+
+  @override
+  void dispose() {
+    _disposed = true;
+    super.dispose();
+  }
+
+  void _safeNotifyListeners() {
+    if (!_disposed) {
+      try {
+        super.notifyListeners();
+      } catch (e) {
+        print('UserSessionService: notifyListeners failed: $e');
+      }
+    }
+  }
 
   // Initialize user session (called on app start)
   Future<void> initializeSession() async {
@@ -90,7 +107,7 @@ class UserSessionService with ChangeNotifier {
       _currentUserId = firebaseDocId;
       _isAuthenticated = false;
 
-      notifyListeners();
+      _safeNotifyListeners();
     } catch (e) {
       print('Error creating anonymous user: $e');
       // Fallback to local-only user
@@ -128,7 +145,7 @@ class UserSessionService with ChangeNotifier {
     _currentUserId = anonymousId;
     _isAuthenticated = false;
 
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   // Create account for anonymous user
@@ -181,7 +198,7 @@ class UserSessionService with ChangeNotifier {
 
         _isAuthenticated = true;
 
-        notifyListeners();
+        _safeNotifyListeners();
 
         return {
           'success': true,
@@ -256,7 +273,7 @@ class UserSessionService with ChangeNotifier {
       _currentUserId = doc.id;
       _isAuthenticated = true;
 
-      notifyListeners();
+      _safeNotifyListeners();
 
       return {
         'success': true,
@@ -282,6 +299,64 @@ class UserSessionService with ChangeNotifier {
     await createAnonymousUser();
   }
 
+  // Delete account
+  Future<Map<String, dynamic>> deleteAccount({required String password}) async {
+    try {
+      if (_currentUser == null || _currentUserId == null) {
+        return {
+          'success': false,
+          'message': 'Jatebɔsɛbɛn ma sɔrɔ',
+          'messageEn': 'Account not found'
+        };
+      }
+
+      // Check if user is authenticated (has password)
+      if (_currentUser!.password == null || _currentUser!.password!.isEmpty) {
+        return {
+          'success': false,
+          'message': 'Jatebɔsɛbɛn nin tɛ kɔdi ye',
+          'messageEn': 'This account has no password'
+        };
+      }
+
+      // Verify password
+      if (!_verifyPassword(password, _currentUser!.password!)) {
+        return {
+          'success': false,
+          'message': 'Kɔdi ma bɛn',
+          'messageEn': 'Incorrect password'
+        };
+      }
+
+      // Delete from Firebase
+      await _firestore.collection('users').doc(_currentUserId!).delete();
+
+      // Clear local session
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.remove('current_user_id');
+      await prefs.remove('is_authenticated');
+
+      // Reset current user
+      _currentUser = null;
+      _currentUserId = null;
+      _isAuthenticated = false;
+
+      _safeNotifyListeners();
+
+      return {
+        'success': true,
+        'message': 'Jatebɔsɛbɛn bɔra ka ɲɛ!',
+        'messageEn': 'Account deleted successfully!'
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': 'Fɛn dɔ ma ɲɛ: $e',
+        'messageEn': 'Error: $e'
+      };
+    }
+  }
+
   // Update user data
   Future<void> updateUserData(Users userData) async {
     if (_isAuthenticated && _currentUserId != null) {
@@ -294,7 +369,7 @@ class UserSessionService with ChangeNotifier {
     // Always update locally
     await _localDb.updateUser(userData.toSemb());
     _currentUser = userData;
-    notifyListeners();
+    _safeNotifyListeners();
   }
 
   // Private helper methods
