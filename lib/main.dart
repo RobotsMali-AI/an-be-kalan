@@ -12,6 +12,7 @@ import 'package:literacy_app/home.dart';
 import 'package:literacy_app/onboarding_screens.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'services/simple_locale.dart';
 
 /// Requires that a Firebase local emulator is running locally.
 /// See https://firebase.flutter.dev/docs/auth/start/#optional-prototype-and-test-with-firebase-local-emulator-suite
@@ -29,7 +30,9 @@ Future<void> main() async {
   app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  // Load locale before runApp
+  final simpleLocale = SimpleLocale();
+  await simpleLocale.load();
   // Initialize ASR service
   try {
     final success = await ASRService.instance.initialize();
@@ -60,7 +63,8 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => UserSessionService()),
       ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
-      ChangeNotifierProvider(create: (_) => DatabaseHelper())
+      ChangeNotifierProvider(create: (_) => DatabaseHelper()),
+      ChangeNotifierProvider<SimpleLocale>.value(value: simpleLocale),
     ],
     child: LiteracyAppEntry(
       hasSeenConfidialiter: hasSeenConfidialiter,
@@ -96,7 +100,6 @@ class _LiteracyAppEntryState extends State<LiteracyAppEntry> {
 
   @override
   Widget build(BuildContext context) {
-    // speech.processAudio();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'An be Kalan',
@@ -132,35 +135,30 @@ class _LiteracyAppEntryState extends State<LiteracyAppEntry> {
                       : constraints.maxWidth,
                   child: Consumer<UserSessionService>(
                     builder: (context, userSession, _) {
-                      return FutureBuilder(
-                        future: userSession.currentUser == null
-                            ? userSession.initializeSession()
-                            : Future.value(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
+                      // Use a more stable approach that doesn't rebuild on every change
+                      if (userSession.currentUser == null) {
+                        // Only initialize once, don't rebuild
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            userSession.initializeSession();
                           }
+                        });
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
 
-                          // Always check onboarding flow first, regardless of user session
-                          if (widget.hasSeenConfidialiter != true) {
-                            return const PrivacyPolicyPage();
-                          }
+                      // Always check onboarding flow first, regardless of user session
+                      if (widget.hasSeenConfidialiter != true) {
+                        return const PrivacyPolicyPage();
+                      }
 
-                          if (widget.hasSeenOnboarding != true) {
-                            return const OnboardingScreens();
-                          }
+                      if (widget.hasSeenOnboarding != true) {
+                        return const OnboardingScreens();
+                      }
 
-                          // After onboarding is complete, check user session
-                          if (userSession.currentUser != null) {
-                            return const HomePage();
-                          }
-
-                          return const AuthGate();
-                        },
-                      );
+                      // After onboarding is complete, check user session
+                      return const HomePage();
                     },
                   ),
                 ),

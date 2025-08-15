@@ -5,9 +5,13 @@ import 'package:literacy_app/feedback.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/widgets/common/unified_app_bar.dart';
 import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/widgets/language_picker.dart';
 import 'package:literacy_app/theme/app_styles.dart';
 import 'package:literacy_app/widgets/common/app_widgets.dart';
 import 'package:literacy_app/tutorial_service.dart';
+import 'package:literacy_app/services/translations.dart';
+import 'package:literacy_app/services/simple_locale.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final Users userData;
@@ -31,6 +35,9 @@ class _ProfilePageState extends State<ProfilePage> {
   final GlobalKey _authBannerKey = GlobalKey();
   final GlobalKey _avatarKey = GlobalKey();
 
+  // Store reference to SimpleLocale provider
+  SimpleLocale? _localeProvider;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +45,23 @@ class _ProfilePageState extends State<ProfilePage> {
         text: widget.userData.displayName ?? 'Kalan-folo');
     controller.addListener(_onNameChanged);
     _checkAndShowTutorial();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Store reference to SimpleLocale provider for safe disposal
+    _localeProvider = context.read<SimpleLocale>();
+  }
+
+  @override
+  void dispose() {
+    // Re-enable notifications when disposing (safely)
+    _localeProvider?.setNotificationsEnabled(true);
+
+    controller.removeListener(_onNameChanged);
+    controller.dispose();
+    super.dispose();
   }
 
   Future<void> _checkAndShowTutorial() async {
@@ -65,13 +89,6 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  @override
-  void dispose() {
-    controller.removeListener(_onNameChanged);
-    controller.dispose();
-    super.dispose();
-  }
-
   void _onNameChanged() {
     if (mounted) {
       setState(() {
@@ -91,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Jiracogo tɔgɔ kura donna'),
+          content: Text(t(context, 'account_username_changed')),
           backgroundColor: AppColors.success,
         ),
       );
@@ -153,7 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        'Jatebɔsɛbɛn dabɔ',
+                        t(context, 'create_account'),
                         style: AppTextStyles.heading3.copyWith(
                           color: AppColors.primaryGreen,
                         ),
@@ -161,7 +178,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati',
+                        t(context, 'account_created_message'),
                         style: AppTextStyles.bodySmall,
                         textAlign: TextAlign.center,
                         softWrap: true,
@@ -188,7 +205,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   .requestFocus(emailFocusNode);
                             },
                             decoration: AppDecorations.getInputDecoration(
-                              hintText: 'I ka tɔgɔ',
+                              hintText: t(context, 'username_filled'),
                               prefixIcon: Icons.person,
                             ),
                           ),
@@ -203,12 +220,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   .requestFocus(passwordFocusNode);
                             },
                             decoration: AppDecorations.getInputDecoration(
-                              hintText: 'Imɛli walima telefɔni nimɔrɔ',
+                              hintText: t(context, 'email_or_phone'),
                               prefixIcon: Icons.email,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Imɛli walima telefɔni de wajibiyalen don';
+                                return t(context, 'email_or_phone_warning');
                               }
                               return null;
                             },
@@ -228,15 +245,15 @@ class _ProfilePageState extends State<ProfilePage> {
                               );
                             },
                             decoration: AppDecorations.getInputDecoration(
-                              hintText: 'Kɔdi',
+                              hintText: t(context, 'password'),
                               prefixIcon: Icons.lock,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Kɔdi de wajibiyalen don';
+                                return t(context, 'password_required');
                               }
                               if (value.length < 6) {
-                                return 'Kɔdi ka kan ka tɛmɛ 6 ye';
+                                return t(context, 'password_min_length');
                               }
                               return null;
                             },
@@ -261,7 +278,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Expanded(
                         child: SecondaryButton(
-                          text: 'Ka dankari',
+                          text: t(context, 'cancel'),
                           onPressed: () => Navigator.of(context).pop(),
                           height: 48,
                         ),
@@ -269,7 +286,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: PrimaryButton(
-                          text: 'Jatebɔsɛbɛn dabɔ',
+                          text: t(context, 'create_account'),
                           onPressed: () => _submitAccountCreation(
                             formKey,
                             emailController,
@@ -370,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: AppSpacing.md),
                       Text(
-                        'I ka don a kɔnɔ',
+                        t(context, 'sign_in'),
                         style: AppTextStyles.heading3.copyWith(
                           color: AppColors.wisdomTeal,
                         ),
@@ -378,7 +395,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'Aw ye aw ka jatebɔsɛbɛn kunnafoniw sɛbɛn walasa ka don',
+                        t(context, 'sign_in_message'),
                         style: AppTextStyles.bodySmall,
                         textAlign: TextAlign.center,
                       ),
@@ -404,12 +421,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   .requestFocus(passwordFocusNode);
                             },
                             decoration: AppDecorations.getInputDecoration(
-                              hintText: 'Imɛli walima telefɔni nimɔrɔ',
+                              hintText: t(context, 'email_or_phone'),
                               prefixIcon: Icons.email,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Imɛli walima telefɔni de wajibiyalen don';
+                                return t(context, 'email_or_phone_warning');
                               }
                               return null;
                             },
@@ -428,12 +445,12 @@ class _ProfilePageState extends State<ProfilePage> {
                               );
                             },
                             decoration: AppDecorations.getInputDecoration(
-                              hintText: 'Kɔdi',
+                              hintText: t(context, 'password'),
                               prefixIcon: Icons.lock,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Kɔdi de wajibiyalen don';
+                                return t(context, 'password_required');
                               }
                               return null;
                             },
@@ -458,7 +475,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Expanded(
                         child: SecondaryButton(
-                          text: 'Ka dankari',
+                          text: t(context, 'cancel'),
                           onPressed: () => Navigator.of(context).pop(),
                           height: 48,
                         ),
@@ -466,7 +483,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: PrimaryButton(
-                          text: 'A digi',
+                          text: t(context, 'enter'),
                           onPressed: () => _submitSignIn(
                             formKey,
                             emailController,
@@ -530,7 +547,7 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           title: Text(
-            'Jatebɔsɛbɛn',
+            t(context, 'account'),
             style: AppTextStyles.heading3,
             textAlign: TextAlign.center,
           ),
@@ -538,7 +555,7 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Aw ka kunnafoniw mara walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+                t(context, 'account_created_message'),
                 style: AppTextStyles.bodySmall,
                 textAlign: TextAlign.center,
                 softWrap: true,
@@ -549,7 +566,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Expanded(
                     child: PrimaryButton(
-                      text: 'Jatebɔsɛbɛn dabɔ',
+                      text: t(context, 'create_account'),
                       onPressed: () {
                         Navigator.of(context).pop();
                         _showAccountCreationDialog();
@@ -560,7 +577,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: SecondaryButton(
-                      text: 'Don a kɔnɔ',
+                      text: t(context, 'sign_in'),
                       onPressed: () {
                         Navigator.of(context).pop();
                         _showSignInDialog();
@@ -595,7 +612,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Ka bɔ',
+                t(context, 'sign_out'),
                 style: AppTextStyles.heading3.copyWith(
                   color: AppColors.error,
                 ),
@@ -603,7 +620,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
           ),
           content: Text(
-            'I baana i ka jatebɔsɛbɛn bɔ wa? I tɛ se ka segin o la.',
+            t(context, 'sign_out_message'),
             style: AppTextStyles.bodyMedium,
             textAlign: TextAlign.center,
             softWrap: true,
@@ -611,7 +628,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           actions: [
             SecondaryButton(
-              text: 'Ka dankari',
+              text: t(context, 'cancel'),
               onPressed: () => Navigator.of(context).pop(),
               width: 120,
               height: 48,
@@ -642,7 +659,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       // The user session change will trigger a rebuild naturally
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('I bɔra ka ɲɛ!'),
+                          content: Text(t(context, 'signed_out')),
                           backgroundColor: AppColors.success,
                         ),
                       );
@@ -650,7 +667,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   },
                   child: Center(
                     child: Text(
-                      'Ka bɔ',
+                      t(context, 'sign_out'),
                       style: AppTextStyles.buttonText.copyWith(
                         color: AppColors.pureWhite,
                       ),
@@ -687,7 +704,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(width: AppSpacing.sm),
               Text(
-                'Jatebɔsɛbɛn bɔ',
+                t(context, 'delete_account'),
                 style: AppTextStyles.heading3.copyWith(
                   color: AppColors.error,
                 ),
@@ -698,7 +715,7 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'I baana i ka jatebɔsɛbɛn bɔ wa? O baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la. I tɛ se ka segin o la.',
+                t(context, 'delete_account_message'),
                 style: AppTextStyles.bodyMedium,
                 textAlign: TextAlign.center,
                 softWrap: true,
@@ -715,12 +732,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     _handleDeleteAccount(passwordController.text, formKey);
                   },
                   decoration: AppDecorations.getInputDecoration(
-                    hintText: 'Kɔdi sɛbɛn walasa ka jatebɔsɛbɛn bɔ',
+                    hintText: t(context, 'enter_password'),
                     prefixIcon: Icons.lock,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Kɔdi de wajibiyalen don';
+                      return t(context, 'password_required');
                     }
                     return null;
                   },
@@ -730,7 +747,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           actions: [
             SecondaryButton(
-              text: 'Ka dankari',
+              text: t(context, 'cancel'),
               onPressed: () => Navigator.of(context).pop(),
               width: 120,
               height: 48,
@@ -827,11 +844,11 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return LoadingOverlay(
       isLoading: isLoading,
-      message: 'Ka makɔnɔ...',
+      message: t(context, 'loading'),
       child: Scaffold(
         backgroundColor: AppColors.offWhite,
         appBar: UnifiedAppBar(
-          title: 'Profil',
+          title: t(context, 'profile'),
           showLogo: false,
           actions: [
             AppBarActionButton(
@@ -842,11 +859,18 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               tooltip: 'Lafili',
             ),
+            AppBarActionButton(
+              icon: Icons.language,
+              onPressed: () => showLanguagePicker(context),
+              tooltip: t(context, 'language'),
+              backgroundColor: AppColors.surfaceLight,
+              iconColor: AppColors.primaryGreen,
+            ),
             if (!widget.userSession.isAuthenticated)
               AppBarActionButton(
                 icon: Icons.account_circle,
                 onPressed: _showAccountOptionsDialog,
-                tooltip: 'Jatebɔsɛbɛn',
+                tooltip: t(context, 'account'),
                 backgroundColor: AppColors.accentSurfaceLight,
                 iconColor: AppColors.accentOrange,
               ),
@@ -854,7 +878,7 @@ class _ProfilePageState extends State<ProfilePage> {
               AppBarActionButton(
                 icon: Icons.logout,
                 onPressed: _showSignOutDialog,
-                tooltip: 'Ka bɔ',
+                tooltip: t(context, 'sign_out'),
                 backgroundColor: AppColors.error.withOpacity(0.1),
                 iconColor: AppColors.error,
               ),
@@ -922,14 +946,14 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'I ni ce! 🦉',
+            t(context, 'welcome'),
             style: AppTextStyles.heading2.copyWith(
               color: AppColors.primaryGreen,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'An be kalan kɛrɛnkɛrɛnnenya',
+            t(context, 'app_subtitle'),
             style: AppTextStyles.subtitle,
           ),
         ],
@@ -952,7 +976,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(width: AppSpacing.md),
               Text(
-                'I ka jiracogo tɔgɔ',
+                t(context, 'your_name'),
                 style: AppTextStyles.heading4,
               ),
             ],
@@ -963,13 +987,13 @@ class _ProfilePageState extends State<ProfilePage> {
             onEditingComplete: updateDisplayName,
             style: AppTextStyles.bodyLarge,
             decoration: AppDecorations.getInputDecoration(
-              hintText: "I ka jiracogo tɔgɔ sɛbɛn",
+              hintText: t(context, 'enter_your_name'),
             ),
           ),
           if (showSaveButton) ...[
             const SizedBox(height: AppSpacing.md),
             PrimaryButton(
-              text: 'Mara',
+              text: t(context, 'save'),
               onPressed: updateDisplayName,
               width: double.infinity,
               icon: Icons.save,
@@ -985,12 +1009,11 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.only(bottom: AppSpacing.lg),
       child: InfoBanner(
         key: _authBannerKey,
-        title: 'Kalan kɛ tɛmɛnni kɛ',
-        message:
-            'Aw ye jatebɔsɛbɛn dabɔ walasa ka aw ka ɲɛtaa sabati ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+        title: t(context, 'learn_bambara'),
+        message: t(context, 'account_created_message'),
         icon: Icons.info_outline,
         color: AppColors.accentOrange,
-        buttonText: 'Jatebɔsɛbɛn dabɔ walima don',
+        buttonText: t(context, 'create_account'),
         onButtonPressed: _showAccountOptionsDialog,
       ),
     );
@@ -1014,7 +1037,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(width: AppSpacing.md),
               Text(
-                'Jatebɔsɛbɛn',
+                t(context, 'account'),
                 style: AppTextStyles.heading4.copyWith(
                   color: AppColors.error,
                 ),
@@ -1023,7 +1046,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'I baana i ka jatebɔsɛbɛn bɔ wa? I tɛ se ka segin o la.',
+            t(context, 'account_deleted'),
             style: AppTextStyles.bodyMedium,
             textAlign: TextAlign.left,
             softWrap: true,
@@ -1064,7 +1087,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               const SizedBox(width: AppSpacing.sm),
                               Text(
-                                'Ka bɔ',
+                                t(context, 'sign_out'),
                                 style: AppTextStyles.buttonText.copyWith(
                                   color: AppColors.pureWhite,
                                 ),
@@ -1150,7 +1173,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Text(
-                          'Ka bɔ',
+                          t(context, 'sign_out'),
                           style: AppTextStyles.buttonText.copyWith(
                             color: AppColors.pureWhite,
                           ),
@@ -1183,35 +1206,35 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               const SizedBox(width: AppSpacing.md),
               Text(
-                'I ka ɲɛtaa jateminɛ',
+                t(context, 'track_progress'),
                 style: AppTextStyles.heading3,
               ),
             ],
           ),
         ),
         StatCard(
-          title: "Dɔnniya",
+          title: t(context, 'level'),
           value: "${widget.userData.xp} XP",
           icon: Icons.star,
           color: AppColors.accentOrange,
         ),
         const SizedBox(height: AppSpacing.md),
         StatCard(
-          title: "Kalan waati bɛɛ lajɛlen",
+          title: t(context, 'total_reading_time'),
           value: "${widget.userData.totalReadingTime} min",
           icon: Icons.timer,
           color: AppColors.wisdomTeal,
         ),
         const SizedBox(height: AppSpacing.md),
         StatCard(
-          title: "Gafew dafara",
+          title: t(context, 'total_books'),
           value: "${widget.userData.completedBooks.length}",
           icon: Icons.book,
           color: AppColors.success,
         ),
         const SizedBox(height: AppSpacing.md),
         StatCard(
-          title: "Gafew bɛɛ kɛɛ la",
+          title: t(context, 'in_progress'),
           value: "${widget.userData.inProgressBooks.length}",
           icon: Icons.bookmark,
           color: AppColors.bookBlue,

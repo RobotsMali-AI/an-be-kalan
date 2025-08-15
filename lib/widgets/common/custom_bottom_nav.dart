@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
+import '../../services/translations.dart';
 import '../../theme/app_styles.dart';
 
 class CustomBottomNav extends StatelessWidget {
@@ -44,7 +45,7 @@ class CustomBottomNav extends StatelessWidget {
             _buildNavItem(
               index: 0,
               icon: Icons.book_rounded,
-              label: 'Gafew',
+              label: t(context, 'books'),
               color: AppColors.primaryGreen,
               key: navKeys?[0],
             ),
@@ -58,14 +59,14 @@ class CustomBottomNav extends StatelessWidget {
             _buildNavItem(
               index: 2,
               icon: Icons.games_rounded,
-              label: 'Tulonkɛlaw',
+              label: t(context, 'games'),
               color: AppColors.accentOrange,
               key: navKeys?[2],
             ),
             _buildNavItem(
               index: 3,
               icon: Icons.person_rounded,
-              label: 'Profil',
+              label: t(context, 'profile'),
               color: AppColors.bookBlue,
               key: navKeys?[3],
             ),

@@ -2,11 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_translate_api/google_translate_api.dart';
+import 'package:provider/provider.dart';
 import '../widgets/common/unified_app_bar.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_styles.dart';
 import '../widgets/common/app_widgets.dart';
 import '../tutorial_service.dart';
+import '../services/simple_locale.dart';
 
 class TranslationPage extends StatefulWidget {
   const TranslationPage({super.key});
@@ -36,6 +38,9 @@ class _TranslationPageState extends State<TranslationPage>
   final GlobalKey _inputFieldKey = GlobalKey();
   final GlobalKey _swapButtonKey = GlobalKey();
   final GlobalKey _translateButtonKey = GlobalKey();
+
+  // Store reference to SimpleLocale provider
+  SimpleLocale? _localeProvider;
 
   final Map<String, Map<String, dynamic>> _languages = {
     'bm': {
@@ -82,6 +87,13 @@ class _TranslationPageState extends State<TranslationPage>
     _checkAndShowTutorial();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Store reference to SimpleLocale provider for safe disposal
+    _localeProvider = context.read<SimpleLocale>();
+  }
+
   void _initializeAnimations() {
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 300),
@@ -104,7 +116,7 @@ class _TranslationPageState extends State<TranslationPage>
 
   void _setupListeners() {
     _textController.addListener(_onTextChanged);
-    _textFocusNode.addListener(_onFocusChanged);
+    // Remove focus listener to prevent rebuilds
   }
 
   void _onTextChanged() {
@@ -116,18 +128,14 @@ class _TranslationPageState extends State<TranslationPage>
     }
   }
 
-  void _onFocusChanged() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
+    // Re-enable notifications when disposing
+    _localeProvider?.setNotificationsEnabled(true);
+
     _fadeController.dispose();
     _scaleController.dispose();
     _textController.removeListener(_onTextChanged);
-    _textFocusNode.removeListener(_onFocusChanged);
     _textController.dispose();
     _textFocusNode.dispose();
     super.dispose();
@@ -745,65 +753,69 @@ class _TranslationPageState extends State<TranslationPage>
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(
-                color: _textFocusNode.hasFocus
-                    ? AppColors.primaryGreen
-                    : AppColors.lightGrey,
-                width: _textFocusNode.hasFocus ? 2 : 1,
-              ),
-            ),
-            child: TextField(
-              key: _inputFieldKey,
-              controller: _textController,
-              focusNode: _textFocusNode,
-              maxLines: 5,
-              style: AppTextStyles.bodyMedium,
-              decoration: InputDecoration(
-                hintText: 'Sɛbɛnni min bɛ ka bamanankan kɛ...',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.mediumGrey,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(AppSpacing.md),
-              ),
-            ),
-          ),
-
-          // Character count and language hint
+          _buildTextField(),
           const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              Text(
-                '${_textController.text.length}/500',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: _textController.text.length > 400
-                      ? AppColors.error
-                      : AppColors.mediumGrey,
-                ),
-              ),
-              const Spacer(),
-              if (_languages[_sourceLanguage] != null)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(_languages[_sourceLanguage]!['flag']),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text(
-                      _languages[_sourceLanguage]!['name'],
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.mediumGrey,
-                      ),
-                    ),
-                  ],
-                ),
-            ],
-          ),
+          _buildInputFooter(),
         ],
       ),
+    );
+  }
+
+  Widget _buildTextField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: AppColors.lightGrey,
+          width: 1,
+        ),
+      ),
+      child: TextField(
+        key: _inputFieldKey,
+        controller: _textController,
+        focusNode: _textFocusNode,
+        maxLines: 5,
+        style: AppTextStyles.bodyMedium,
+        decoration: InputDecoration(
+          hintText: 'Sɛbɛnni min bɛ ka bamanankan kɛ...',
+          hintStyle: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.mediumGrey,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(AppSpacing.md),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputFooter() {
+    return Row(
+      children: [
+        Text(
+          '${_textController.text.length}/500',
+          style: AppTextStyles.bodySmall.copyWith(
+            color: _textController.text.length > 400
+                ? AppColors.error
+                : AppColors.mediumGrey,
+          ),
+        ),
+        const Spacer(),
+        if (_languages[_sourceLanguage] != null)
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(_languages[_sourceLanguage]!['flag']),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                _languages[_sourceLanguage]!['name'],
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.mediumGrey,
+                ),
+              ),
+            ],
+          ),
+      ],
     );
   }
 
