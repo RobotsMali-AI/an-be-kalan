@@ -16,6 +16,7 @@ import 'package:literacy_app/widgets/common/unified_app_bar.dart';
 import 'package:literacy_app/theme/app_colors.dart';
 import 'package:literacy_app/theme/app_styles.dart';
 import 'package:literacy_app/widgets/common/app_widgets.dart';
+import 'package:literacy_app/services/translations.dart';
 
 // ignore: must_be_immutable
 class BookPageWidget extends StatefulWidget {
@@ -136,7 +137,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
     return Scaffold(
       backgroundColor: AppColors.offWhite,
       appBar: UnifiedAppBar(
-        title: 'Gafew',
+        title: t(context, 'books'),
         actions: [
           AppBarActionButton(
             key: _refreshKey,
@@ -151,7 +152,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
         ],
         bottom: AppBarSearchWidget(
           key: _searchKey,
-          hintText: 'Gafe dɔ ɲini...',
+          hintText: t(context, 'search_book'),
           onChanged: searchBook,
           controller: _bookSearchController,
           onClear: () => searchBook(''),
@@ -180,7 +181,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     Text(
-                      'Ɛntɛrinɛti ɲɔgɔndan tɛ yen',
+                      t(context, 'no_internet'),
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.error,
                         fontWeight: FontWeight.w500,
@@ -209,7 +210,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'An ka gafew',
+                    t(context, 'ours_books'),
                     style: AppTextStyles.heading3,
                   ),
                 ],
@@ -248,7 +249,7 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                                   'Gafew sɔrɔli ma ɲɛ. I ye a lajɛ kokura.',
                               icon: Icons.error_outline,
                               color: AppColors.error,
-                              buttonText: 'A lajɛ kokura',
+                              buttonText: t(context, 'no_internet_button'),
                               onButtonPressed: () {
                                 setState(() {
                                   booksFuture =
@@ -272,8 +273,8 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                           if (displayedBooks.isEmpty) {
                             return Center(
                               child: InfoBanner(
-                                title: 'Gafe si tɛ yen',
-                                message: 'Gafe wɛrɛw bɛ na sɔɔni.',
+                                title: t(context, 'no_books'),
+                                message: t(context, 'no_books_message'),
                                 icon: Icons.book_outlined,
                                 color: AppColors.mediumGrey,
                               ),
@@ -337,12 +338,11 @@ class _BookPageWidgetState extends State<BookPageWidget> {
                       child: Padding(
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         child: InfoBanner(
-                          title: 'Ɛntɛrinɛti ɲɔgɔndan tɛ',
-                          message:
-                              'I tɛ ɛntɛrinɛti kan. Aw ye aw ka jɛgɛnsira lajɛ.',
+                          title: t(context, 'no_internet'),
+                          message: t(context, 'no_internet_message'),
                           icon: Icons.wifi_off,
                           color: AppColors.error,
-                          buttonText: 'A lajɛ kokura',
+                          buttonText: t(context, 'no_internet_button'),
                           onButtonPressed: () {
                             _connectivity
                                 .checkConnectivity()

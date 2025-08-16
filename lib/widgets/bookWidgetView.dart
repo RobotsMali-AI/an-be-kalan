@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
+import 'package:literacy_app/services/translations.dart';
 
 class BookWidgetView extends StatelessWidget {
   const BookWidgetView({
@@ -89,15 +90,16 @@ class BookWidgetView extends StatelessWidget {
                             Row(
                               children: [
                                 if (isCompleted)
-                                  const StatusLabel(
-                                      text: "A bana", color: Colors.green),
+                                  StatusLabel(
+                                      text: t(context, 'finished_book'),
+                                      color: Colors.green),
                                 if (isInProgress)
-                                  const StatusLabel(
-                                      text: "A bɛ sen na",
+                                  StatusLabel(
+                                      text: t(context, 'in_progress'),
                                       color: Colors.orange),
                                 if (!isCompleted && !isInProgress)
-                                  const StatusLabel(
-                                      text: "A ma daminɛ folo",
+                                  StatusLabel(
+                                      text: t(context, 'not_biggining_book'),
                                       color: Colors.blueGrey),
                               ],
                             ),
