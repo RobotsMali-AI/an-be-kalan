@@ -3,6 +3,8 @@ import 'package:audioplayers/audioplayers.dart';
 import 'dart:math';
 
 class SyllableSoundsScreen extends StatefulWidget {
+  const SyllableSoundsScreen({super.key});
+
   @override
   _SyllableSoundsScreenState createState() => _SyllableSoundsScreenState();
 }
@@ -111,7 +113,12 @@ class _SyllableSoundsScreenState extends State<SyllableSoundsScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 child: GridView.builder(
+<<<<<<< Updated upstream
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+=======
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+>>>>>>> Stashed changes
                     crossAxisCount: 2,
                     crossAxisSpacing: 15,
                     mainAxisSpacing: 15,

@@ -310,13 +310,14 @@ class LessonScreenState extends State<LessonScreen> {
             text: char,
             style: TextStyle(color: isCorrect ? Colors.green : Colors.red),
           ));
-          if (op != 'insertion')
+          if (op != 'insertion') {
             q++; // Move alignment index only if not an insertion in transcription
+          }
         } else {
           // Beyond transcription length, assume incorrect
           highlightedSpans.add(TextSpan(
             text: char,
-            style: TextStyle(color: Colors.red),
+            style: const TextStyle(color: Colors.red),
           ));
         }
       } else {
@@ -343,8 +344,12 @@ class LessonScreenState extends State<LessonScreen> {
     List<List<int>> dp = List.generate(m + 1, (_) => List.filled(n + 1, 0));
 
     // Initialize DP table
-    for (int i = 0; i <= m; i++) dp[i][0] = i; // Deletions
-    for (int j = 0; j <= n; j++) dp[0][j] = j; // Insertions
+    for (int i = 0; i <= m; i++) {
+      dp[i][0] = i; // Deletions
+    }
+    for (int j = 0; j <= n; j++) {
+      dp[0][j] = j; // Insertions
+    }
 
     // Fill DP table
     for (int i = 1; i <= m; i++) {
