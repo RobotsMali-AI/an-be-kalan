@@ -36,14 +36,14 @@ class AcceuilNkalan extends StatelessWidget {
             'assets/imJeu1.jpg', // Replace with actual grayscale image path
         'page': const AlphabetPage(),
       },
-      // {
-      //   'title': 'Kalan',
-      //   'image':
-      //       'assets/imJeu1.jpg', // Replace with actual grayscale image path
-      //   'page': SyllableSoundsScreen(),
-      // },
+      {
+        'title': 'Kalan',
+        'image':
+            'assets/imJeu1.jpg', // Replace with actual grayscale image path
+        'page': SyllableSoundsScreen(),
+      },
     ];
-
+  
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
@@ -64,7 +64,7 @@ class AcceuilNkalan extends StatelessWidget {
         color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: GridView.builder(
+          child: GridView.builder( 
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 0.8,
