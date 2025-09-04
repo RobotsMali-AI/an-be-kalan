@@ -6,6 +6,10 @@ import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
 
 class ChooseCorrectSpellPage extends StatefulWidget {
   const ChooseCorrectSpellPage({super.key});
@@ -134,41 +138,35 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
           : () => checkAnswer(option),
       child: AnimatedContainer(
         duration: 300.ms,
-        decoration: BoxDecoration(
+        decoration: AppDecorations.primaryCard.copyWith(
           color: isSelected
-              ? (isCorrectOption ? Colors.black : Colors.grey[300])
-              : Colors.white,
+              ? (isCorrectOption ? AppColors.success : AppColors.error)
+              : AppColors.pureWhite,
           border: Border.all(
-            color: Colors.black,
+            color: isSelected
+                ? (isCorrectOption ? AppColors.success : AppColors.error)
+                : AppColors.accentOrange,
             width: 2,
           ),
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 5,
-              spreadRadius: 1,
-            ),
-          ],
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Row(
             children: [
               if (isSelected)
                 Icon(
                   isCorrectOption ? Icons.check : Icons.close,
-                  color: isCorrectOption ? Colors.white : Colors.black,
+                  color: AppColors.pureWhite,
                 ),
-              const SizedBox(width: 10),
-              Text(
-                option,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: isSelected && isCorrectOption
-                      ? Colors.white
-                      : Colors.black,
-                  fontWeight: FontWeight.bold,
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  option,
+                  style: AppTextStyles.heading4.copyWith(
+                    color: isSelected
+                        ? AppColors.pureWhite
+                        : AppColors.accentOrange,
+                  ),
                 ),
               ),
             ],
@@ -261,10 +259,17 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
   @override
   Widget build(BuildContext context) {
     if (allSpells.isEmpty || currentSpell == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: Center(
+            child: LoadingOverlay(
+              isLoading: true,
+              message: 'Sɛbɛn cogo ɲuman sugandili...',
+              child: Container(),
+            ),
           ),
         ),
       );
@@ -272,257 +277,144 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
 
     if (_showCelebration) return _showCelebrationDialog(context);
 
-    List<String> options = List.from(currentSpell!['options']);
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: Text(
-          'Hakɛya ${allSpells.length - remainingSpells.length - 1}/${allSpells.length}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Column(
-        children: [
-          LinearProgressIndicator(
-            value: (allSpells.length - remainingSpells.length - 1) /
-                allSpells.length,
-            backgroundColor: Colors.grey[300],
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: Image.asset(
-                          currentSpell!['image'],
-                          height: 200,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.volume_up,
-                                  color: Colors.white),
-                              onPressed: () =>
-                                  _playAudio(currentSpell!['audio']),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.lightbulb,
-                                  color: Colors.white),
-                              onPressed: () =>
-                                  setState(() => _showHint = !_showHint),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.white),
-                              onPressed: () => setState(() =>
-                                  _showWordCompletion = !_showWordCompletion),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: const Text(
-                        'Jaabi ye ?',
-                        style: TextStyle(
-                          fontSize: 24,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...options.map((option) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: _buildOption(option),
-                        )),
-                    if (_showHint)
-                      Container(
-                        padding: const EdgeInsets.all(15),
-                        margin: const EdgeInsets.only(top: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Text(
-                          currentSpell!['hint'],
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    if (_showWordCompletion)
-                      Container(
-                        padding: const EdgeInsets.all(15),
-                        margin: const EdgeInsets.only(top: 20),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              'a daminɛ ye: ${currentSpell!['partial']}',
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            TextField(
-                              controller: _wordController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderSide:
-                                      const BorderSide(color: Colors.black),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                hintText: 'Daɲɛ sɛbɛn...',
-                                hintStyle: const TextStyle(color: Colors.grey),
-                                suffixIcon: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: IconButton(
-                                    icon: const Icon(Icons.check,
-                                        color: Colors.white),
-                                    onPressed: _checkTypedAnswer,
-                                  ),
-                                ),
-                              ),
-                              style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    if (_isCorrect)
-                      Column(
-                        children: [
-                          Lottie.asset('assets/animations/success.json',
-                              width: 120, repeat: false),
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                              borderRadius: BorderRadius.circular(50),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 5,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              onPressed: _nextWord,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 30,
-                                  vertical: 15,
-                                ),
-                              ),
-                              child: const Text('Dangan'),
-                            ),
-                          ),
-                        ],
-                      ),
-                  ],
-                ),
+      appBar: UnifiedAppBar(
+        title: 'Sɛbɛn cogo ɲuman sugandili',
+        showLogo: false,
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            margin: const EdgeInsets.only(right: AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.accentOrange,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+            ),
+            child: Text(
+              '${allSpells.length - remainingSpells.length}/${allSpells.length}',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.pureWhite,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            children: [
+              // Progress card
+              AppCard(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ɲɛtaa',
+                          style: AppTextStyles.heading4.copyWith(
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                        Text(
+                          '${allSpells.length - remainingSpells.length}/${allSpells.length}',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    LinearProgressIndicator(
+                      value: (allSpells.length - remainingSpells.length) /
+                          allSpells.length,
+                      backgroundColor: AppColors.lightGrey,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Word display card
+              AppCard(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.spellcheck,
+                            color: AppColors.accentOrange, size: 24),
+                        const SizedBox(width: AppSpacing.md),
+                        Text(
+                          'Sɛbɛnni ɲuman sugandi',
+                          style: AppTextStyles.heading4.copyWith(
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.accentGradient,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentOrange.withOpacity(0.3),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.volume_up,
+                            color: AppColors.pureWhite, size: 32),
+                        onPressed: () => _playAudio(currentSpell!['audio']),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+
+              // Options
+              Expanded(
+                child: ListView.builder(
+                  itemCount: currentSpell!['options'].length,
+                  itemBuilder: (context, index) {
+                    final option = currentSpell!['options'][index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _buildOption(option),
+                    );
+                  },
+                ),
+              ),
+
+              // Action buttons
+              if (selectedOption != null && _isCorrect)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.lg),
+                  child: PrimaryButton(
+                    text: 'Ka taa fɛ',
+                    onPressed: _nextWord,
+                    icon: Icons.arrow_forward,
+                    width: double.infinity,
+                  ),
+                ),
+            ],
+          ),
+        ),
       ),
     );
   }

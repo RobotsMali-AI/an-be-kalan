@@ -1,230 +1,302 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:literacy_app/auth.dart';
-import 'package:literacy_app/backend_code/api_firebase_service.dart';
+import 'package:literacy_app/backend_code/user_session_service.dart';
 import 'package:literacy_app/feedback.dart';
-import 'package:literacy_app/main.dart' show auth;
 import 'package:literacy_app/models/Users.dart';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/widgets/language_picker.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
+import 'package:literacy_app/tutorial_service.dart';
+import 'package:literacy_app/services/translations.dart';
+import 'package:literacy_app/services/simple_locale.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
-
-const placeholderImage =
-    'https://drive.google.com/uc?export=download&id=1_egpUE2P2KJ3WVQ44iCT0ux6f_KdJVdO';
 
 class ProfilePage extends StatefulWidget {
   final Users userData;
-  final User user;
+  final UserSessionService userSession;
 
-  const ProfilePage({super.key, required this.user, required this.userData});
+  const ProfilePage(
+      {super.key, required this.userData, required this.userSession});
 
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
   late TextEditingController controller;
-  String? photoURL;
   bool showSaveButton = false;
   bool isLoading = false;
+
+  // GlobalKeys for tutorial targets
+  final GlobalKey _nameInputKey = GlobalKey();
+  final GlobalKey _statsKey = GlobalKey();
+  final GlobalKey _authBannerKey = GlobalKey();
+  final GlobalKey _avatarKey = GlobalKey();
+
+  // Store reference to SimpleLocale provider
+  SimpleLocale? _localeProvider;
 
   @override
   void initState() {
     super.initState();
-    photoURL = widget.user.photoURL; // Initialize with current user photo
-    controller = TextEditingController(text: widget.user.displayName);
+    controller = TextEditingController(
+        text: widget.userData.displayName ?? 'Kalan-folo');
     controller.addListener(_onNameChanged);
+    _checkAndShowTutorial();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Store reference to SimpleLocale provider for safe disposal
+    _localeProvider = context.read<SimpleLocale>();
   }
 
   @override
   void dispose() {
+    // Re-enable notifications when disposing (safely)
+    _localeProvider?.setNotificationsEnabled(true);
+
     controller.removeListener(_onNameChanged);
     controller.dispose();
     super.dispose();
   }
 
-  void _onNameChanged() {
-    setState(() {
-      showSaveButton = controller.text != widget.user.displayName &&
-          controller.text.isNotEmpty;
-    });
-  }
-
-  Future updateDisplayName() async {
-    await widget.user.updateDisplayName(controller.text);
-    setState(() {
-      showSaveButton = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Jiracogo tɔgɔ kura donna')),
-    );
-  }
-
-  Future<List<String>> fetchAvatarUrls() async {
-    try {
-      final storageRef = FirebaseStorage.instance.ref().child('avatars');
-      final listResult = await storageRef.listAll();
-      final urls = <String>[];
-      for (var item in listResult.items) {
-        final url = await item.getDownloadURL();
-        urls.add(url);
-      }
-      return urls;
-    } catch (e) {
-      print('Error fetching avatars: $e');
-      return [];
+  Future<void> _checkAndShowTutorial() async {
+    if (mounted) {
+      // Small delay to ensure UI is rendered, then show tutorial immediately
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (mounted && !TutorialService.isTutorialShowing()) {
+          // Check if we should show tutorial
+          bool shouldShow = await TutorialService.shouldShowTutorial('profile');
+          if (shouldShow) {
+            // Additional small delay to ensure scroll positions are settled
+            await Future.delayed(const Duration(milliseconds: 300));
+            if (mounted) {
+              await TutorialService.showProfileTutorial(
+                context,
+                nameInputKey: _nameInputKey,
+                statsKey: _statsKey,
+                authBannerKey: _authBannerKey,
+                avatarKey: _avatarKey,
+              );
+            }
+          }
+        }
+      });
     }
   }
 
-  Future<void> _chooseAvatar() async {
-    showDialog(
+  void _onNameChanged() {
+    if (mounted) {
+      setState(() {
+        showSaveButton = controller.text != widget.userData.displayName &&
+            controller.text.isNotEmpty;
+      });
+    }
+  }
+
+  Future updateDisplayName() async {
+    widget.userData.displayName = controller.text;
+    await widget.userSession.updateUserData(widget.userData);
+
+    if (mounted) {
+      setState(() {
+        showSaveButton = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(t(context, 'account_username_changed')),
+          backgroundColor: AppColors.success,
+        ),
+      );
+    }
+  }
+
+  Future<void> _signOut() async {
+    await widget.userSession.signOut();
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthGate()),
+      );
+    }
+  }
+
+  Future<void> _showAccountCreationDialog() async {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final nameController =
+        TextEditingController(text: widget.userData.displayName);
+    final formKey = GlobalKey<FormState>();
+
+    // Focus nodes for field switching
+    final nameFocusNode = FocusNode();
+    final emailFocusNode = FocusNode();
+    final passwordFocusNode = FocusNode();
+
+    await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          backgroundColor: Colors.transparent,
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            padding: const EdgeInsets.all(24),
+            constraints: const BoxConstraints(maxHeight: 600),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  'Aw ye aw ka ja ɲuman sugandi!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                    letterSpacing: 1.2,
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(AppRadius.lg),
+                      topRight: Radius.circular(AppRadius.lg),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.person_add_rounded,
+                        size: 48,
+                        color: AppColors.primaryGreen,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        t(context, 'create_account'),
+                        style: AppTextStyles.heading3.copyWith(
+                          color: AppColors.primaryGreen,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        t(context, 'account_created_message'),
+                        style: AppTextStyles.bodySmall,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 20),
-                Expanded(
-                  child: FutureBuilder<List<String>>(
-                    future: fetchAvatarUrls(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: Colors.black,
-                          ),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text(
-                            'Ayiwa! Fɛn dɔ ma ɲɛ.',
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 18,
+
+                // Form content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: nameController,
+                            focusNode: nameFocusNode,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(emailFocusNode);
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: t(context, 'username_filled'),
+                              prefixIcon: Icons.person,
                             ),
                           ),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'Ja si tɛ yen sisan.',
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 18,
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: emailController,
+                            focusNode: emailFocusNode,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocusNode);
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: t(context, 'email_or_phone'),
+                              prefixIcon: Icons.email,
                             ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return t(context, 'email_or_phone_warning');
+                              }
+                              return null;
+                            },
                           ),
-                        );
-                      } else {
-                        final urls = snapshot.data!;
-                        return GridView.builder(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: passwordController,
+                            focusNode: passwordFocusNode,
+                            obscureText: true,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) {
+                              _submitAccountCreation(
+                                formKey,
+                                emailController,
+                                passwordController,
+                                nameController,
+                              );
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: t(context, 'password'),
+                              prefixIcon: Icons.lock,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return t(context, 'password_required');
+                              }
+                              if (value.length < 6) {
+                                return t(context, 'password_min_length');
+                              }
+                              return null;
+                            },
                           ),
-                          itemCount: urls.length,
-                          itemBuilder: (context, index) {
-                            final avatarUrl = urls[index];
-                            return GestureDetector(
-                              onTap: () async {
-                                try {
-                                  await widget.user.updatePhotoURL(avatarUrl);
-                                  if (!mounted) return;
-                                  setState(() {
-                                    photoURL = avatarUrl;
-                                  });
-                                  Navigator.pop(context);
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Ja kura donna!',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.black,
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Ayiwa! A ma se ka ja kura ye.',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        backgroundColor: Colors.black,
-                                      ),
-                                    );
-                                  }
-                                }
-                              },
-                              child: AnimatedScale(
-                                scale: 1.0,
-                                duration: const Duration(milliseconds: 200),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.black,
-                                      width: 2,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ],
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      avatarUrl,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Actions
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(AppRadius.lg),
+                      bottomRight: Radius.circular(AppRadius.lg),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SecondaryButton(
+                          text: t(context, 'cancel'),
+                          onPressed: () => Navigator.of(context).pop(),
+                          height: 48,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: PrimaryButton(
+                          text: t(context, 'create_account'),
+                          onPressed: () => _submitAccountCreation(
+                            formKey,
+                            emailController,
+                            passwordController,
+                            nameController,
+                          ),
+                          height: 48,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -233,59 +305,535 @@ class _ProfilePageState extends State<ProfilePage> {
         );
       },
     );
+
+    // Clean up focus nodes
+    nameFocusNode.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
   }
 
-  Future<void> _signOut() async {
-    if (widget.user.isAnonymous) {
-      await context.read<ApiFirebaseService>().deleteUserData(widget.user.uid);
-      await widget.user.delete();
-    }
-    await auth.signOut();
-    await GoogleSignIn().signOut();
-    if (mounted) {
-      Navigator.pop(context);
+  Future<void> _submitAccountCreation(
+    GlobalKey<FormState> formKey,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+    TextEditingController nameController,
+  ) async {
+    if (formKey.currentState!.validate()) {
+      final result = await widget.userSession.createAccount(
+        emailOrPhone: emailController.text.trim(),
+        password: passwordController.text,
+        displayName:
+            nameController.text.isNotEmpty ? nameController.text : null,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor:
+              result['success'] ? AppColors.success : AppColors.error,
+        ),
+      );
+
+      if (result['success'] && mounted) {
+        // Don't call setState here as it might cause tab reset
+        // The user session change will trigger a rebuild naturally
+      }
     }
   }
 
-  Future<void> _deleteAccount() async {
-    final confirm = await showDialog<bool>(
+  Future<void> _showSignInDialog() async {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    // Focus nodes for field switching
+    final emailFocusNode = FocusNode();
+    final passwordFocusNode = FocusNode();
+
+    await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('I baana i ka jiracogo faga wa?'),
-        content: const Text('I ye i jiracogo faga. I tɛ se ka segin o la.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Ayi'),
+      barrierDismissible: false,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Ɛɛ'),
+          child: Container(
+            constraints: const BoxConstraints(maxHeight: 500),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.wisdomTeal.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(AppRadius.lg),
+                      topRight: Radius.circular(AppRadius.lg),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.login_rounded,
+                        size: 48,
+                        color: AppColors.wisdomTeal,
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      Text(
+                        t(context, 'sign_in'),
+                        style: AppTextStyles.heading3.copyWith(
+                          color: AppColors.wisdomTeal,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        t(context, 'sign_in_message'),
+                        style: AppTextStyles.bodySmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Form content
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: emailController,
+                            focusNode: emailFocusNode,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context)
+                                  .requestFocus(passwordFocusNode);
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: t(context, 'email_or_phone'),
+                              prefixIcon: Icons.email,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return t(context, 'email_or_phone_warning');
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextFormField(
+                            controller: passwordController,
+                            focusNode: passwordFocusNode,
+                            obscureText: true,
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) {
+                              _submitSignIn(
+                                formKey,
+                                emailController,
+                                passwordController,
+                              );
+                            },
+                            decoration: AppDecorations.getInputDecoration(
+                              hintText: t(context, 'password'),
+                              prefixIcon: Icons.lock,
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return t(context, 'password_required');
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Actions
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(AppRadius.lg),
+                      bottomRight: Radius.circular(AppRadius.lg),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: SecondaryButton(
+                          text: t(context, 'cancel'),
+                          onPressed: () => Navigator.of(context).pop(),
+                          height: 48,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: PrimaryButton(
+                          text: t(context, 'enter'),
+                          onPressed: () => _submitSignIn(
+                            formKey,
+                            emailController,
+                            passwordController,
+                          ),
+                          height: 48,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
+        );
+      },
     );
 
-    if (confirm == true) {
-      setState(() {
-        isLoading = true;
-      });
+    // Clean up focus nodes
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
+  }
+
+  Future<void> _submitSignIn(
+    GlobalKey<FormState> formKey,
+    TextEditingController emailController,
+    TextEditingController passwordController,
+  ) async {
+    if (formKey.currentState!.validate()) {
+      final result = await widget.userSession.signIn(
+        emailOrPhone: emailController.text.trim(),
+        password: passwordController.text,
+      );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']),
+          backgroundColor:
+              result['success'] ? AppColors.success : AppColors.error,
+        ),
+      );
+
+      if (result['success'] && mounted) {
+        // Don't call setState here as it might cause tab reset
+        // The user session change will trigger a rebuild naturally
+      }
+    }
+  }
+
+  Future<void> _showAccountOptionsDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Text(
+            t(context, 'account'),
+            style: AppTextStyles.heading3,
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                t(context, 'account_created_message'),
+                style: AppTextStyles.bodySmall,
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                children: [
+                  Expanded(
+                    child: PrimaryButton(
+                      text: t(context, 'create_account'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showAccountCreationDialog();
+                      },
+                      height: 48,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: SecondaryButton(
+                      text: t(context, 'sign_in'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showSignInDialog();
+                      },
+                      height: 48,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showSignOutDialog() async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.logout,
+                color: AppColors.error,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                t(context, 'sign_out'),
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            t(context, 'sign_out_message'),
+            style: AppTextStyles.bodyMedium,
+            textAlign: TextAlign.center,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+          ),
+          actions: [
+            SecondaryButton(
+              text: t(context, 'cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+              width: 120,
+              height: 48,
+            ),
+            Container(
+              width: 120,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.error.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await widget.userSession.signOut();
+                    if (mounted) {
+                      // Don't call setState here as it might cause tab reset
+                      // The user session change will trigger a rebuild naturally
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(t(context, 'signed_out')),
+                          backgroundColor: AppColors.success,
+                        ),
+                      );
+                    }
+                  },
+                  child: Center(
+                    child: Text(
+                      t(context, 'sign_out'),
+                      style: AppTextStyles.buttonText.copyWith(
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showDeleteAccountDialog() async {
+    final passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.pureWhite,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.delete_forever,
+                color: AppColors.error,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                t(context, 'delete_account'),
+                style: AppTextStyles.heading3.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                t(context, 'delete_account_message'),
+                style: AppTextStyles.bodyMedium,
+                textAlign: TextAlign.center,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Form(
+                key: formKey,
+                child: TextFormField(
+                  controller: passwordController,
+                  obscureText: true,
+                  textInputAction: TextInputAction.done,
+                  onFieldSubmitted: (_) {
+                    _handleDeleteAccount(passwordController.text, formKey);
+                  },
+                  decoration: AppDecorations.getInputDecoration(
+                    hintText: t(context, 'enter_password'),
+                    prefixIcon: Icons.lock,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return t(context, 'password_required');
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            SecondaryButton(
+              text: t(context, 'cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+              width: 120,
+              height: 48,
+            ),
+            Container(
+              width: 120,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.error.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: () {
+                    _handleDeleteAccount(passwordController.text, formKey);
+                    Navigator.of(context).pop();
+                  },
+                  child: Center(
+                    child: Text(
+                      'Bɔ',
+                      style: AppTextStyles.buttonText.copyWith(
+                        color: AppColors.pureWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Clean up controller
+    //passwordController.dispose();
+  }
+
+  Future<void> _handleDeleteAccount(
+      String password, GlobalKey<FormState> formKey) async {
+    if (formKey.currentState!.validate()) {
+      // Close dialog first
+      //Navigator.of(context).pop();
+
       try {
-        await context
-            .read<ApiFirebaseService>()
-            .deleteUserData(widget.user.uid);
-        await widget.user.delete();
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const AuthGate()));
-        // After deletion, auth state listener should navigate to sign-in page
+        final result = await widget.userSession.deleteAccount(
+          password: password,
+        );
+
+        if (!mounted) return;
+
+        // Show result message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']),
+            backgroundColor:
+                result['success'] ? AppColors.success : AppColors.error,
+          ),
+        );
+
+        // Only navigate if deletion was successful
+        if (result['success'] && mounted) {
+          // Small delay to ensure SnackBar is shown
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AuthGate()),
+            );
+          }
+        }
       } catch (e) {
         if (mounted) {
-          setState(() {
-            isLoading = false;
-          });
-          print(e);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Ayiwa! Jiracogo ma se ka faga: $e')),
+            SnackBar(
+              content: Text('Fɛn dɔ ma ɲɛ: $e'),
+              backgroundColor: AppColors.error,
+            ),
           );
         }
       }
@@ -294,321 +842,404 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final random = math.Random();
-    final randomColor = Color.fromRGBO(
-      random.nextInt(256),
-      random.nextInt(256),
-      random.nextInt(256),
-      0.1,
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'N ka Profil',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.black,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            margin: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              icon: const Icon(Icons.feedback, color: Colors.black),
+    return LoadingOverlay(
+      isLoading: isLoading,
+      message: t(context, 'loading'),
+      child: Scaffold(
+        backgroundColor: AppColors.offWhite,
+        appBar: UnifiedAppBar(
+          title: t(context, 'profile'),
+          showLogo: false,
+          actions: [
+            AppBarActionButton(
+              icon: Icons.feedback,
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const FeedbackScreen()),
               ),
               tooltip: 'Lafili',
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 4,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+            AppBarActionButton(
+              icon: Icons.language,
+              onPressed: () => showLanguagePicker(context),
+              tooltip: t(context, 'language'),
+              backgroundColor: AppColors.surfaceLight,
+              iconColor: AppColors.primaryGreen,
             ),
-            margin: const EdgeInsets.only(right: 16),
-            child: IconButton(
-              icon: const Icon(Icons.logout, color: Colors.black),
-              onPressed: _signOut,
-              tooltip: 'Ka bɔ',
-            ),
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: FocusScope.of(context).unfocus,
-        child: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.white,
-                    Colors.grey.shade50,
-                  ],
-                ),
+            if (!widget.userSession.isAuthenticated)
+              AppBarActionButton(
+                icon: Icons.account_circle,
+                onPressed: _showAccountOptionsDialog,
+                tooltip: t(context, 'account'),
+                backgroundColor: AppColors.accentSurfaceLight,
+                iconColor: AppColors.accentOrange,
               ),
-            ),
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 30),
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 70,
-                          backgroundImage: NetworkImage(
-                            photoURL ?? placeholderImage,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [Colors.transparent, randomColor],
-                            stops: const [0.7, 1.0],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      onEditingComplete: updateDisplayName,
-                      textAlign: TextAlign.center,
-                      controller: controller,
-                      style: const TextStyle(
-                        color: Colors.black87,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      decoration: const InputDecoration(
-                        hintText: "I ka jiracogo tɔgɔ sɛbɛn",
-                        hintStyle: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 18,
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ElevatedButton.icon(
-                          onPressed: _chooseAvatar,
-                          icon: const Icon(Icons.person, color: Colors.white),
-                          label: const Text(
-                            'Ja sugandi',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            elevation: 0,
-                          ),
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 10),
-                        child: ElevatedButton.icon(
-                          onPressed: _deleteAccount,
-                          icon: const Icon(Icons.delete, color: Colors.white),
-                          label: const Text(
-                            'Delete Account',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 12,
-                            ),
-                            elevation: 0,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      children: [
-                        _buildStatCard(
-                          title: "Dɔnniya",
-                          value: "${widget.userData.xp} XP",
-                          icon: Icons.star,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildStatCard(
-                          title: "Kalan waati bɛɛ lajɛlen",
-                          value: widget.userData.totalReadingTime.toString(),
-                          icon: Icons.timer,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildStatCard(
-                          title: "Gafew dafara",
-                          value: "${widget.userData.completedBooks.length}",
-                          icon: Icons.book,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isLoading)
-              Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                  ),
-                ),
+            if (widget.userSession.isAuthenticated)
+              AppBarActionButton(
+                icon: Icons.logout,
+                onPressed: _showSignOutDialog,
+                tooltip: t(context, 'sign_out'),
+                backgroundColor: AppColors.error.withOpacity(0.1),
+                iconColor: AppColors.error,
               ),
           ],
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              children: [
+                // Profile avatar section
+                _buildProfileAvatar(),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Name input section
+                _buildNameInput(),
+                const SizedBox(height: AppSpacing.xl),
+
+                // Authentication status
+                if (!widget.userSession.isAuthenticated)
+                  _buildAuthenticationBanner(),
+
+                // Sign out section for authenticated users
+                if (widget.userSession.isAuthenticated) _buildSignOutSection(),
+
+                // Stats section
+                _buildStatsSection(),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStatCard({
-    required String title,
-    required String value,
-    required IconData icon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(20),
-      child: Row(
+  Widget _buildProfileAvatar() {
+    return AppCard(
+      key: _avatarKey,
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      child: Column(
         children: [
+          // App Logo as Profile Picture
           Container(
             decoration: BoxDecoration(
-              color: Colors.black,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(12),
-            child: Icon(icon, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+            child: ClipOval(
+              child: Image.asset(
+                'assets/logo.jpg',
+                height: 120,
+                width: 120,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(height: 8),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            t(context, 'welcome'),
+            style: AppTextStyles.heading2.copyWith(
+              color: AppColors.primaryGreen,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            t(context, 'app_subtitle'),
+            style: AppTextStyles.subtitle,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameInput() {
+    return AppCard(
+      key: _nameInputKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.person,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.md),
               Text(
-                value,
-                style: const TextStyle(
-                  color: Colors.black54,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
+                t(context, 'your_name'),
+                style: AppTextStyles.heading4,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          TextField(
+            controller: controller,
+            onEditingComplete: updateDisplayName,
+            style: AppTextStyles.bodyLarge,
+            decoration: AppDecorations.getInputDecoration(
+              hintText: t(context, 'enter_your_name'),
+            ),
+          ),
+          if (showSaveButton) ...[
+            const SizedBox(height: AppSpacing.md),
+            PrimaryButton(
+              text: t(context, 'save'),
+              onPressed: updateDisplayName,
+              width: double.infinity,
+              icon: Icons.save,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuthenticationBanner() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+      child: InfoBanner(
+        key: _authBannerKey,
+        title: t(context, 'learn_bambara'),
+        message: t(context, 'account_created_message'),
+        icon: Icons.info_outline,
+        color: AppColors.accentOrange,
+        buttonText: t(context, 'create_account'),
+        onButtonPressed: _showAccountOptionsDialog,
+      ),
+    );
+  }
+
+  Widget _buildSignOutSection() {
+    // Check if user has a password (authenticated account)
+    final hasPassword = widget.userData.password != null &&
+        widget.userData.password!.isNotEmpty;
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.logout,
+                color: AppColors.error,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                t(context, 'account'),
+                style: AppTextStyles.heading4.copyWith(
+                  color: AppColors.error,
                 ),
               ),
             ],
           ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            t(context, 'account_deleted'),
+            style: AppTextStyles.bodyMedium,
+            textAlign: TextAlign.left,
+            softWrap: true,
+            overflow: TextOverflow.visible,
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          // Show both buttons only if user has password
+          if (hasPassword) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.accentOrange,
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.error.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        onTap: _showSignOutDialog,
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.logout,
+                                color: AppColors.pureWhite,
+                                size: 20,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                t(context, 'sign_out'),
+                                style: AppTextStyles.buttonText.copyWith(
+                                  color: AppColors.pureWhite,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Container(
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.error,
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      border: Border.all(
+                        color: AppColors.error,
+                        width: 1,
+                      ),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        onTap: _showDeleteAccountDialog,
+                        child: Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.delete_forever,
+                                color: AppColors.pureWhite,
+                                size: 20,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'Bɔ',
+                                style: AppTextStyles.buttonText.copyWith(
+                                  color: AppColors.pureWhite,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ] else ...[
+            // Show only sign out button for users without password
+            Container(
+              width: double.infinity,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.error.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: _showSignOutDialog,
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.logout,
+                          color: AppColors.pureWhite,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(
+                          t(context, 'sign_out'),
+                          style: AppTextStyles.buttonText.copyWith(
+                            color: AppColors.pureWhite,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
+    );
+  }
+
+  Widget _buildStatsSection() {
+    return Column(
+      key: _statsKey,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: Row(
+            children: [
+              Icon(
+                Icons.analytics,
+                color: AppColors.primaryGreen,
+                size: 24,
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Text(
+                t(context, 'track_progress'),
+                style: AppTextStyles.heading3,
+              ),
+            ],
+          ),
+        ),
+        StatCard(
+          title: t(context, 'level'),
+          value: "${widget.userData.xp} XP",
+          icon: Icons.star,
+          color: AppColors.accentOrange,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        StatCard(
+          title: t(context, 'total_reading_time'),
+          value: "${widget.userData.totalReadingTime} min",
+          icon: Icons.timer,
+          color: AppColors.wisdomTeal,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        StatCard(
+          title: t(context, 'total_books'),
+          value: "${widget.userData.completedBooks.length}",
+          icon: Icons.book,
+          color: AppColors.success,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        StatCard(
+          title: t(context, 'in_progress'),
+          value: "${widget.userData.inProgressBooks.length}",
+          icon: Icons.bookmark,
+          color: AppColors.bookBlue,
+        ),
+      ],
     );
   }
 }

@@ -5,6 +5,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
 
 class ChooseContextPage extends StatefulWidget {
   const ChooseContextPage({super.key});
@@ -117,58 +121,42 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
   Widget _showCelebrationDialog(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.all(0),
-      child: Stack(
-        children: [
-          Container(
-            color: Colors.black.withOpacity(0.5),
-            child: Center(
-              child: Card(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                elevation: 10,
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/badge.png', width: 150),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Baara Kabako!',
-                        style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _restartGame();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50)),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 20),
-                          elevation: 5,
-                        ),
-                        child: const Text(
-                          'Restart!',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+      insetPadding: const EdgeInsets.all(AppSpacing.lg),
+      child: Container(
+        decoration: AppDecorations.primaryCard,
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/badge.png', width: 120),
+            const SizedBox(height: AppSpacing.lg),
+            Text(
+              'Baara Kabako!',
+              style: AppTextStyles.heading1.copyWith(
+                color: AppColors.primaryGreen,
               ),
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              'I ye baara ɲuman kɛ!',
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: AppColors.wisdomTeal,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            PrimaryButton(
+              text: 'Ka daminɛ kokura',
+              onPressed: () {
+                Navigator.pop(context);
+                _restartGame();
+              },
+              icon: Icons.refresh,
+              width: double.infinity,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -176,10 +164,17 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
   @override
   Widget build(BuildContext context) {
     if (allContexts.isEmpty || currentContext == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+      return Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: Center(
+            child: LoadingOverlay(
+              isLoading: true,
+              message: 'Ja ɲuman sukandili...',
+              child: Container(),
+            ),
           ),
         ),
       );
@@ -191,136 +186,164 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
     List<Map<String, dynamic>> images = List.from(currentContext!['images']);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: Text(
-          'Round ${allContexts.length - remainingContexts.length}/${allContexts.length}',
-          style: const TextStyle(color: Colors.white),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+      appBar: UnifiedAppBar(
+        title: 'Ja ɲuman sukandili',
+        showLogo: false,
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            margin: const EdgeInsets.only(right: AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.accentOrange,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+            ),
+            child: Text(
+              '${allContexts.length - remainingContexts.length}/${allContexts.length}',
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.pureWhite,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              LinearProgressIndicator(
-                value: (allContexts.length - remainingContexts.length) /
-                    allContexts.length,
-                backgroundColor: Colors.grey[200],
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
-                minHeight: 8,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              const SizedBox(height: 30),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(15),
+              // Progress card
+              AppCard(
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Ɲɛtaa',
+                          style: AppTextStyles.heading4.copyWith(
+                            color: AppColors.wisdomTeal,
+                          ),
+                        ),
+                        Text(
+                          '${allContexts.length - remainingContexts.length}/${allContexts.length}',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.accentOrange,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    LinearProgressIndicator(
+                      value: (allContexts.length - remainingContexts.length) /
+                          allContexts.length,
+                      backgroundColor: AppColors.lightGrey,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.wisdomTeal),
+                      minHeight: 8,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ],
                 ),
-                child: const Row(
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              // Instruction card
+              AppCard(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.touch_app, color: Colors.black87),
-                    SizedBox(width: 10),
+                    Icon(Icons.touch_app,
+                        color: AppColors.wisdomTeal, size: 24),
+                    const SizedBox(width: AppSpacing.md),
                     Text(
-                      'ja ɲuman sugandi',
-                      style: TextStyle(fontSize: 18, color: Colors.black87),
+                      'Ja ɲuman sugandi',
+                      style: AppTextStyles.heading4.copyWith(
+                        color: AppColors.wisdomTeal,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () => _playAudio(currentContext!['audio']),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.05),
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Text(
-                    currentContext!['word'],
-                    style: const TextStyle(
-                      fontSize: 32,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(height: AppSpacing.lg),
+              // Word display card
+              AppCard(
+                child: Column(
+                  children: [
+                    Text(
+                      currentContext!['word'],
+                      style: AppTextStyles.heading1.copyWith(
+                        color: AppColors.primaryGreen,
+                        fontSize: 36,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 2,
+                    const SizedBox(height: AppSpacing.lg),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withOpacity(0.3),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.volume_up,
+                            color: AppColors.pureWhite, size: 32),
+                        onPressed: () => _playAudio(currentContext!['audio']),
+                      ),
                     ),
                   ],
                 ),
-                child: IconButton(
-                  icon: const Icon(Icons.volume_up,
-                      color: Colors.white, size: 40),
-                  onPressed: () => _playAudio(currentContext!['audio']),
-                ),
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: AppSpacing.xl),
               Expanded(
                 child: GridView.count(
                   crossAxisCount: 2,
                   childAspectRatio: 1,
-                  mainAxisSpacing: 20,
-                  crossAxisSpacing: 20,
+                  mainAxisSpacing: AppSpacing.lg,
+                  crossAxisSpacing: AppSpacing.lg,
                   children: images.map<Widget>((img) {
                     final isSelected = selectedImage == img['path'];
                     return AnimatedContainer(
                       duration: 300.ms,
                       curve: Curves.easeOutBack,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
+                      decoration: AppDecorations.primaryCard.copyWith(
                         border: Border.all(
                           color: isSelected
-                              ? (img['correct'] ? Colors.black : Colors.black)
+                              ? (img['correct']
+                                  ? AppColors.success
+                                  : AppColors.error)
                               : Colors.transparent,
-                          width: 4,
+                          width: 3,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 10,
-                            spreadRadius: 2,
-                          ),
-                        ],
                       ),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
                         child: Stack(
                           children: [
                             Image.asset(img['path'], fit: BoxFit.cover),
                             if (isSelected)
                               Positioned.fill(
                                 child: Container(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: (img['correct']
+                                          ? AppColors.success
+                                          : AppColors.error)
+                                      .withOpacity(0.8),
                                   child: Center(
                                     child: Icon(
                                       img['correct']
                                           ? Icons.check_circle
                                           : Icons.cancel,
-                                      color: Colors.white,
+                                      color: AppColors.pureWhite,
                                       size: 60,
                                     ).animate().scale(),
                                   ),

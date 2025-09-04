@@ -28,7 +28,13 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           context.read<DatabaseHelper>().getUser(widget.user.uid);
           context.read<DatabaseHelper>().getBooks();
-          books = context.read<DatabaseHelper>().books;
+
+          // Ensure no duplicates in initial book list
+          final bookSet = <String, Book>{};
+          for (final book in context.read<DatabaseHelper>().books) {
+            bookSet[book.title] = book;
+          }
+          books = bookSet.values.toList();
         });
         isLoading = false;
       });
@@ -45,14 +51,14 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
     // TODO: implement initState
     super.initState();
     initUserData();
-    auth.userChanges().listen((event) {
-      if (event != null && mounted) {
-        setState(() {
-          widget.user = event;
-        });
-        initUserData();
-      }
-    });
+    // auth.userChanges().listen((event) {
+    //   if (event != null && mounted) {
+    //     setState(() {
+    //       widget.user = event;
+    //     });
+    //     initUserData();
+    //   }
+    // });
   }
 
   @override
@@ -75,19 +81,23 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
         setState(() {
           if (query.isEmpty) {
             // If the query is empty, reset to the original book list from the database
-            books = context
+            final bookSet = <String, Book>{};
+            for (final book in context
                 .read<DatabaseHelper>()
                 .books
-                .where((element) => element.uuid!.contains(widget.user.uid))
-                .toList();
+                .where((element) => element.uuid!.contains(widget.user.uid))) {
+              bookSet[book.title] = book;
+            }
+            books = bookSet.values.toList();
           } else {
-            // Filter books based on the query
-            books = context
-                .read<DatabaseHelper>()
-                .books
-                .where((book) =>
-                    book.title.toLowerCase().contains(query.toLowerCase()))
-                .toList();
+            // Filter books based on the query and ensure no duplicates
+            final filteredSet = <String, Book>{};
+            for (final book in context.read<DatabaseHelper>().books.where(
+                (book) =>
+                    book.title.toLowerCase().contains(query.toLowerCase()))) {
+              filteredSet[book.title] = book;
+            }
+            books = filteredSet.values.toList();
           }
         });
       }

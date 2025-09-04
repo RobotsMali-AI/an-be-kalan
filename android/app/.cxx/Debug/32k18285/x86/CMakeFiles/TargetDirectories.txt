@@ -1,0 +1,2 @@
+C:/Users/texts/Pictures/an-be-kalan/android/app/.cxx/Debug/32k18285/x86/CMakeFiles/edit_cache.dir
+C:/Users/texts/Pictures/an-be-kalan/android/app/.cxx/Debug/32k18285/x86/CMakeFiles/rebuild_cache.dir

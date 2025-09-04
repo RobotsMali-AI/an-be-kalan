@@ -6,9 +6,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
+import 'package:literacy_app/backend_code/asr_service.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
+import 'package:literacy_app/models/xpLog.dart';
 
 class ApiFirebaseService with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -106,18 +108,19 @@ class ApiFirebaseService with ChangeNotifier {
 
   /// Function that creates and save empty user data dictionary for new user
   Users createUserData(String uid) {
+    // This method is now deprecated as user creation is handled by UserSessionService
+    // Return a default user for compatibility
     Users userData = Users(
-        downloadBooks: [],
-        completedBooks: [],
-        favoriteBooks: [],
-        xpLog: [],
+        downloadBooks: <dynamic>[],
+        completedBooks: <dynamic>[],
+        favoriteBooks: <dynamic>[],
+        xpLog: <XPLog>[],
         totalReadingTime: 0,
-        inProgressBooks: [],
+        inProgressBooks: <BookUser>[],
         xp: 0);
 
-    // Save user data to Firestore
+    // Don't save to Firebase here as it's handled by UserSessionService
     helper.insertUser(userData);
-    saveUserData(uid, userData); // Ensure it's saved before returning
     notifyListeners();
     return userData;
   }
@@ -206,10 +209,9 @@ class ApiFirebaseService with ChangeNotifier {
   /// Sends an audio file to the ASR model for inference
   /// and returns the transcribed text.
   ///
-  /// This function checks the file extension to ensure it's either a `.flac` or `.wav`
-  /// format before proceeding. It then reads the file and sends it as a POST request
-  /// to the ASR model API. If the request is successful, it returns the transcribed
-  /// text. If the service is unavailable, it retries the request.
+  /// This function uses platform-specific ASR:
+  /// - Android: Local on-device NeMo ASR model via native FFI
+  /// - iOS: Cloud-based API transcription
   ///
   /// Args:
   ///   filePath (String): The path to the audio file to be transcribed.
@@ -220,27 +222,17 @@ class ApiFirebaseService with ChangeNotifier {
   ///
 
   Future<String?> inferenceASRModel(String filePath) async {
-    // final apiUrl = Uri.parse(asrModelApiUri);
-
     // Validate file format
     if (!filePath.endsWith('.m4a') && !filePath.endsWith('.wav')) {
       print('Unsupported file format: $filePath');
-      SnackBar(
-        content: Text('Unsupported file format: $filePath'),
-        duration: const Duration(seconds: 30),
-      );
       return null;
     }
-    try {
-      final audioFile = File(filePath);
 
-      final transcribe = await transcribeAudio(audioFile);
-      return transcribe["transcription"];
+    try {
+      // Use the new ASR service which handles platform-specific logic
+      return await ASRService.instance.transcribeAudio(filePath);
     } catch (e) {
-      SnackBar(
-        content: Text('Failed to transcribe audio: $e'),
-        duration: const Duration(seconds: 30),
-      );
+      print('Failed to transcribe audio: $e');
       return null;
     }
   }

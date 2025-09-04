@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fade_shimmer_master/fade_shimmer_master.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
+import 'package:literacy_app/backend_code/user_session_service.dart';
+import 'package:literacy_app/backend_code/asr_service.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
+import 'package:literacy_app/tutorial_service.dart';
 import 'package:literacy_app/widgets/OneImageMultipleWordsPage.dart';
 import 'package:literacy_app/widgets/floatingHintButton.dart';
 import 'package:literacy_app/widgets/multiple_choose_question.dart';
@@ -20,20 +23,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'models/Users.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'theme/app_colors.dart';
+import 'theme/app_styles.dart';
 import 'dart:math';
 
 class LessonScreen extends StatefulWidget {
   final String uid;
   final Users userdata;
   final String bookTitle;
-  Book? book;
-  bool isOffLine;
+  final Book? book;
+  final bool isOffLine;
 
-  LessonScreen({
+  const LessonScreen({
     required this.uid,
     required this.userdata,
     required this.bookTitle,
     required this.isOffLine,
+    this.book,
     Key? key,
   }) : super(key: key);
 
@@ -46,6 +52,11 @@ class LessonScreenState extends State<LessonScreen> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   final AudioPlayer _sentencePlayer =
       AudioPlayer(); // New player for sentence audio
+
+  // GlobalKeys for tutorial targets
+  final GlobalKey _micButtonKey = GlobalKey();
+  final GlobalKey _audioButtonKey = GlobalKey();
+  final GlobalKey _resetButtonKey = GlobalKey();
 
   bool isRecording = false;
   bool hasRecording = false;
@@ -69,14 +80,22 @@ class LessonScreenState extends State<LessonScreen> {
   String currentImageUrl = '';
 
   int readingTime = 0;
+  int currentSessionTime = 0;
   DateTime? startTime;
 
   List<double> accuracies = [];
+
+  // ASR Debug variables
+  bool _showASRDebug = false;
+  Map<String, dynamic>? _asrStatus;
+
   @override
   void initState() {
     super.initState();
     setupLesson();
     setupAudioSession();
+    _initializeASR();
+    _loadASRStatus();
 
     _audioPlayer.setReleaseMode(ReleaseMode.stop);
 
@@ -122,6 +141,9 @@ class LessonScreenState extends State<LessonScreen> {
         _loading = false;
       });
       setupInitialPageAndSentence();
+
+      // Show tutorial for first-time users
+      _checkAndShowTutorial();
     }
   }
 
@@ -179,6 +201,42 @@ class LessonScreenState extends State<LessonScreen> {
     await session.setActive(true);
   }
 
+  Future<void> _initializeASR() async {
+    try {
+      final initialized = await ASRService.instance.initialize();
+      if (initialized) {
+        print('ASR service initialized successfully for lesson screen');
+      } else {
+        print('ASR service initialization failed, will fall back to API');
+      }
+      _loadASRStatus();
+    } catch (e) {
+      print('Error initializing ASR service: $e');
+    }
+  }
+
+  Future<void> _checkAndShowTutorial() async {
+    if (mounted) {
+      // Delay to ensure the lesson screen is fully built
+      Future.delayed(const Duration(milliseconds: 1500), () async {
+        if (mounted) {
+          await TutorialService.showLessonTutorial(
+            context,
+            micButtonKey: _micButtonKey,
+            audioButtonKey: _audioButtonKey,
+            resetButtonKey: _resetButtonKey,
+          );
+        }
+      });
+    }
+  }
+
+  Future<void> _loadASRStatus() async {
+    setState(() {
+      _asrStatus = ASRService.instance.getStatus();
+    });
+  }
+
   Future<void> startRecording() async {
     if (await _audioRecorder.hasPermission()) {
       await _sentencePlayer.pause(); // Pause sentence audio before recording
@@ -193,7 +251,8 @@ class LessonScreenState extends State<LessonScreen> {
       );
       setState(() {
         isRecording = true;
-        hasRecording = false;
+        // Keep hasRecording true if there was a previous recording
+        // Only reset transcription, not the recording state
         if (hasTranscription) hasTranscription = false;
       });
     } else {
@@ -261,25 +320,54 @@ class LessonScreenState extends State<LessonScreen> {
     updatedBookUser.creditedXp = newAccSum;
     updatedBookUser.creditedReadingTime = newReadingTime;
 
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .update(user.toFirestore());
+    // Use UserSessionService to update user data
+    await context.read<UserSessionService>().updateUserData(user);
   }
 
   void sendAudioToASR() async {
-    if (mounted) setState(() => _sending = true);
-    String? transcription =
-        await context.read<ApiFirebaseService>().inferenceASRModel(_filePath!);
-    if (transcription != null && mounted) {
-      List<TextSpan> highlightedSpans = getHighlightedTextSpans(transcription);
+    if (_filePath == null) {
+      print('No audio file to transcribe');
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+    });
+
+    try {
+      print('=== Starting ASR Transcription ===');
+      print('File path: $_filePath');
+
+      // Get current ASR status before transcription
+      _loadASRStatus();
+
+      // Use local ASR service instead of API
+      String? transcription =
+          await ASRService.instance.transcribeAudio(_filePath!);
+
+      // Update ASR status after transcription
+      _loadASRStatus();
+
+      if (transcription != null && mounted) {
+        List<TextSpan> highlightedSpans =
+            getHighlightedTextSpans(transcription);
+        setState(() {
+          currentTextSpans = highlightedSpans;
+          hasTranscription = true;
+          _loading = false;
+        });
+        print('Transcription completed successfully');
+      } else {
+        setState(() {
+          _loading = false;
+        });
+        print('Transcription failed - no result returned');
+      }
+    } catch (e) {
       setState(() {
-        hasTranscription = true;
-        currentTextSpans = highlightedSpans;
-        _sending = false;
+        _loading = false;
       });
-    } else if (mounted) {
-      setState(() => _sending = false);
+      print('Error during transcription: $e');
     }
   }
 
@@ -321,10 +409,15 @@ class LessonScreenState extends State<LessonScreen> {
           ));
         }
       } else {
-        // Non-word characters (e.g., punctuation) remain unchanged in color or red
+        // Check if character is punctuation or number - always highlight in green
+        bool isPunctuationOrNumber = RegExp(r'[.,!?;:()\-\d]').hasMatch(char) ||
+            char == '"' ||
+            char == "'";
         highlightedSpans.add(TextSpan(
           text: char,
-          style: const TextStyle(color: Colors.red),
+          style: TextStyle(
+            color: isPunctuationOrNumber ? Colors.green : Colors.red,
+          ),
         ));
       }
     }
@@ -388,6 +481,8 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   void moveToNextSentence() {
+    if (!mounted) return; // Check if widget is still mounted
+
     setState(() {
       currentSentenceIndex += 1;
       if (currentSentenceIndex < currentSentences.length) {
@@ -434,7 +529,8 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> saveProgress() async {
     Duration duration = DateTime.now().difference(startTime!);
-    readingTime += duration.inSeconds;
+    currentSessionTime = duration.inSeconds;
+    int totalReadingTime = readingTime + currentSessionTime;
     if (mounted) setState(() => _sending = true);
 
     await context.read<ApiFirebaseService>().bookmark(
@@ -443,7 +539,7 @@ class LessonScreenState extends State<LessonScreen> {
             lastAccessed: DateTime.now(),
             title: widget.bookTitle,
             bookmark: currentPage.toString(),
-            readingTime: readingTime,
+            readingTime: totalReadingTime,
             totalPages: bookData!.content.length,
             accuracies: accuracies,
           ),
@@ -454,7 +550,8 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> bookmarkCurrentPageAndExit(BuildContext context) async {
     Duration duration = DateTime.now().difference(startTime!);
-    readingTime += duration.inSeconds;
+    currentSessionTime = duration.inSeconds;
+    int totalReadingTime = readingTime + currentSessionTime;
     setState(() => _sending = true);
     await context.read<ApiFirebaseService>().bookmark(
           widget.uid,
@@ -462,7 +559,7 @@ class LessonScreenState extends State<LessonScreen> {
             lastAccessed: DateTime.now(),
             title: widget.bookTitle,
             bookmark: currentPage.toString(),
-            readingTime: readingTime,
+            readingTime: totalReadingTime,
             totalPages: bookData!.content.length,
             accuracies: accuracies,
           ),
@@ -474,9 +571,11 @@ class LessonScreenState extends State<LessonScreen> {
 
   Future<void> endLesson(BuildContext context) async {
     Duration duration = DateTime.now().difference(startTime!);
-    readingTime += duration.inSeconds;
-    double readTime = readingTime / 60;
-    int readingTimeInMinutes = readTime.toInt();
+    currentSessionTime = duration.inSeconds;
+    int totalReadingTime = readingTime + currentSessionTime;
+
+    if (!mounted) return; // Check if widget is still mounted
+
     setState(() => _sending = true);
 
     Map<String, dynamic> result =
@@ -487,7 +586,7 @@ class LessonScreenState extends State<LessonScreen> {
                   totalPages: bookData!.content.length,
                   title: widget.bookTitle,
                   bookmark: currentPage.toString(),
-                  readingTime: readingTimeInMinutes,
+                  readingTime: totalReadingTime,
                   accuracies: accuracies),
               widget.userdata,
             );
@@ -499,9 +598,11 @@ class LessonScreenState extends State<LessonScreen> {
             totalPages: bookData!.content.length,
             title: widget.bookTitle,
             bookmark: currentPage.toString(),
-            readingTime: readingTimeInMinutes,
+            readingTime: totalReadingTime,
             accuracies: accuracies),
         widget.uid);
+
+    if (!mounted) return; // Check again after async operations
 
     setState(() => _sending = false);
 
@@ -512,8 +613,10 @@ class LessonScreenState extends State<LessonScreen> {
         .expand((pageContent) => pageContent.sentences)
         .map((sentence) => sentence.text.split(' ').length)
         .reduce((sum, count) => sum + count);
-    String wordPerMin =
-        (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2);
+    double readingTimeInMinutes = totalReadingTime / 60.0;
+    String wordPerMin = readingTimeInMinutes > 0
+        ? (totalBookWordCount / readingTimeInMinutes).toStringAsFixed(2)
+        : "0.00";
     String averageAcc = (averageAccuracy * 100).toStringAsFixed(2);
 
     final hasMultiple = bookData!.evaluation?.multiple.isNotEmpty ?? false;
@@ -573,6 +676,9 @@ class LessonScreenState extends State<LessonScreen> {
         );
       }
     }
+
+    if (!mounted) return; // Check before showing dialog
+
     setState(() {
       context.read<ApiFirebaseService>().getUserData(widget.uid);
     });
@@ -581,110 +687,149 @@ class LessonScreenState extends State<LessonScreen> {
       barrierDismissible: false,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
         ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-            maxWidth: MediaQuery.of(context).size.width * 0.9,
+        elevation: 16,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
+            gradient: AppColors.backgroundGradient,
           ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Title with a celebratory icon
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.star, color: Colors.amber, size: 32),
-                      SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          'Aw ni ce!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+              maxWidth: MediaQuery.of(context).size.width * 0.9,
+            ),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xxl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Celebration Header with App Logo
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        gradient: AppColors.accentGradient,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentOrange.withOpacity(0.4),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
                           ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  // Stat rows for XP, time, speed, and accuracy
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      children: [
-                        _buildStatRow(
-                          icon: Icons.monetization_on,
-                          label: 'XP Sɔrɔla',
-                          value:
-                              '${context.read<ApiFirebaseService>().userInfo!.xp} XP',
-                          color: Colors.green,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildStatRow(
-                          icon: Icons.timer,
-                          label: 'Waati min taara',
-                          value:
-                              '${readingTimeInMinutes.toStringAsFixed(2)} minutes',
-                          color: Colors.blue,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildStatRow(
-                          icon: Icons.speed,
-                          label: 'Kalan teliya',
-                          value: '$wordPerMin daɲɛw/minitiw',
-                          color: Colors.purple,
-                        ),
-                        const SizedBox(height: 12),
-                        _buildStatRow(
-                          icon: Icons.check_circle,
-                          label: 'Tilennenya',
-                          value: '$averageAcc%',
-                          color: Colors.orange,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  // Continue button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Ka taa fɛ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                      child: ClipOval(
+                        child: Image.asset(
+                          'assets/logo.jpg',
+                          height: 56,
+                          width: 56,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: AppSpacing.xl),
+
+                    Text(
+                      'Aw ni ce!',
+                      style: AppTextStyles.heading1.copyWith(
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      'Kalan kaamalen don!',
+                      style: AppTextStyles.subtitle.copyWith(
+                        color: AppColors.wisdomTeal,
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xxl),
+
+                    // Stats Container
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      decoration: AppDecorations.primaryCard.copyWith(
+                        gradient: LinearGradient(
+                          colors: [AppColors.pureWhite, AppColors.surfaceLight],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildStatRow(
+                            icon: Icons.star,
+                            label: 'XP Sɔrɔla',
+                            value: '${updatedUserData.xp} XP',
+                            color: AppColors.primaryGreen,
+                          ),
+                          Divider(
+                              height: AppSpacing.xl,
+                              color: AppColors.lightGrey),
+                          _buildStatRow(
+                            icon: Icons.timer_outlined,
+                            label: 'Waati min taara',
+                            value:
+                                '${readingTimeInMinutes.toStringAsFixed(1)} minitiw',
+                            color: AppColors.wisdomTeal,
+                          ),
+                          Divider(
+                              height: AppSpacing.xl,
+                              color: AppColors.lightGrey),
+                          _buildStatRow(
+                            icon: Icons.speed,
+                            label: 'Kalan teliya',
+                            value: '$wordPerMin daɲɛw/minitiw',
+                            color: AppColors.bookBlue,
+                          ),
+                          Divider(
+                              height: AppSpacing.xl,
+                              color: AppColors.lightGrey),
+                          _buildStatRow(
+                            icon: Icons.check_circle_outline,
+                            label: 'Tilennenya',
+                            value: '$averageAcc%',
+                            color: AppColors.accentOrange,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xxl),
+
+                    // Continue Button
+                    Container(
+                      width: double.infinity,
+                      decoration: AppDecorations.primaryButtonDecoration,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: AppSpacing.lg),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                        ),
+                        child: Text(
+                          'Ka taa fɛ',
+                          style: AppTextStyles.buttonText.copyWith(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-      ).animate().fadeIn(duration: 300.ms).scale(
+      ).animate().fadeIn(duration: 400.ms).scale(
             begin: const Offset(0.8, 0.8),
             end: const Offset(1.0, 1.0),
           ),
@@ -706,96 +851,100 @@ class LessonScreenState extends State<LessonScreen> {
 
   Widget buildAudioSection() {
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: [AppColors.surfaceLight, AppColors.pureWhite],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
+            color: AppColors.primaryGreen.withOpacity(0.1),
+            blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
+        border: Border.all(color: AppColors.lightGrey, width: 1),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppColors.primaryGradient,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: Icon(
+                isPlaying ? Icons.pause : Icons.play_arrow,
+                color: AppColors.pureWhite,
+                size: 28,
+              ),
+              onPressed: togglePlayback,
+              tooltip: isPlaying ? 'Pause' : 'Play',
+            ),
+          ),
+          const SizedBox(width: AppSpacing.lg),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: AppColors.primaryGreen,
+                    inactiveTrackColor: AppColors.lightGrey,
+                    thumbColor: AppColors.primaryGreen,
+                    overlayColor: AppColors.primaryGreen.withOpacity(0.1),
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 8),
+                    overlayShape:
+                        const RoundSliderOverlayShape(overlayRadius: 16),
+                    trackHeight: 4,
+                  ),
+                  child: Slider(
+                    value: _currentPosition.inMilliseconds.toDouble().clamp(
+                          0.0,
+                          _audioDuration.inMilliseconds.toDouble(),
+                        ),
+                    min: 0.0,
+                    max: _audioDuration.inMilliseconds.toDouble(),
+                    onChanged: (double value) {
+                      setState(() {
+                        final newPosition =
+                            Duration(milliseconds: value.toInt());
+                        _audioPlayer.seek(newPosition);
+                        _currentPosition = newPosition;
+                      });
+                    },
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      formatDuration(_currentPosition),
+                      style: AppTextStyles.captionText.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      formatDuration(_audioDuration),
+                      style: AppTextStyles.captionText.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
-                child: IconButton(
-                  icon: Icon(
-                    isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: Colors.white,
-                    size: 36,
-                  ),
-                  onPressed: togglePlayback,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                formatDuration(_currentPosition),
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Text(
-                ' / ',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Text(
-                formatDuration(_audioDuration),
-                style: const TextStyle(
-                  fontSize: 18,
-                  color: Colors.black87,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              activeTrackColor: Colors.black,
-              inactiveTrackColor: Colors.grey.shade200,
-              thumbColor: Colors.black,
-              overlayColor: Colors.black.withOpacity(0.2),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
-            ),
-            child: Slider(
-              value: _currentPosition.inMilliseconds.toDouble().clamp(
-                    0.0,
-                    _audioDuration.inMilliseconds.toDouble(),
-                  ),
-              min: 0.0,
-              max: _audioDuration.inMilliseconds.toDouble(),
-              onChanged: (double value) {
-                setState(() {
-                  final newPosition = Duration(milliseconds: value.toInt());
-                  _audioPlayer.seek(newPosition);
-                  _currentPosition = newPosition;
-                });
-              },
+              ],
             ),
           ),
         ],
@@ -814,13 +963,17 @@ class LessonScreenState extends State<LessonScreen> {
     if (isRecording) {
       return Container(
         decoration: BoxDecoration(
-          color: Colors.black,
+          gradient: LinearGradient(
+            colors: [AppColors.error, Colors.red.shade700],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: AppColors.error.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -828,21 +981,26 @@ class LessonScreenState extends State<LessonScreen> {
           key: const ValueKey('stop'),
           heroTag: 'stopFAB',
           onPressed: stopRecording,
-          backgroundColor: Colors.black,
-          child: const Icon(Icons.stop, color: Colors.white),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(Icons.stop, color: Colors.white, size: 28),
         ),
       );
     } else if (hasTranscription) {
       if (lastPage && currentSentenceIndex == currentSentences.length - 1) {
         return Container(
           decoration: BoxDecoration(
-            color: Colors.black,
+            gradient: LinearGradient(
+              colors: [AppColors.success, AppColors.lightGreen],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+                color: AppColors.success.withOpacity(0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -850,8 +1008,9 @@ class LessonScreenState extends State<LessonScreen> {
             key: const ValueKey('end'),
             heroTag: 'endFAB',
             onPressed: () => endLesson(context),
-            backgroundColor: Colors.black,
-            child: const Icon(Icons.check, color: Colors.white),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: const Icon(Icons.check, color: Colors.white, size: 28),
           ),
         );
       } else {
@@ -864,22 +1023,23 @@ class LessonScreenState extends State<LessonScreen> {
     } else {
       return Container(
         decoration: BoxDecoration(
-          color: Colors.black,
+          gradient: AppColors.primaryGradient,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: AppColors.primaryGreen.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: FloatingActionButton(
-          key: const ValueKey('mic'),
+          key: _micButtonKey,
           heroTag: 'micFAB',
           onPressed: startRecording,
-          backgroundColor: Colors.black,
-          child: const Icon(Icons.mic, color: Colors.white),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(Icons.mic, color: Colors.white, size: 28),
         ),
       );
     }
@@ -887,311 +1047,629 @@ class LessonScreenState extends State<LessonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-        ),
-      );
-    }
-
     return PopScope(
       onPopInvokedWithResult: (bool didPop, Object? result) {
         if (didPop && lastPage == false) {
-          // Perform any synchronous operations here
-          // Note: Avoid asynchronous operations in this callback
           saveProgress();
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.black,
-          elevation: 0,
-          centerTitle: true,
-          title: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Text(
-              widget.bookTitle,
-              style: const TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: Colors.black,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: IconButton(
-                onPressed: () => bookmarkCurrentPageAndExit(context),
-                icon: const Icon(Icons.close, color: Colors.white, size: 28),
-              ),
-            ),
-          ],
-        ),
         body: Container(
-          color: Colors.white,
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SafeArea(
+            child: Stack(
+              children: [
+                _buildMainContent(),
+                // Loading dialog overlay
+                if (_loading)
+                  Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.all(AppSpacing.xl),
+                        padding: const EdgeInsets.all(AppSpacing.xl),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
+                          color: AppColors.pureWhite,
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 12,
-                              offset: const Offset(0, 6),
+                              color: AppColors.primaryGreen.withOpacity(0.2),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: widget.isOffLine == false
-                              ? CachedNetworkImage(
-                                  imageUrl: currentImageUrl,
-                                  placeholder: (context, url) => const Center(
-                                    child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.black),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error,
-                                          color: Colors.black),
-                                  fit: BoxFit.contain,
-                                  width: MediaQuery.of(context).size.width,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.38,
-                                )
-                              : Image.memory(
-                                  base64Decode(currentImageUrl),
-                                  fit: BoxFit.contain,
-                                  width: MediaQuery.of(context).size.width,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.38,
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.primaryGreen),
+                              strokeWidth: 3,
                             ),
-                          ],
-                        ),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: RichText(
-                            key: ValueKey(currentSentence),
-                            text: TextSpan(
-                              text: '',
-                              style: const TextStyle(
-                                fontSize: 28,
-                                color: Colors.black87,
-                                height: 1.5,
+                            const SizedBox(height: AppSpacing.lg),
+                            Text(
+                              'Kalan labɛn...',
+                              style: AppTextStyles.bodyLarge.copyWith(
+                                color: AppColors.primaryGreen,
+                                fontWeight: FontWeight.w600,
                               ),
-                              children: currentTextSpans,
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'Aw ka kuma bɛ bamanankan kan na',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.mediumGrey,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
-                        child: FloatingActionButton(
-                          mini: true,
-                          backgroundColor: Colors.black,
-                          tooltip: 'Listen to the sentence',
-                          onPressed: () async {
-                            try {
-                              if (widget.isOffLine) {
-                                await _sentencePlayer
-                                    .setSource(DeviceFileSource(currentAudio));
-                              } else {
-                                await _sentencePlayer
-                                    .setSource(UrlSource(currentAudio));
-                              }
-                              await _sentencePlayer
-                                  .play(UrlSource(currentAudio));
-                            } catch (e) {
-                              print('Error playing sentence audio: $e');
-                            }
-                          },
-                          child:
-                              const Icon(Icons.volume_up, color: Colors.white),
-                        ),
                       ),
-                      const SizedBox(height: 24),
-                      if (hasRecording) buildAudioSection(),
-                      const SizedBox(height: 80),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 20,
-                left: 20,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.grey.shade200,
-                          valueColor:
-                              const AlwaysStoppedAnimation<Color>(Colors.black),
-                          value: currentPage / (bookData!.content.length),
-                          strokeWidth: 6,
-                        ),
-                      ),
-                      Text(
-                        '$currentPage',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 20,
-                right: 20,
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, animation) => ScaleTransition(
-                    scale: animation,
-                    child: child,
-                  ),
-                  child: buildFAB(),
-                ),
-              ),
-              if (_sending)
-                Container(
-                  color: Colors.black.withOpacity(0.3),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Future<void> showCongratulatoryDialog(BuildContext context) async {}
+  Widget _buildMainContent() {
+    return PopScope(
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop && lastPage == false) {
+          saveProgress();
+        }
+      },
+      child: Scaffold(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                // Enhanced App Bar with Logo
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.pureWhite,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryGreen.withOpacity(0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      // App Logo
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryGreen.withOpacity(0.2),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/logo.jpg',
+                            height: 36,
+                            width: 36,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.bookTitle,
+                              style: AppTextStyles.heading4.copyWith(
+                                color: AppColors.primaryGreen,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              'Kalan ka taa fɛ',
+                              style: AppTextStyles.subtitle.copyWith(
+                                fontSize: 14,
+                                color: AppColors.wisdomTeal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Debug button
+                      // Container(
+                      //   decoration: BoxDecoration(
+                      //     gradient: LinearGradient(
+                      //       colors: [
+                      //         AppColors.accentOrange,
+                      //         AppColors.accentOrange.withOpacity(0.8)
+                      //       ],
+                      //       begin: Alignment.topLeft,
+                      //       end: Alignment.bottomRight,
+                      //     ),
+                      //     shape: BoxShape.circle,
+                      //     boxShadow: [
+                      //       BoxShadow(
+                      //         color: AppColors.accentOrange.withOpacity(0.3),
+                      //         blurRadius: 8,
+                      //         offset: const Offset(0, 3),
+                      //       ),
+                      //     ],
+                      //   ),
+                      //   child: IconButton(
+                      //     onPressed: () async {
+                      //       print('\n=== ASR DEBUG STATUS ===');
+                      //       final status = ASRService.instance.getStatus();
 
-// Helper method to build stat rows
+                      //       status.forEach((key, value) {
+                      //         print('$key: $value');
+                      //       });
+
+                      //       print('========================\n');
+
+                      //       // Show status in snackbar too
+                      //       ScaffoldMessenger.of(context).showSnackBar(
+                      //         SnackBar(
+                      //           content: Text(
+                      //             'ASR Status: ${status['isInitialized'] ? 'Initialized' : 'Not Initialized'}\n'
+                      //             'Platform: ${status['platform']}\n'
+                      //             'API Fallback: ${status['allowAPIFallback'] ? 'Enabled' : 'Disabled'}\n'
+                      //             'Session Handle: ${status['sessionHandle']}\n'
+                      //             'Last Error: ${status['lastError'] ?? 'None'}',
+                      //             style:
+                      //                 const TextStyle(fontFamily: 'monospace'),
+                      //           ),
+                      //           duration: const Duration(seconds: 10),
+                      //           backgroundColor: AppColors.charcoal,
+                      //         ),
+                      //       );
+                      //     },
+                      //     icon: const Icon(Icons.bug_report,
+                      //         color: Colors.white, size: 20),
+                      //     tooltip: 'ASR Debug',
+                      //   ),
+                      // ),
+                      // const SizedBox(width: AppSpacing.sm),
+                      // Exit button moved to the right
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppColors.mediumGrey, AppColors.darkGrey],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.mediumGrey.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          onPressed: () => bookmarkCurrentPageAndExit(context),
+                          icon: const Icon(Icons.close,
+                              color: Colors.white, size: 24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Progress Bar - minimal and clean
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+                  color: AppColors.pureWhite,
+                  child: Container(
+                    height: 6,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(3),
+                      color: AppColors.lightGrey,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value:
+                            (currentPage + 1) / (bookData?.content.length ?? 1),
+                        backgroundColor: Colors.transparent,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          (currentPage + 1) / (bookData?.content.length ?? 1) <
+                                  0.5
+                              ? AppColors.accentOrange
+                              : AppColors.primaryGreen,
+                        ),
+                        minHeight: 6,
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Main content area - optimized for maximum image coverage
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(AppSpacing.lg,
+                        AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
+                    decoration: AppDecorations.elevatedCard,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                      child: Column(
+                        children: [
+                          // Image Section - dynamically sized to cover all unused space
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppColors.surfaceLight,
+                                    AppColors.offWhite
+                                  ],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  // Main image covering full area
+                                  widget.isOffLine == false
+                                      ? CachedNetworkImage(
+                                          imageUrl: currentImageUrl,
+                                          placeholder: (context, url) => Center(
+                                            child: FadeShimmerMaster(
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              useGradient: true,
+                                              fadeTheme: FadeTheme.light,
+                                              radius: 0,
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            color: AppColors.lightGrey,
+                                            child: Center(
+                                              child: Icon(Icons.error,
+                                                  color: AppColors.mediumGrey,
+                                                  size: 48),
+                                            ),
+                                          ),
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        )
+                                      : Image.memory(
+                                          base64Decode(currentImageUrl),
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                        ),
+
+                                  // Gradient overlay for better text readability
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.transparent,
+                                          Colors.black.withOpacity(0.3),
+                                        ],
+                                        stops: const [0.6, 1.0],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          // Text and Audio Section - compact and efficient
+                          Container(
+                            width: double.infinity,
+                            constraints: BoxConstraints(
+                              minHeight:
+                                  120, // Minimum height for text and audio button
+                              maxHeight: MediaQuery.of(context).size.height *
+                                  0.25, // Maximum 25% of screen
+                            ),
+                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            decoration: BoxDecoration(
+                              color: AppColors.pureWhite,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.charcoal.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, -2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Text Display - scrollable if needed
+                                Flexible(
+                                  child: SingleChildScrollView(
+                                    child: Center(
+                                      child: AnimatedSwitcher(
+                                        duration:
+                                            const Duration(milliseconds: 400),
+                                        child: RichText(
+                                          key: ValueKey(currentSentence),
+                                          text: TextSpan(
+                                            text: '',
+                                            style:
+                                                AppTextStyles.heading4.copyWith(
+                                              fontSize: 20,
+                                              height: 1.4,
+                                              color: AppColors.charcoal,
+                                            ),
+                                            children: currentTextSpans,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: AppSpacing.md),
+
+                                // Audio Button - compact but prominent
+                                Container(
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.accentGradient,
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.accentOrange
+                                            .withOpacity(0.4),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 6),
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                  child: IconButton(
+                                    key: _audioButtonKey,
+                                    iconSize: 28,
+                                    icon: const Icon(Icons.volume_up,
+                                        color: Colors.white, size: 28),
+                                    tooltip: 'Écouter la phrase',
+                                    onPressed: () async {
+                                      try {
+                                        if (widget.isOffLine) {
+                                          await _sentencePlayer.setSource(
+                                              DeviceFileSource(currentAudio));
+                                        } else {
+                                          await _sentencePlayer.setSource(
+                                              UrlSource(currentAudio));
+                                        }
+                                        await _sentencePlayer
+                                            .play(UrlSource(currentAudio));
+                                      } catch (e) {
+                                        print(
+                                            'Error playing sentence audio: $e');
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Bottom Control Panel - optimized to prevent overflow
+                Container(
+                  height: MediaQuery.of(context).size.height *
+                      0.26, // Increased to 26% to accommodate all controls without overflow
+                  constraints: BoxConstraints(
+                    minHeight: 180, // Minimum height to ensure functionality
+                    maxHeight:
+                        MediaQuery.of(context).size.height * 0.3, // Maximum cap
+                  ),
+                  margin: const EdgeInsets.fromLTRB(AppSpacing.lg,
+                      AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
+                  decoration: AppDecorations.elevatedCard,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.all(AppSpacing.md), // Balanced padding
+                    child: Column(
+                      children: [
+                        // Top row with reset and main action buttons
+                        SizedBox(
+                          height: 56, // Fixed height for buttons
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Reset Button - beautifully styled
+                              Container(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      AppColors.wisdomTeal,
+                                      AppColors.lightTeal
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          AppColors.wisdomTeal.withOpacity(0.3),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 6),
+                                      spreadRadius: 1,
+                                    ),
+                                  ],
+                                ),
+                                child: IconButton(
+                                  key: _resetButtonKey,
+                                  iconSize:
+                                      26, // Slightly smaller to optimize space
+                                  onPressed: () async {
+                                    // Reset recording state and hide player
+                                    if (isRecording) {
+                                      await _audioRecorder.stop();
+                                    }
+                                    await _audioPlayer.stop();
+                                    setState(() {
+                                      isRecording = false;
+                                      hasRecording = false;
+                                      hasTranscription = false;
+                                      isPlaying = false;
+                                      _currentPosition = Duration.zero;
+                                      _audioDuration = Duration.zero;
+                                      _filePath = null;
+                                      // Reset text spans to show original sentence
+                                      currentTextSpans = [
+                                        TextSpan(text: currentSentence)
+                                      ];
+                                    });
+                                  },
+                                  icon: const Icon(Icons.refresh,
+                                      color: Colors.white, size: 26),
+                                  tooltip: 'Reset',
+                                ),
+                              ),
+
+                              // Main Action Button - enhanced
+                              buildFAB(),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(
+                            height: AppSpacing.sm), // Optimized spacing
+
+                        // Audio Controls Section - flexible height that expands to fill remaining space
+                        Expanded(
+                          child: hasRecording
+                              ? buildAudioSection()
+                              : Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.surfaceLight,
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.lg),
+                                    border: Border.all(
+                                      color: AppColors.lightGrey,
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          isRecording
+                                              ? Icons.mic
+                                              : Icons.mic_outlined,
+                                          color: isRecording
+                                              ? AppColors.error
+                                              : AppColors.mediumGrey,
+                                          size: 28,
+                                        ),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Flexible(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: AppSpacing.sm),
+                                            child: Text(
+                                              isRecording
+                                                  ? 'Ka fɔli ka daminɛ...'
+                                                  : 'Aw ka kan dɔn walasa ka kalan daminɛ',
+                                              style: AppTextStyles.bodySmall
+                                                  .copyWith(
+                                                color: isRecording
+                                                    ? AppColors.error
+                                                    : AppColors.mediumGrey,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStatRow({
     required IconData icon,
     required String label,
     required String value,
     required Color color,
   }) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black54,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: color,
+          child: Icon(icon, color: color, size: 20),
+        ),
+        const SizedBox(width: AppSpacing.lg),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.mediumGrey,
+                ),
               ),
-              textAlign: TextAlign.end,
-              overflow: TextOverflow.ellipsis,
-            ),
+              Text(
+                value,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

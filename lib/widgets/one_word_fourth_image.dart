@@ -7,6 +7,10 @@ import 'package:literacy_app/models/onewordmultipleimagequestions.dart';
 import 'package:lottie/lottie.dart';
 import 'package:confetti/confetti.dart';
 import 'package:provider/provider.dart';
+import 'package:literacy_app/widgets/common/unified_app_bar.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
+import 'package:literacy_app/widgets/common/app_widgets.dart';
 
 class OneWordMultipleImagePage extends StatefulWidget {
   const OneWordMultipleImagePage(
@@ -126,103 +130,87 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   Widget build(BuildContext context) {
     final currentQuestion = questions[questionOrder[_currentQuestionIndex]];
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        title: Container(
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+      appBar: UnifiedAppBar(
+        title: currentQuestion.question,
+        showLogo: false,
+        actions: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            margin: const EdgeInsets.all(AppSpacing.sm),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.accentOrange.withOpacity(0.2),
+                  AppColors.accentOrange.withOpacity(0.1),
+                ],
               ),
-            ],
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(
+                color: AppColors.accentOrange.withOpacity(0.3),
+                width: 1,
+              ),
+            ),
+            child: Text(
+              '${_currentQuestionIndex + 1}/${questions.length}',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.accentOrange,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  currentQuestion.question,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.black),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
       body: Container(
-        color: Colors.white,
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
         child: SafeArea(
           child: Column(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: LinearProgressIndicator(
                   value: (_currentQuestionIndex + 1) / questions.length,
-                  backgroundColor: Colors.grey[200],
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.black),
+                  backgroundColor: AppColors.lightGrey.withOpacity(0.3),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
                   minHeight: 8,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
               ),
-              const SizedBox(height: 20),
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
+              const SizedBox(height: AppSpacing.lg),
+              AppCard(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.accentOrange.withOpacity(0.1),
+                        AppColors.accentOrange.withOpacity(0.05),
+                      ],
                     ),
-                  ],
-                ),
-                child: Text(
-                  currentQuestion.word,
-                  style: const TextStyle(
-                    fontSize: 36,
-                    color: Colors.black87,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
-                  textAlign: TextAlign.center,
+                  child: Text(
+                    currentQuestion.word,
+                    style: AppTextStyles.heading1.copyWith(
+                      fontSize: 36,
+                      color: AppColors.accentOrange,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.lg),
               Expanded(
                 child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   itemCount: currentQuestion.options.length,
                   itemBuilder: (context, index) {
                     final option = currentQuestion.options[index];
@@ -241,80 +229,122 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
                         );
                       },
                       child: Padding(
-                        padding: const EdgeInsets.only(bottom: 20),
-                        child: GestureDetector(
-                          onTap: _hasAnswered
-                              ? null
-                              : () => _checkAnswer(option.image),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: isSelected
-                                    ? (isCorrectOption
-                                        ? Colors.black
-                                        : Colors.black.withOpacity(0.5))
-                                    : Colors.transparent,
-                                width: 4,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: Stack(
-                                children: [
-                                  Image.network(
-                                    option.image,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: 220,
+                        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                        child: AppCard(
+                          child: Material(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            child: InkWell(
+                              onTap: _hasAnswered
+                                  ? null
+                                  : () => _checkAnswer(option.image),
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.circular(AppRadius.lg),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? (isCorrectOption
+                                            ? AppColors.primaryGreen
+                                            : AppColors.accentOrange)
+                                        : AppColors.accentOrange
+                                            .withOpacity(0.3),
+                                    width: 3,
                                   ),
-                                  if (isSelected)
-                                    Positioned.fill(
-                                      child: Container(
-                                        color: Colors.black.withOpacity(0.4),
-                                        child: Center(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: isSelected
+                                          ? (isCorrectOption
+                                              ? AppColors.primaryGreen
+                                                  .withOpacity(0.3)
+                                              : AppColors.accentOrange
+                                                  .withOpacity(0.3))
+                                          : AppColors.accentOrange
+                                              .withOpacity(0.1),
+                                      blurRadius: 12,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius:
+                                      BorderRadius.circular(AppRadius.lg),
+                                  child: Stack(
+                                    children: [
+                                      Image.network(
+                                        option.image,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        height: 220,
+                                      ),
+                                      if (isSelected)
+                                        Positioned.fill(
                                           child: Container(
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.2),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 4),
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  (isCorrectOption
+                                                          ? AppColors
+                                                              .primaryGreen
+                                                          : AppColors
+                                                              .accentOrange)
+                                                      .withOpacity(0.8),
+                                                  (isCorrectOption
+                                                          ? AppColors
+                                                              .primaryGreen
+                                                          : AppColors
+                                                              .accentOrange)
+                                                      .withOpacity(0.6),
+                                                ],
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: AppColors.pureWhite,
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: (isCorrectOption
+                                                              ? AppColors
+                                                                  .primaryGreen
+                                                              : AppColors
+                                                                  .accentOrange)
+                                                          .withOpacity(0.3),
+                                                      blurRadius: 8,
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
+                                                padding: const EdgeInsets.all(
+                                                    AppSpacing.md),
+                                                child: Icon(
+                                                  isCorrectOption
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color: isCorrectOption
+                                                      ? AppColors.primaryGreen
+                                                      : AppColors.accentOrange,
+                                                  size: 50,
+                                                ),
+                                              ).animate().scale(),
                                             ),
-                                            padding: const EdgeInsets.all(12),
-                                            child: Icon(
-                                              isCorrectOption
-                                                  ? Icons.check_circle
-                                                  : Icons.cancel,
-                                              color: Colors.black,
-                                              size: 50,
-                                            ),
-                                          ).animate().scale(),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                ],
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
-                          ).animate().shakeX(
-                                duration: const Duration(milliseconds: 300),
-                                hz: 4,
-                                amount: isSelected && !_isCorrect ? 2 : 0,
-                              ),
-                        ),
+                          ),
+                        ).animate().shakeX(
+                              duration: const Duration(milliseconds: 300),
+                              hz: 4,
+                              amount: isSelected && !_isCorrect ? 2 : 0,
+                            ),
                       ),
                     );
                   },
@@ -322,28 +352,43 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
               ),
               if (_hasAnswered)
                 Container(
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.accentOrange,
+                        AppColors.accentOrange.withOpacity(0.8)
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.accentOrange.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
                   child: ElevatedButton(
                     onPressed: _nextQuestion,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 16,
-                      ),
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: AppColors.pureWhite,
                       elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                        vertical: AppSpacing.md,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
                     ),
                     child: Text(
                       _currentQuestionIndex < questions.length - 1
                           ? 'Nata'
                           : 'A bana',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyles.buttonText.copyWith(
+                        color: AppColors.pureWhite,
                       ),
                     ),
                   ),
@@ -356,94 +401,265 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
   }
 
   Widget _buildCelebration() {
+    final accuracy = (correctAnswers / questions.length * 100).round();
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(AppSpacing.lg),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryGreen.withOpacity(0.95),
+              AppColors.wisdomTeal.withOpacity(0.95),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
+              color: AppColors.primaryGreen.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
             ),
           ],
         ),
-        padding: const EdgeInsets.all(30),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Stack(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.black,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirection: 1.57,
+                particleDrag: 0.05,
+                emissionFrequency: 0.05,
+                numberOfParticles: 20,
+                gravity: 0.05,
+                shouldLoop: false,
+                colors: const [
+                  Colors.yellow,
+                  Colors.orange,
+                  Colors.pink,
+                  Colors.blue,
+                  Colors.green,
                 ],
               ),
-              padding: const EdgeInsets.all(16),
-              child: Lottie.asset(
-                'assets/animations/celebration.json',
-                width: 200,
-                repeat: false,
-              ),
             ),
-            const SizedBox(height: 24),
-            Text(
-              performanceMessage(),
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-                letterSpacing: 1.2,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'I ye ɲuman $correctAnswers/${questions.length}. I donniya $correctAnswers sɔrɔ!',
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black87,
-                height: 1.5,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.celebration, color: Colors.white),
-              label: const Text(
-                'A bana',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 16,
-                ),
-                elevation: 0,
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.charcoal.withOpacity(0.2),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/logo.jpg',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ).animate().scale(
+                        duration: 600.ms,
+                        curve: Curves.elasticOut,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _getPerformanceIcon(accuracy),
+                      color: AppColors.pureWhite,
+                      size: 36,
+                    ),
+                  ).animate().scale(
+                        delay: 300.ms,
+                        duration: 500.ms,
+                        curve: Curves.elasticOut,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text(
+                    _getPerformanceMessage(accuracy)['title']!,
+                    style: AppTextStyles.heading2.copyWith(
+                      color: AppColors.pureWhite,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(
+                        delay: 600.ms,
+                        duration: 400.ms,
+                      ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    _getPerformanceMessage(accuracy)['subtitle']!,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.pureWhite.withOpacity(0.9),
+                    ),
+                    textAlign: TextAlign.center,
+                  ).animate().fadeIn(
+                        delay: 800.ms,
+                        duration: 400.ms,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.pureWhite.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _buildStatItem(
+                            'Tiɲɛ',
+                            '$correctAnswers/${questions.length}',
+                            Icons.check_circle),
+                        _buildStatItem(
+                            'Ɲɛnamaya', '$accuracy%', Icons.trending_up),
+                        _buildStatItem('XP', '+$correctAnswers', Icons.star),
+                      ],
+                    ),
+                  ).animate().slideY(
+                        delay: 1000.ms,
+                        begin: 0.3,
+                        duration: 500.ms,
+                        curve: Curves.easeOut,
+                      ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primaryGreen,
+                          AppColors.wisdomTeal,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primaryGreen.withOpacity(0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: AppColors.pureWhite,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl,
+                          vertical: AppSpacing.lg,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.home,
+                            color: AppColors.pureWhite,
+                            size: 20,
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            'N sɔnna',
+                            style: AppTextStyles.buttonText.copyWith(
+                              color: AppColors.pureWhite,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ).animate().fadeIn(
+                        delay: 1200.ms,
+                        duration: 400.ms,
+                      ),
+                ],
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildStatItem(String label, String value, IconData icon) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: AppColors.pureWhite, size: 20),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          value,
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: AppColors.pureWhite,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.pureWhite.withOpacity(0.8),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Map<String, String> _getPerformanceMessage(int accuracy) {
+    if (accuracy >= 90) {
+      return {
+        'title': 'Barika da!',
+        'subtitle': 'I ye baara ɲuman kɛ kosɛbɛ!',
+      };
+    } else if (accuracy >= 70) {
+      return {
+        'title': 'Aw ni ce!',
+        'subtitle': 'I ye ɲɛnamaya ɲuman sɔrɔ!',
+      };
+    } else if (accuracy >= 50) {
+      return {
+        'title': 'Ka ɲɛ!',
+        'subtitle': 'I bɛ ɲɛtaa sɔrɔ, kɛ ka taa ɲɛ!',
+      };
+    } else {
+      return {
+        'title': 'Kalan kɛ!',
+        'subtitle': 'Segin ka kɛ, i bɛna ɲɛ!',
+      };
+    }
+  }
+
+  IconData _getPerformanceIcon(int accuracy) {
+    if (accuracy >= 90) return Icons.emoji_events;
+    if (accuracy >= 70) return Icons.thumb_up;
+    if (accuracy >= 50) return Icons.trending_up;
+    return Icons.school;
   }
 }
