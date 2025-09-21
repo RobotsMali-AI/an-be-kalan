@@ -2,163 +2,163 @@
     {
       "letter": "a",
       "image": "assets/nkalanIm/a.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/a.mp3",
+      "audio2": "nkalanSound/a.mp3"
     },
     {
       "letter": "b",
       "image": "assets/nkalanIm/b.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/b.mp3",
+      "audio2": "nkalanSound/b.mp3"
     },
     {
       "letter": "c",
       "image": "assets/nkalanIm/c.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/c.mp3",
+      "audio2": "nkalanSound/c.mp3"
     },
     {
       "letter": "d",
       "image": "assets/nkalanIm/d.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/d.mp3",
+      "audio2": "nkalanSound/d.mp3"
     },
     {
       "letter": "e",
       "image": "assets/nkalanIm/e.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/e.mp3",
+      "audio2": "nkalanSound/e.mp3"
     },
     {
       "letter": "ɛ",
       "image": "assets/nkalanIm/ɛ.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/ee.mp3",
+      "audio2": "nkalanSound/ee.mp3"
     },
     {
       "letter": "f",
       "image": "assets/nkalanIm/f.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/f.mp3",
+      "audio2": "nkalanSound/f.mp3"
     },
     {
       "letter": "g",
       "image": "assets/nkalanIm/g.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/g.mp3",
+      "audio2": "nkalanSound/g.mp3"
     },
     {
       "letter": "h",
       "image": "assets/nkalanIm/h.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/h.mp3",
+      "audio2": "nkalanSound/h.mp3"
     },
     {
       "letter": "i",
       "image": "assets/nkalanIm/i.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/i.mp3",
+      "audio2": "nkalanSound/i.mp3"
     },
     {
       "letter": "j",
       "image": "assets/nkalanIm/j.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/j.mp3",
+      "audio2": "nkalanSound/j.mp3"
     },
     {
       "letter": "k",
       "image": "assets/nkalanIm/k.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/k.mp3",
+      "audio2": "nkalanSound/k.mp3"
     },
     {
       "letter": "l",
       "image": "assets/nkalanIm/l.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/l.mp3",
+      "audio2": "nkalanSound/l.mp3"
     },
     {
       "letter": "m",
       "image": "assets/nkalanIm/m.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/m.mp3",
+      "audio2": "nkalanSound/m.mp3"
     },
     {
       "letter": "n",
       "image": "assets/nkalanIm/n.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/n.mp3",
+      "audio2": "nkalanSound/n.mp3"
     },
     {
       "letter": "ɲ",
       "image": "assets/nkalanIm/ɲ.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/nn.mp3",
+      "audio2": "nkalanSound/nn.mp3"
     },
     {
       "letter": "ŋ",
       "image": "assets/nkalanIm/ŋ.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/nnn.mp3",
+      "audio2": "nkalanSound/nnn.mp3"
     },
     {
       "letter": "o",
       "image": "assets/nkalanIm/o.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/o.mp3",
+      "audio2": "nkalanSound/o.mp3"
     },
     {
       "letter": "ɔ",
       "image": "assets/nkalanIm/ɔ.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/oo.mp3",
+      "audio2": "nkalanSound/oo.mp3"
     },
     {
       "letter": "p",
       "image": "assets/nkalanIm/p.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/p.mp3",
+      "audio2": "nkalanSound/p.mp3"
     },
     {
       "letter": "r",
       "image": "assets/nkalanIm/r.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/r.mp3",
+      "audio2": "nkalanSound/r.mp3"
     },
     {
       "letter": "s",
       "image": "assets/nkalanIm/s.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/s.mp3",
+      "audio2": "nkalanSound/s.mp3"
     },
     {
       "letter": "t",
       "image": "assets/nkalanIm/t.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/t.mp3",
+      "audio2": "nkalanSound/t.mp3"
     },
     {
       "letter": "u",
       "image": "assets/nkalanIm/u.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/u.mp3",
+      "audio2": "nkalanSound/u.mp3"
     },
     {
       "letter": "w",
       "image": "assets/nkalanIm/w.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/w.mp3",
+      "audio2": "nkalanSound/w.mp3"
     },
     {
       "letter": "y",
       "image": "assets/nkalanIm/y.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/y.mp3",
+      "audio2": "nkalanSound/y.mp3"
     },
     {
       "letter": "z",
       "image": "assets/nkalanIm/z.jpg",
-      "audio1": "nkalanSound/laisse.mp3",
-      "audio2": "nkalanSound/laisse.mp3"
+      "audio1": "nkalanSound/z.mp3",
+      "audio2": "nkalanSound/z.mp3"
     }    
   ]
