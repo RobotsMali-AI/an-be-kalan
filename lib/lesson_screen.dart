@@ -47,7 +47,8 @@ class LessonScreen extends StatefulWidget {
   LessonScreenState createState() => LessonScreenState();
 }
 
-class LessonScreenState extends State<LessonScreen> {
+class LessonScreenState extends State<LessonScreen>
+    with WidgetsBindingObserver {
   final Record _audioRecorder = Record();
   final AudioPlayer _audioPlayer = AudioPlayer();
   final AudioPlayer _sentencePlayer =
@@ -79,9 +80,10 @@ class LessonScreenState extends State<LessonScreen> {
   List<TextSpan> currentTextSpans = [];
   String currentImageUrl = '';
 
-  int readingTime = 0;
-  int currentSessionTime = 0;
-  DateTime? startTime;
+  int readingTime = 0; // Total accumulated reading time from previous sessions
+  int currentSessionTime = 0; // Time accumulated in current session
+  DateTime? startTime; // Start time of current sentence/page
+  DateTime? sessionStartTime; // Start time of entire lesson session
 
   List<double> accuracies = [];
 
@@ -92,6 +94,7 @@ class LessonScreenState extends State<LessonScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // Listen to app lifecycle
     setupLesson();
     setupAudioSession();
     _initializeASR();
@@ -181,6 +184,8 @@ class LessonScreenState extends State<LessonScreen> {
       currentTextSpans = [TextSpan(text: currentSentence)];
       currentImageUrl = bookData!.content[pageKey]!.imageUrl;
       startTime = DateTime.now();
+      sessionStartTime =
+          DateTime.now(); // Track when the entire session started
     } else {
       currentSentences = [];
       currentSentence = '';
@@ -478,6 +483,12 @@ class LessonScreenState extends State<LessonScreen> {
   void moveToNextSentence() {
     if (!mounted) return; // Check if widget is still mounted
 
+    // Accumulate time spent on current sentence before moving to next
+    if (startTime != null) {
+      final sentenceDuration = DateTime.now().difference(startTime!);
+      currentSessionTime += sentenceDuration.inSeconds;
+    }
+
     setState(() {
       currentSentenceIndex += 1;
       if (currentSentenceIndex < currentSentences.length) {
@@ -504,6 +515,11 @@ class LessonScreenState extends State<LessonScreen> {
         currentSentence = currentSentences[currentSentenceIndex];
         if (currentPage == bookData!.content.length - 1) lastPage = true;
       }
+
+      // Calculate total reading time for this session
+      int totalReadingTime = readingTime + currentSessionTime;
+
+      // Update bookmark with accumulated time
       partialUpdate(
           widget.userdata,
           BookUser(
@@ -511,20 +527,30 @@ class LessonScreenState extends State<LessonScreen> {
               totalPages: bookData!.content.length,
               title: widget.bookTitle,
               bookmark: currentPage.toString(),
-              readingTime: readingTime,
+              readingTime: totalReadingTime,
               accuracies: accuracies),
           widget.uid);
+
       hasTranscription = false;
       hasRecording = false;
       isPlaying = false;
       _currentPosition = Duration.zero;
       currentTextSpans = [TextSpan(text: currentSentence)];
+
+      // Reset start time for the new sentence
+      startTime = DateTime.now();
     });
   }
 
   Future<void> saveProgress() async {
-    Duration duration = DateTime.now().difference(startTime!);
-    currentSessionTime = duration.inSeconds;
+    // Add time spent on current sentence to session time
+    if (startTime != null) {
+      final sentenceDuration = DateTime.now().difference(startTime!);
+      currentSessionTime += sentenceDuration.inSeconds;
+      // Reset start time after accumulating
+      startTime = DateTime.now();
+    }
+
     int totalReadingTime = readingTime + currentSessionTime;
     if (mounted) setState(() => _sending = true);
 
@@ -544,8 +570,12 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> bookmarkCurrentPageAndExit(BuildContext context) async {
-    Duration duration = DateTime.now().difference(startTime!);
-    currentSessionTime = duration.inSeconds;
+    // Add time spent on current sentence to session time before exiting
+    if (startTime != null) {
+      final sentenceDuration = DateTime.now().difference(startTime!);
+      currentSessionTime += sentenceDuration.inSeconds;
+    }
+
     int totalReadingTime = readingTime + currentSessionTime;
     setState(() => _sending = true);
     await context.read<ApiFirebaseService>().bookmark(
@@ -565,8 +595,12 @@ class LessonScreenState extends State<LessonScreen> {
   }
 
   Future<void> endLesson(BuildContext context) async {
-    Duration duration = DateTime.now().difference(startTime!);
-    currentSessionTime = duration.inSeconds;
+    // Add time spent on current sentence to session time before completing
+    if (startTime != null) {
+      final sentenceDuration = DateTime.now().difference(startTime!);
+      currentSessionTime += sentenceDuration.inSeconds;
+    }
+
     int totalReadingTime = readingTime + currentSessionTime;
 
     if (!mounted) return; // Check if widget is still mounted
@@ -835,6 +869,7 @@ class LessonScreenState extends State<LessonScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // Remove lifecycle listener
     if (isRecording) {
       _audioRecorder.stop();
     }
@@ -842,6 +877,29 @@ class LessonScreenState extends State<LessonScreen> {
     _audioPlayer.dispose();
     _sentencePlayer.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Pause timer when app goes to background
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      if (startTime != null) {
+        // Accumulate time before pausing
+        final sentenceDuration = DateTime.now().difference(startTime!);
+        currentSessionTime += sentenceDuration.inSeconds;
+        startTime = null; // Pause the timer
+      }
+    }
+    // Resume timer when app comes back to foreground
+    else if (state == AppLifecycleState.resumed) {
+      if (startTime == null && mounted) {
+        // Resume the timer
+        startTime = DateTime.now();
+      }
+    }
   }
 
   Widget buildAudioSection() {

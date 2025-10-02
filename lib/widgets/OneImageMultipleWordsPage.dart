@@ -485,142 +485,200 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage>
     HapticFeedback.lightImpact();
   }
 
+  Future<bool> _onWillPop() async {
+    if (currentLevel == 0 && !hasChecked) {
+      // First question, not answered yet - allow exit
+      return true;
+    }
+
+    // Show confirmation dialog
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.pureWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        title: Text(
+          'Ka bɔ?',
+          style: AppTextStyles.heading3.copyWith(
+            color: AppColors.primaryGreen,
+          ),
+        ),
+        content: Text(
+          'Aw ka ɲɛtaa bɛna bɔ. Aw b\'a fɛ ka bɔ?',
+          style: AppTextStyles.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Ayi', style: TextStyle(color: AppColors.mediumGrey)),
+          ),
+          TextButton(
+            onPressed: () {
+              // Save progress before exiting
+              context
+                  .read<ApiFirebaseService>()
+                  .saveUserData(widget.user.uid!, widget.user);
+              Navigator.pop(context, true);
+            },
+            child: Text('Awɔ', style: TextStyle(color: AppColors.primaryGreen)),
+          ),
+        ],
+      ),
+    );
+
+    return shouldExit ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentQuestion = widget.list[questionOrder[currentLevel]];
     final progress = (currentLevel + 1) / widget.list.length;
 
-    return Scaffold(
-      backgroundColor: AppColors.offWhite,
-      appBar: UnifiedAppBar(
-        title: 'Ja ni Daɲɛw',
-        actions: [
-          AppBarActionButton(
-            icon: showHint ? Icons.lightbulb : Icons.lightbulb_outline,
-            onPressed: _toggleHint,
-            tooltip: 'Dɛmɛ',
-            backgroundColor: AppColors.accentSurfaceLight,
-            iconColor: showHint ? AppColors.accentOrange : AppColors.mediumGrey,
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.xs,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+        final shouldPop = await _onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.offWhite,
+        appBar: UnifiedAppBar(
+          title: 'Ja ni Daɲɛw',
+          actions: [
+            AppBarActionButton(
+              icon: showHint ? Icons.lightbulb : Icons.lightbulb_outline,
+              onPressed: _toggleHint,
+              tooltip: 'Dɛmɛ',
+              backgroundColor: AppColors.accentSurfaceLight,
+              iconColor:
+                  showHint ? AppColors.accentOrange : AppColors.mediumGrey,
             ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.primaryGreen.withOpacity(0.1),
-                  AppColors.wisdomTeal.withOpacity(0.1),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.sm,
+                vertical: AppSpacing.xs,
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primaryGreen.withOpacity(0.1),
+                    AppColors.wisdomTeal.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(
+                  color: AppColors.primaryGreen.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.quiz,
+                    color: AppColors.primaryGreen,
+                    size: 14,
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
+                  Text(
+                    '${currentLevel + 1}/${widget.list.length}',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.primaryGreen,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
                 ],
               ),
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(
-                color: AppColors.primaryGreen.withOpacity(0.3),
-                width: 1,
-              ),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.quiz,
-                  color: AppColors.primaryGreen,
-                  size: 14,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  '${currentLevel + 1}/${widget.list.length}',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.primaryGreen,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
+          ],
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: Column(
+            children: [
+              // Progress bar
+              _buildProgressBar(progress),
+
+              // Main content
+              Expanded(
+                child: SlideTransition(
+                  position: _slideAnimation,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    child: Column(
+                      children: [
+                        // Question text
+                        _buildQuestionSection(currentQuestion.question),
+
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Image and options in a column layout
+                        Expanded(
+                          child: Column(
+                            children: [
+                              // Image section (top)
+                              Container(
+                                height: 200,
+                                width: double.infinity,
+                                constraints: const BoxConstraints(
+                                  maxWidth: 400,
+                                ),
+                                child:
+                                    _buildImageSection(currentQuestion.image),
+                              ),
+
+                              const SizedBox(height: AppSpacing.lg),
+
+                              // Options section (bottom)
+                              Expanded(
+                                child: _buildOptionsSection(currentQuestion),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Action buttons
+                        _buildActionButtons(),
+
+                        const SizedBox(height: AppSpacing.md),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
-        child: Column(
-          children: [
-            // Progress bar
-            _buildProgressBar(progress),
+              ),
 
-            // Main content
-            Expanded(
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  child: Column(
-                    children: [
-                      // Question text
-                      _buildQuestionSection(currentQuestion.question),
-
-                      const SizedBox(height: AppSpacing.md),
-
-                      // Image and options in a column layout
-                      Expanded(
-                        child: Column(
-                          children: [
-                            // Image section (top)
-                            Container(
-                              height: 200,
-                              width: double.infinity,
-                              constraints: const BoxConstraints(
-                                maxWidth: 400,
-                              ),
-                              child: _buildImageSection(currentQuestion.image),
-                            ),
-
-                            const SizedBox(height: AppSpacing.lg),
-
-                            // Options section (bottom)
-                            Expanded(
-                              child: _buildOptionsSection(currentQuestion),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Action buttons
-                      _buildActionButtons(),
-
-                      const SizedBox(height: AppSpacing.md),
+              // Confetti overlay
+              if (hasChecked && selectedOption == currentQuestion.answer)
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: ConfettiWidget(
+                    confettiController: _confettiController,
+                    blastDirection: 1.57,
+                    particleDrag: 0.05,
+                    emissionFrequency: 0.05,
+                    numberOfParticles: 15,
+                    gravity: 0.05,
+                    shouldLoop: false,
+                    colors: const [
+                      Colors.yellow,
+                      Colors.orange,
+                      Colors.green,
+                      Colors.blue,
                     ],
                   ),
                 ),
-              ),
-            ),
-
-            // Confetti overlay
-            if (hasChecked && selectedOption == currentQuestion.answer)
-              Align(
-                alignment: Alignment.topCenter,
-                child: ConfettiWidget(
-                  confettiController: _confettiController,
-                  blastDirection: 1.57,
-                  particleDrag: 0.05,
-                  emissionFrequency: 0.05,
-                  numberOfParticles: 15,
-                  gravity: 0.05,
-                  shouldLoop: false,
-                  colors: const [
-                    Colors.yellow,
-                    Colors.orange,
-                    Colors.green,
-                    Colors.blue,
-                  ],
-                ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -965,20 +1023,6 @@ class _OneImageMultipleWordsPageState extends State<OneImageMultipleWordsPage>
               ),
             ),
           ] else ...[
-            Expanded(
-              child: SecondaryButton(
-                text: 'Segin ka lajɛ',
-                onPressed: () {
-                  setState(() {
-                    hasChecked = false;
-                    selectedOption = null;
-                  });
-                  HapticFeedback.lightImpact();
-                },
-                icon: Icons.refresh,
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: PrimaryButton(
                 text: currentLevel < widget.list.length - 1 ? 'Nata' : 'Dafa',

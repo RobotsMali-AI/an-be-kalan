@@ -1221,7 +1221,8 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: AppSpacing.md),
         StatCard(
           title: t(context, 'total_reading_time'),
-          value: "${widget.userData.totalReadingTime} min",
+          value:
+              "${(widget.userData.totalReadingTime / 60).toStringAsFixed(1)} min",
           icon: Icons.timer,
           color: AppColors.wisdomTeal,
         ),

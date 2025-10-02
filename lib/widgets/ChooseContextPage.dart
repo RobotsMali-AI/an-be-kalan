@@ -216,42 +216,6 @@ class _ChooseContextPageState extends State<ChooseContextPage> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              // Progress card
-              AppCard(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Ɲɛtaa',
-                          style: AppTextStyles.heading4.copyWith(
-                            color: AppColors.wisdomTeal,
-                          ),
-                        ),
-                        Text(
-                          '${allContexts.length - remainingContexts.length}/${allContexts.length}',
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.accentOrange,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    LinearProgressIndicator(
-                      value: (allContexts.length - remainingContexts.length) /
-                          allContexts.length,
-                      backgroundColor: AppColors.lightGrey,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppColors.wisdomTeal),
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
               // Instruction card
               AppCard(
                 child: Row(

@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_translate_api/google_translate_api.dart';
 import 'package:provider/provider.dart';
 import '../widgets/common/unified_app_bar.dart';
 import '../theme/app_colors.dart';
@@ -9,6 +7,7 @@ import '../theme/app_styles.dart';
 import '../widgets/common/app_widgets.dart';
 import '../tutorial_service.dart';
 import '../services/simple_locale.dart';
+import '../services/google_translate_service.dart';
 
 class TranslationPage extends StatefulWidget {
   const TranslationPage({super.key});
@@ -62,16 +61,6 @@ class _TranslationPageState extends State<TranslationPage>
       'name': 'العربية',
       'flag': '🇸🇦',
       'color': AppColors.bookBlue,
-    },
-    'es': {
-      'name': 'Español',
-      'flag': '🇪🇸',
-      'color': AppColors.error,
-    },
-    'pt': {
-      'name': 'Português',
-      'flag': '🇵🇹',
-      'color': AppColors.success,
     },
   };
 
@@ -227,81 +216,44 @@ class _TranslationPageState extends State<TranslationPage>
   }
 
   Future<String> _translateToBambara(String text, String sourceLanguage) async {
-    // Simulate API call delay
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    // Enhanced Bambara translation simulation
-    final Map<String, String> basicTranslations = {
-      'hello': 'I ni ce',
-      'goodbye': 'Kan ben',
-      'thank you': 'I ni ce kosɛbɛ',
-      'yes': 'Awɔ',
-      'no': 'Ayi',
-      'water': 'Ji',
-      'food': 'Dumuni',
-      'house': 'So',
-      'family': 'Somɔgɔw',
-      'friend': 'Teri',
-      'love': 'Kanu',
-      'peace': 'Here',
-      'school': 'Karanso',
-      'teacher': 'Karamɔgɔ',
-      'student': 'Karanden',
-    };
-
-    String lowerText = text.toLowerCase().trim();
-
-    if (basicTranslations.containsKey(lowerText)) {
-      return basicTranslations[lowerText]!;
+    try {
+      final translatedText = await GoogleTranslateService().translate(
+        text: text,
+        sourceLanguage: sourceLanguage,
+        targetLanguage: 'bm',
+      );
+      return translatedText;
+    } catch (e) {
+      throw Exception('Failed to translate to Bambara: $e');
     }
-
-    // For other texts, provide a contextual response
-    return 'Bamanankan baara: "$text" → [${_languages[sourceLanguage]!['name']} kan na bamanankan ma]';
   }
 
   Future<String> _translateFromBambara(
       String text, String targetLanguage) async {
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    final Map<String, Map<String, String>> translations = {
-      'i ni ce': {
-        'fr': 'Bonjour',
-        'en': 'Hello',
-        'ar': 'السلام عليكم',
-        'es': 'Hola',
-        'pt': 'Olá',
-      },
-      'kan ben': {
-        'fr': 'Au revoir',
-        'en': 'Goodbye',
-        'ar': 'مع السلامة',
-        'es': 'Adiós',
-        'pt': 'Tchau',
-      },
-      'ji': {
-        'fr': 'Eau',
-        'en': 'Water',
-        'ar': 'ماء',
-        'es': 'Agua',
-        'pt': 'Água',
-      },
-    };
-
-    String lowerText = text.toLowerCase().trim();
-
-    if (translations.containsKey(lowerText) &&
-        translations[lowerText]!.containsKey(targetLanguage)) {
-      return translations[lowerText]![targetLanguage]!;
+    try {
+      final translatedText = await GoogleTranslateService().translate(
+        text: text,
+        sourceLanguage: 'bm',
+        targetLanguage: targetLanguage,
+      );
+      return translatedText;
+    } catch (e) {
+      throw Exception('Failed to translate from Bambara: $e');
     }
-
-    return 'Translation: "$text" → [Bamanankan to ${_languages[targetLanguage]!['name']}]';
   }
 
   Future<String> _translateBetweenLanguages(
       String text, String source, String target) async {
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    return 'Translation: "$text" → [${_languages[source]!['name']} to ${_languages[target]!['name']}]';
+    try {
+      final translatedText = await GoogleTranslateService().translate(
+        text: text,
+        sourceLanguage: source,
+        targetLanguage: target,
+      );
+      return translatedText;
+    } catch (e) {
+      throw Exception('Failed to translate between languages: $e');
+    }
   }
 
   void _addToHistory(
@@ -686,7 +638,7 @@ class _TranslationPageState extends State<TranslationPage>
                 style: AppTextStyles.bodyMedium,
                 icon: Icon(Icons.arrow_drop_down, color: color),
                 items: _languages.entries.map((entry) {
-                  final data = entry.value as Map<String, dynamic>;
+                  final data = entry.value;
                   return DropdownMenuItem<String>(
                     value: entry.key,
                     child: Row(
@@ -884,17 +836,6 @@ class _TranslationPageState extends State<TranslationPage>
                       size: 20,
                     ),
                     tooltip: 'Kopi',
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      // Share functionality could be added here
-                    },
-                    icon: Icon(
-                      Icons.share,
-                      color: AppColors.wisdomTeal,
-                      size: 20,
-                    ),
-                    tooltip: 'Tila',
                   ),
                 ],
               ],

@@ -412,273 +412,336 @@ class _MultipleChoiceQuestionPageState extends State<MultipleChoiceQuestionPage>
     );
   }
 
+  Future<bool> _onWillPop() async {
+    if (currentQuestionIndex == 0 && !isAnswered) {
+      // First question, not answered yet - allow exit
+      return true;
+    }
+
+    // Show confirmation dialog
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.pureWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        title: Text(
+          'Ka bɔ?',
+          style: AppTextStyles.heading3.copyWith(
+            color: AppColors.wisdomTeal,
+          ),
+        ),
+        content: Text(
+          'Aw ka ɲɛtaa bɛna bɔ. Aw b\'a fɛ ka bɔ?',
+          style: AppTextStyles.bodyMedium,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Ayi', style: TextStyle(color: AppColors.mediumGrey)),
+          ),
+          TextButton(
+            onPressed: () {
+              // Save progress before exiting
+              context
+                  .read<ApiFirebaseService>()
+                  .saveUserData(widget.user.uid!, widget.user);
+              Navigator.pop(context, true);
+            },
+            child: Text('Awɔ', style: TextStyle(color: AppColors.wisdomTeal)),
+          ),
+        ],
+      ),
+    );
+
+    return shouldExit ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     var currentQuestion = widget.questions[questionOrder[currentQuestionIndex]];
 
-    return Scaffold(
-      appBar: UnifiedAppBar(
-        title: widget.title,
-        showLogo: false,
-        actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-            margin: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.wisdomTeal.withOpacity(0.2),
-                  AppColors.wisdomTeal.withOpacity(0.1),
-                ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+        final shouldPop = await _onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: UnifiedAppBar(
+          title: widget.title,
+          showLogo: false,
+          actions: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+              margin: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.wisdomTeal.withOpacity(0.2),
+                    AppColors.wisdomTeal.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(
+                  color: AppColors.wisdomTeal.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(
-                color: AppColors.wisdomTeal.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              '${currentQuestionIndex + 1}/${widget.questions.length}',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.wisdomTeal,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AppCard(
-                        child: Container(
-                          margin: const EdgeInsets.only(
-                              top: AppSpacing.lg, bottom: AppSpacing.xl),
-                          padding: const EdgeInsets.all(AppSpacing.xl),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                AppColors.wisdomTeal.withOpacity(0.1),
-                                AppColors.wisdomTeal.withOpacity(0.05),
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                          ),
-                          child: Text(
-                            currentQuestion.question,
-                            style: AppTextStyles.heading2.copyWith(
-                              color: AppColors.wisdomTeal,
-                              height: 1.5,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      )
-                          .animate(delay: _questionAnimDuration)
-                          .scaleXY(begin: 0.8, curve: Curves.elasticOut),
-                      ...currentQuestion.options.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final option = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: AppSpacing.sm),
-                          child: AppCard(
-                            child: Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(AppRadius.lg),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: _getOptionGradient(option),
-                                  ),
-                                  borderRadius:
-                                      BorderRadius.circular(AppRadius.lg),
-                                  border: Border.all(
-                                    color: _getOptionBorderColor(option),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: CheckboxListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.lg,
-                                      vertical: AppSpacing.md),
-                                  title: Text(
-                                    option,
-                                    style: AppTextStyles.bodyLarge.copyWith(
-                                      color: _getTextColor(option),
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.5,
-                                    ),
-                                  ),
-                                  value: selectedAnswers.contains(option),
-                                  onChanged: isAnswered
-                                      ? null
-                                      : (bool? value) {
-                                          _toggleAnswer(option);
-                                        },
-                                  activeColor: AppColors.wisdomTeal,
-                                  checkColor: AppColors.pureWhite,
-                                ),
-                              ),
-                            ),
-                          )
-                              .animate(
-                                delay: _questionAnimDuration +
-                                    _optionAnimInterval * index,
-                              )
-                              .fadeIn()
-                              .slideX(begin: index.isEven ? 0.5 : -0.5),
-                        );
-                      }),
-                      const SizedBox(height: AppSpacing.lg),
-                      if (isAnswered)
-                        AppCard(
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: _isOverallCorrect()
-                                    ? [
-                                        AppColors.primaryGreen.withOpacity(0.2),
-                                        AppColors.primaryGreen.withOpacity(0.1)
-                                      ]
-                                    : [
-                                        AppColors.accentOrange.withOpacity(0.2),
-                                        AppColors.accentOrange.withOpacity(0.1)
-                                      ],
-                              ),
-                              borderRadius: BorderRadius.circular(AppRadius.lg),
-                            ),
-                            child: Text(
-                              _isOverallCorrect()
-                                  ? "Baara ɲuman!"
-                                  : "Baara jugu!",
-                              style: AppTextStyles.heading3.copyWith(
-                                color: _isOverallCorrect()
-                                    ? AppColors.primaryGreen
-                                    : AppColors.accentOrange,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(height: AppSpacing.lg),
-                      if (!isAnswered)
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.wisdomTeal,
-                                AppColors.wisdomTeal.withOpacity(0.8)
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(50),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.wisdomTeal.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton(
-                            onPressed: selectedAnswers.isNotEmpty
-                                ? _checkAnswers
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              foregroundColor: AppColors.pureWhite,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.xl,
-                                vertical: AppSpacing.md,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                            ),
-                            child: Text(
-                              "Ka jɛ",
-                              style: AppTextStyles.buttonText.copyWith(
-                                color: AppColors.pureWhite,
-                              ),
-                            ),
-                          ),
-                        ),
-                      if (isAnswered)
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                AppColors.primaryGreen,
-                                AppColors.primaryGreen.withOpacity(0.8)
-                              ],
-                            ),
-                            borderRadius: BorderRadius.circular(50),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primaryGreen.withOpacity(0.3),
-                                blurRadius: 8,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton(
-                            onPressed: _nextQuestion,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              foregroundColor: AppColors.pureWhite,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.xl,
-                                vertical: AppSpacing.md,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  "Nata",
-                                  style: AppTextStyles.buttonText.copyWith(
-                                    color: AppColors.pureWhite,
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.sm),
-                                Icon(
-                                  Icons.arrow_forward,
-                                  size: 24,
-                                  color: AppColors.pureWhite,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ).animate().scale().shake(),
-                    ],
-                  ),
+              child: Text(
+                '${currentQuestionIndex + 1}/${widget.questions.length}',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.wisdomTeal,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ],
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AppCard(
+                          child: Container(
+                            margin: const EdgeInsets.only(
+                                top: AppSpacing.lg, bottom: AppSpacing.xl),
+                            padding: const EdgeInsets.all(AppSpacing.xl),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  AppColors.wisdomTeal.withOpacity(0.1),
+                                  AppColors.wisdomTeal.withOpacity(0.05),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
+                            ),
+                            child: Text(
+                              currentQuestion.question,
+                              style: AppTextStyles.heading2.copyWith(
+                                color: AppColors.wisdomTeal,
+                                height: 1.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                            .animate(delay: _questionAnimDuration)
+                            .scaleXY(begin: 0.8, curve: Curves.elasticOut),
+                        ...currentQuestion.options.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final option = entry.value;
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: AppSpacing.sm),
+                            child: AppCard(
+                              child: Material(
+                                color: Colors.transparent,
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.lg),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: _getOptionGradient(option),
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.lg),
+                                    border: Border.all(
+                                      color: _getOptionBorderColor(option),
+                                      width: 2,
+                                    ),
+                                  ),
+                                  child: CheckboxListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: AppSpacing.lg,
+                                        vertical: AppSpacing.md),
+                                    title: Text(
+                                      option,
+                                      style: AppTextStyles.bodyLarge.copyWith(
+                                        color: _getTextColor(option),
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.5,
+                                      ),
+                                    ),
+                                    value: selectedAnswers.contains(option),
+                                    onChanged: isAnswered
+                                        ? null
+                                        : (bool? value) {
+                                            _toggleAnswer(option);
+                                          },
+                                    activeColor: AppColors.wisdomTeal,
+                                    checkColor: AppColors.pureWhite,
+                                  ),
+                                ),
+                              ),
+                            )
+                                .animate(
+                                  delay: _questionAnimDuration +
+                                      _optionAnimInterval * index,
+                                )
+                                .fadeIn()
+                                .slideX(begin: index.isEven ? 0.5 : -0.5),
+                          );
+                        }),
+                        const SizedBox(height: AppSpacing.lg),
+                        if (isAnswered)
+                          AppCard(
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(AppSpacing.lg),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: _isOverallCorrect()
+                                      ? [
+                                          AppColors.primaryGreen
+                                              .withOpacity(0.2),
+                                          AppColors.primaryGreen
+                                              .withOpacity(0.1)
+                                        ]
+                                      : [
+                                          AppColors.accentOrange
+                                              .withOpacity(0.2),
+                                          AppColors.accentOrange
+                                              .withOpacity(0.1)
+                                        ],
+                                ),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.lg),
+                              ),
+                              child: Text(
+                                _isOverallCorrect()
+                                    ? "Baara ɲuman!"
+                                    : "Baara jugu!",
+                                style: AppTextStyles.heading3.copyWith(
+                                  color: _isOverallCorrect()
+                                      ? AppColors.primaryGreen
+                                      : AppColors.accentOrange,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: AppSpacing.lg),
+                        if (!isAnswered)
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.wisdomTeal,
+                                  AppColors.wisdomTeal.withOpacity(0.8)
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(50),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.wisdomTeal.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: selectedAnswers.isNotEmpty
+                                  ? _checkAnswers
+                                  : null,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: AppColors.pureWhite,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.xl,
+                                  vertical: AppSpacing.md,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: Text(
+                                "Ka jɛ",
+                                style: AppTextStyles.buttonText.copyWith(
+                                  color: AppColors.pureWhite,
+                                ),
+                              ),
+                            ),
+                          ),
+                        if (isAnswered)
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primaryGreen,
+                                  AppColors.primaryGreen.withOpacity(0.8)
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(50),
+                              boxShadow: [
+                                BoxShadow(
+                                  color:
+                                      AppColors.primaryGreen.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton(
+                              onPressed: _nextQuestion,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                foregroundColor: AppColors.pureWhite,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.xl,
+                                  vertical: AppSpacing.md,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    "Nata",
+                                    style: AppTextStyles.buttonText.copyWith(
+                                      color: AppColors.pureWhite,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Icon(
+                                    Icons.arrow_forward,
+                                    size: 24,
+                                    color: AppColors.pureWhite,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ).animate().scale().shake(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

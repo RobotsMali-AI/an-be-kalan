@@ -126,274 +126,334 @@ class _OneWordMultipleImagePageState extends State<OneWordMultipleImagePage>
     return value.clamp(0.0, 1.0);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final currentQuestion = questions[questionOrder[_currentQuestionIndex]];
-    return Scaffold(
-      appBar: UnifiedAppBar(
-        title: currentQuestion.question,
-        showLogo: false,
+  Future<bool> _onWillPop() async {
+    if (_currentQuestionIndex == 0 && !_hasAnswered) {
+      // First question, not answered yet - allow exit
+      return true;
+    }
+
+    // Show confirmation dialog
+    final shouldExit = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.pureWhite,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        title: Text(
+          'Ka bɔ?',
+          style: AppTextStyles.heading3.copyWith(
+            color: AppColors.accentOrange,
+          ),
+        ),
+        content: Text(
+          'Aw ka ɲɛtaa bɛna bɔ. Aw b\'a fɛ ka bɔ?',
+          style: AppTextStyles.bodyMedium,
+        ),
         actions: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-            margin: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColors.accentOrange.withOpacity(0.2),
-                  AppColors.accentOrange.withOpacity(0.1),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(
-                color: AppColors.accentOrange.withOpacity(0.3),
-                width: 1,
-              ),
-            ),
-            child: Text(
-              '${_currentQuestionIndex + 1}/${questions.length}',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: AppColors.accentOrange,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Ayi', style: TextStyle(color: AppColors.mediumGrey)),
+          ),
+          TextButton(
+            onPressed: () {
+              // Save progress before exiting
+              context
+                  .read<ApiFirebaseService>()
+                  .saveUserData(widget.user.uid!, widget.user);
+              Navigator.pop(context, true);
+            },
+            child: Text('Awɔ', style: TextStyle(color: AppColors.accentOrange)),
           ),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: AppColors.backgroundGradient,
+    );
+
+    return shouldExit ?? false;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final currentQuestion = questions[questionOrder[_currentQuestionIndex]];
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) async {
+        if (didPop) return;
+        final shouldPop = await _onWillPop();
+        if (shouldPop && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        appBar: UnifiedAppBar(
+          title: currentQuestion.question,
+          showLogo: false,
+          actions: [
+            Container(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+              margin: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.accentOrange.withOpacity(0.2),
+                    AppColors.accentOrange.withOpacity(0.1),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(
+                  color: AppColors.accentOrange.withOpacity(0.3),
+                  width: 1,
+                ),
+              ),
+              child: Text(
+                '${_currentQuestionIndex + 1}/${questions.length}',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.accentOrange,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
         ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: LinearProgressIndicator(
-                  value: (_currentQuestionIndex + 1) / questions.length,
-                  backgroundColor: AppColors.lightGrey.withOpacity(0.3),
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
-                  minHeight: 8,
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              AppCard(
-                child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  padding: const EdgeInsets.all(AppSpacing.xl),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.accentOrange.withOpacity(0.1),
-                        AppColors.accentOrange.withOpacity(0.05),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                  ),
-                  child: Text(
-                    currentQuestion.word,
-                    style: AppTextStyles.heading1.copyWith(
-                      fontSize: 36,
-                      color: AppColors.accentOrange,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              Expanded(
-                child: ListView.builder(
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: AppColors.backgroundGradient,
+          ),
+          child: SafeArea(
+            child: Column(
+              children: [
+                Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  itemCount: currentQuestion.options.length,
-                  itemBuilder: (context, index) {
-                    final option = currentQuestion.options[index];
-                    final isSelected = _selectedImage == option.image;
-                    final isCorrectOption = option.correct;
-                    return AnimatedBuilder(
-                      animation: _controller,
-                      builder: (context, child) {
-                        double animationValue = getAnimationValue(index);
-                        return Opacity(
-                          opacity: animationValue,
-                          child: Transform.scale(
-                            scale: animationValue,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.lg),
-                        child: AppCard(
-                          child: Material(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            child: InkWell(
-                              onTap: _hasAnswered
-                                  ? null
-                                  : () => _checkAnswer(option.image),
+                  child: LinearProgressIndicator(
+                    value: (_currentQuestionIndex + 1) / questions.length,
+                    backgroundColor: AppColors.lightGrey.withOpacity(0.3),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
+                    minHeight: 8,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                AppCard(
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          AppColors.accentOrange.withOpacity(0.1),
+                          AppColors.accentOrange.withOpacity(0.05),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                    ),
+                    child: Text(
+                      currentQuestion.word,
+                      style: AppTextStyles.heading1.copyWith(
+                        fontSize: 36,
+                        color: AppColors.accentOrange,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                Expanded(
+                  child: ListView.builder(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    itemCount: currentQuestion.options.length,
+                    itemBuilder: (context, index) {
+                      final option = currentQuestion.options[index];
+                      final isSelected = _selectedImage == option.image;
+                      final isCorrectOption = option.correct;
+                      return AnimatedBuilder(
+                        animation: _controller,
+                        builder: (context, child) {
+                          double animationValue = getAnimationValue(index);
+                          return Opacity(
+                            opacity: animationValue,
+                            child: Transform.scale(
+                              scale: animationValue,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.lg),
+                          child: AppCard(
+                            child: Material(
+                              color: Colors.transparent,
                               borderRadius: BorderRadius.circular(AppRadius.lg),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.circular(AppRadius.lg),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? (isCorrectOption
-                                            ? AppColors.primaryGreen
-                                            : AppColors.accentOrange)
-                                        : AppColors.accentOrange
-                                            .withOpacity(0.3),
-                                    width: 3,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
+                              child: InkWell(
+                                onTap: _hasAnswered
+                                    ? null
+                                    : () => _checkAnswer(option.image),
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.lg),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 300),
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.lg),
+                                    border: Border.all(
                                       color: isSelected
                                           ? (isCorrectOption
                                               ? AppColors.primaryGreen
-                                                  .withOpacity(0.3)
-                                              : AppColors.accentOrange
-                                                  .withOpacity(0.3))
+                                              : AppColors.accentOrange)
                                           : AppColors.accentOrange
-                                              .withOpacity(0.1),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 6),
+                                              .withOpacity(0.3),
+                                      width: 3,
                                     ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(AppRadius.lg),
-                                  child: Stack(
-                                    children: [
-                                      Image.network(
-                                        option.image,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: 220,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: isSelected
+                                            ? (isCorrectOption
+                                                ? AppColors.primaryGreen
+                                                    .withOpacity(0.3)
+                                                : AppColors.accentOrange
+                                                    .withOpacity(0.3))
+                                            : AppColors.accentOrange
+                                                .withOpacity(0.1),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 6),
                                       ),
-                                      if (isSelected)
-                                        Positioned.fill(
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  (isCorrectOption
-                                                          ? AppColors
-                                                              .primaryGreen
-                                                          : AppColors
-                                                              .accentOrange)
-                                                      .withOpacity(0.8),
-                                                  (isCorrectOption
-                                                          ? AppColors
-                                                              .primaryGreen
-                                                          : AppColors
-                                                              .accentOrange)
-                                                      .withOpacity(0.6),
-                                                ],
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                  color: AppColors.pureWhite,
-                                                  shape: BoxShape.circle,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: (isCorrectOption
-                                                              ? AppColors
-                                                                  .primaryGreen
-                                                              : AppColors
-                                                                  .accentOrange)
-                                                          .withOpacity(0.3),
-                                                      blurRadius: 8,
-                                                      offset:
-                                                          const Offset(0, 4),
-                                                    ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.circular(AppRadius.lg),
+                                    child: Stack(
+                                      children: [
+                                        Image.network(
+                                          option.image,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 220,
+                                        ),
+                                        if (isSelected)
+                                          Positioned.fill(
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    (isCorrectOption
+                                                            ? AppColors
+                                                                .primaryGreen
+                                                            : AppColors
+                                                                .accentOrange)
+                                                        .withOpacity(0.8),
+                                                    (isCorrectOption
+                                                            ? AppColors
+                                                                .primaryGreen
+                                                            : AppColors
+                                                                .accentOrange)
+                                                        .withOpacity(0.6),
                                                   ],
                                                 ),
-                                                padding: const EdgeInsets.all(
-                                                    AppSpacing.md),
-                                                child: Icon(
-                                                  isCorrectOption
-                                                      ? Icons.check_circle
-                                                      : Icons.cancel,
-                                                  color: isCorrectOption
-                                                      ? AppColors.primaryGreen
-                                                      : AppColors.accentOrange,
-                                                  size: 50,
-                                                ),
-                                              ).animate().scale(),
+                                              ),
+                                              child: Center(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.pureWhite,
+                                                    shape: BoxShape.circle,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: (isCorrectOption
+                                                                ? AppColors
+                                                                    .primaryGreen
+                                                                : AppColors
+                                                                    .accentOrange)
+                                                            .withOpacity(0.3),
+                                                        blurRadius: 8,
+                                                        offset:
+                                                            const Offset(0, 4),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  padding: const EdgeInsets.all(
+                                                      AppSpacing.md),
+                                                  child: Icon(
+                                                    isCorrectOption
+                                                        ? Icons.check_circle
+                                                        : Icons.cancel,
+                                                    color: isCorrectOption
+                                                        ? AppColors.primaryGreen
+                                                        : AppColors
+                                                            .accentOrange,
+                                                    size: 50,
+                                                  ),
+                                                ).animate().scale(),
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ).animate().shakeX(
-                              duration: const Duration(milliseconds: 300),
-                              hz: 4,
-                              amount: isSelected && !_isCorrect ? 2 : 0,
-                            ),
-                      ),
-                    );
-                  },
+                          ).animate().shakeX(
+                                duration: const Duration(milliseconds: 300),
+                                hz: 4,
+                                amount: isSelected && !_isCorrect ? 2 : 0,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              if (_hasAnswered)
-                Container(
-                  margin: const EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.accentOrange,
-                        AppColors.accentOrange.withOpacity(0.8)
+                if (_hasAnswered)
+                  Container(
+                    margin: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.accentOrange,
+                          AppColors.accentOrange.withOpacity(0.8)
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.accentOrange.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
                       ],
                     ),
-                    borderRadius: BorderRadius.circular(50),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.accentOrange.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
+                    child: ElevatedButton(
+                      onPressed: _nextQuestion,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        foregroundColor: AppColors.pureWhite,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xl,
+                          vertical: AppSpacing.md,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
                       ),
-                    ],
-                  ),
-                  child: ElevatedButton(
-                    onPressed: _nextQuestion,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      foregroundColor: AppColors.pureWhite,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.xl,
-                        vertical: AppSpacing.md,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                    ),
-                    child: Text(
-                      _currentQuestionIndex < questions.length - 1
-                          ? 'Nata'
-                          : 'A bana',
-                      style: AppTextStyles.buttonText.copyWith(
-                        color: AppColors.pureWhite,
+                      child: Text(
+                        _currentQuestionIndex < questions.length - 1
+                            ? 'Nata'
+                            : 'A bana',
+                        style: AppTextStyles.buttonText.copyWith(
+                          color: AppColors.pureWhite,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

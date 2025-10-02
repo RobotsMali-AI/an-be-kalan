@@ -308,43 +308,6 @@ class _ChooseCorrectSpellPageState extends State<ChooseCorrectSpellPage> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              // Progress card
-              AppCard(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Ɲɛtaa',
-                          style: AppTextStyles.heading4.copyWith(
-                            color: AppColors.accentOrange,
-                          ),
-                        ),
-                        Text(
-                          '${allSpells.length - remainingSpells.length}/${allSpells.length}',
-                          style: AppTextStyles.bodyLarge.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryGreen,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    LinearProgressIndicator(
-                      value: (allSpells.length - remainingSpells.length) /
-                          allSpells.length,
-                      backgroundColor: AppColors.lightGrey,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(AppColors.accentOrange),
-                      minHeight: 8,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-
               // Word display card
               AppCard(
                 child: Column(
