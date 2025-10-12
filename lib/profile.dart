@@ -611,10 +611,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                t(context, 'sign_out'),
-                style: AppTextStyles.heading3.copyWith(
-                  color: AppColors.error,
+              Expanded(
+                child: Text(
+                  t(context, 'sign_out'),
+                  style: AppTextStyles.heading3.copyWith(
+                    color: AppColors.error,
+                  ),
                 ),
               ),
             ],
@@ -703,10 +705,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text(
-                t(context, 'delete_account'),
-                style: AppTextStyles.heading3.copyWith(
-                  color: AppColors.error,
+              Expanded(
+                child: Text(
+                  t(context, 'delete_account'),
+                  style: AppTextStyles.heading3.copyWith(
+                    color: AppColors.error,
+                  ),
                 ),
               ),
             ],
@@ -975,9 +979,11 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.md),
-              Text(
-                t(context, 'your_name'),
-                style: AppTextStyles.heading4,
+              Expanded(
+                child: Text(
+                  t(context, 'your_name'),
+                  style: AppTextStyles.heading4,
+                ),
               ),
             ],
           ),
@@ -1036,10 +1042,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.md),
-              Text(
-                t(context, 'account'),
-                style: AppTextStyles.heading4.copyWith(
-                  color: AppColors.error,
+              Expanded(
+                child: Text(
+                  t(context, 'account'),
+                  style: AppTextStyles.heading4.copyWith(
+                    color: AppColors.error,
+                  ),
                 ),
               ),
             ],
@@ -1205,9 +1213,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 size: 24,
               ),
               const SizedBox(width: AppSpacing.md),
-              Text(
-                t(context, 'track_progress'),
-                style: AppTextStyles.heading3,
+              Expanded(
+                child: Text(
+                  t(context, 'track_progress'),
+                  style: AppTextStyles.heading3,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                ),
               ),
             ],
           ),

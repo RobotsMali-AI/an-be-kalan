@@ -6,7 +6,7 @@ import 'package:literacy_app/theme/app_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreens extends StatefulWidget {
-  const OnboardingScreens({Key? key}) : super(key: key);
+  const OnboardingScreens({super.key});
 
   @override
   State<OnboardingScreens> createState() => _OnboardingScreensState();
@@ -142,7 +142,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                         ),
                         child: Text(
                           _currentPage == _totalPages - 1
-                              ? 'Ka daminɛ'
+                              ? 'A daminɛ'
                               : 'Ka taa fɛ',
                           style:
                               AppTextStyles.buttonText.copyWith(fontSize: 18),
@@ -198,7 +198,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
           // App name
           Text(
-            'An be Kalan',
+            'An bɛ kalan',
             style: AppTextStyles.heading1.copyWith(
               fontSize: 36,
               color: AppColors.primaryGreen,
@@ -214,7 +214,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
           // Subtitle
           Text(
-            'Bamanan kan kalan',
+            'Bamanankan kalan',
             style: AppTextStyles.subtitle.copyWith(
               fontSize: 18,
               color: AppColors.wisdomTeal,
@@ -255,7 +255,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'Bamanan kan kalanni masin min bɛ baara kɛ ni AI teknoloji ye. Kalan, fɔcogo, digi ani wale kɛ dɔrɔn.',
+                  'Bamanankankalan fɛrɛ koura min bɛ baara kɛ ni teknoloji IA ye walasa ka bamanankan kalanni nɔgɔya.',
                   style: AppTextStyles.bodyLarge.copyWith(
                     height: 1.6,
                     color: AppColors.charcoal,
@@ -316,7 +316,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
           // Title
           Text(
-            'AI Fɔcogo Sɛgɛsɛgɛli',
+            'Bamanankan fɔcogo sɛgɛsɛgɛli',
             style: AppTextStyles.heading2.copyWith(
               color: AppColors.bookBlue,
             ),
@@ -338,22 +338,22 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
                   icon: Icons.record_voice_over,
                   title: 'Kumakan Sɛgɛsɛgɛli',
                   description:
-                      'Aw ka kumakan sɛgɛsɛgɛ ka kɛ sɛbɛnni ye otomatiki la',
+                      'Aw ye sɛbɛnni kalan walasa k\'aw kumakanw sɛgɛsɛgɛ',
                   color: AppColors.bookBlue,
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 _buildFeatureItem(
                   icon: Icons.spellcheck,
-                  title: 'Fɔlisen Tiɲɛni',
-                  description: 'Aw ka fɔlisen tiɲɛ ani ka fɔcogo ɲuman kalan',
+                  title: 'Filiw latilenni',
+                  description:
+                      'Aw ye aw kumakan bayelemanenw kalan ka aw ka filiw don',
                   color: AppColors.primaryGreen,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _buildFeatureItem(
                   icon: Icons.analytics_outlined,
                   title: 'Ɲɛtaa Jateminɛ',
-                  description:
-                      'Aw ka ɲɛtaa ye caman hakɛ ani ka aw yɛrɛ ɲɛnabɔ',
+                  description: 'Aw ye aw ka ɲɛtaa jateminɛ',
                   color: AppColors.accentOrange,
                 ),
               ],
@@ -405,7 +405,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
           // Title
           Text(
-            'Bamanankan-Faransi\nBaarakɛcogo',
+            'Bamanankan bayɛlɛmani',
             style: AppTextStyles.heading2.copyWith(
               color: AppColors.accentOrange,
             ),
@@ -490,15 +490,16 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
 
                 _buildFeatureItem(
                   icon: Icons.translate,
-                  title: 'Dayɛlɛmani Teliya',
-                  description: 'Daɲɛw ani kumasenw dayɛlɛmani teliman',
+                  title: 'Bayɛlɛmani kɛ teliyala',
+                  description: 'Daɲɛw ani kumasenw bayɛlɛmani',
                   color: AppColors.accentOrange,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 _buildFeatureItem(
                   icon: Icons.history,
-                  title: 'Baarakɛli Mara',
-                  description: 'Aw ka dayɛlɛmaniw mara walasa ka segin u ma',
+                  title: 'Bayɛlɛmanenw mara',
+                  description:
+                      'Aw ka bayɛlɛmanenw mara walasa aw bɛ se ka segin u ma',
                   color: AppColors.wisdomTeal,
                 ),
               ],

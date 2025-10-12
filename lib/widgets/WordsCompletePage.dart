@@ -576,111 +576,164 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
             const SizedBox(height: 16),
             Expanded(child: _buildKeyboard()),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 if (!_isCorrect)
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.accentOrange,
-                          AppColors.accentOrange.withOpacity(0.8)
+                  Expanded(
+                    child: Container(
+                      margin:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.accentOrange,
+                            AppColors.accentOrange.withOpacity(0.8)
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.accentOrange.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(50),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.accentOrange.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                      child: ElevatedButton(
+                        onPressed: () => setState(() => userInput =
+                            userInput.isNotEmpty
+                                ? userInput.substring(0, userInput.length - 1)
+                                : ''),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: AppColors.pureWhite,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.md,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: () => setState(() => userInput =
-                          userInput.isNotEmpty
-                              ? userInput.substring(0, userInput.length - 1)
-                              : ''),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: AppColors.pureWhite,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.md,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
-                        ),
-                      ),
-                      child: Text(
-                        'Sigini jɔɔsi',
-                        style: AppTextStyles.buttonText.copyWith(
-                          color: AppColors.pureWhite,
+                        child: Text(
+                          'Sigini jɔɔsi',
+                          style: AppTextStyles.buttonText.copyWith(
+                            color: AppColors.pureWhite,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primaryGreen,
-                        AppColors.primaryGreen.withOpacity(0.8)
-                      ],
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primaryGreen.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: Icon(Icons.volume_up,
-                        color: AppColors.pureWhite, size: 30),
-                    onPressed: () =>
-                        _playAudio(gameWords[currentIndex]['audio']),
-                  ),
-                ),
+                // Audio button - always in the middle
+                // Container(
+                //   margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                //   decoration: BoxDecoration(
+                //     gradient: LinearGradient(
+                //       colors: [
+                //         AppColors.primaryGreen,
+                //         AppColors.primaryGreen.withOpacity(0.8)
+                //       ],
+                //     ),
+                //     shape: BoxShape.circle,
+                //     boxShadow: [
+                //       BoxShadow(
+                //         color: AppColors.primaryGreen.withOpacity(0.3),
+                //         blurRadius: 8,
+                //         offset: const Offset(0, 4),
+                //       ),
+                //     ],
+                //   ),
+                //   child: IconButton(
+                //     icon: Icon(Icons.volume_up,
+                //         color: AppColors.pureWhite, size: 30),
+                //     onPressed: () =>
+                //         _playAudio(gameWords[currentIndex]['audio']),
+                //   ),
+                // ),
                 if (_isCorrect)
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primaryGreen,
-                          AppColors.primaryGreen.withOpacity(0.8)
+                  Expanded(
+                    child: Container(
+                      margin:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primaryGreen,
+                            AppColors.primaryGreen.withOpacity(0.8)
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
                         ],
                       ),
-                      borderRadius: BorderRadius.circular(50),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryGreen.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                      child: ElevatedButton(
+                        onPressed: _nextWord,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: AppColors.pureWhite,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.md,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         ),
-                      ],
-                    ),
-                    child: ElevatedButton(
-                      onPressed: _nextWord,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        foregroundColor: AppColors.pureWhite,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.md,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(50),
+                        child: Text(
+                          'Dangan',
+                          style: AppTextStyles.buttonText.copyWith(
+                            color: AppColors.pureWhite,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'Dangan',
-                        style: AppTextStyles.buttonText.copyWith(
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: Container(
+                      margin:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primaryGreen,
+                            AppColors.primaryGreen.withOpacity(0.8)
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryGreen.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton(
+                        onPressed: _checkWord,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          foregroundColor: AppColors.pureWhite,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.md,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        child: Icon(
+                          Icons.check,
                           color: AppColors.pureWhite,
+                          size: 24,
                         ),
                       ),
                     ),
@@ -690,36 +743,6 @@ class _WordsCompletePageState extends State<WordsCompletePage> {
           ],
         ),
       ),
-      floatingActionButton: !_isCorrect
-          ? Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primaryGreen,
-                    AppColors.primaryGreen.withOpacity(0.8)
-                  ],
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primaryGreen.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: FloatingActionButton(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                onPressed: _checkWord,
-                child: Icon(
-                  Icons.check,
-                  color: AppColors.pureWhite,
-                  size: 28,
-                ),
-              ),
-            )
-          : null,
     );
   }
 

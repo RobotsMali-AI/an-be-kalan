@@ -7,6 +7,7 @@ import '../theme/app_styles.dart';
 import '../widgets/common/app_widgets.dart';
 import '../tutorial_service.dart';
 import '../services/simple_locale.dart';
+import '../services/translations.dart';
 import '../services/google_translate_service.dart';
 
 class TranslationPage extends StatefulWidget {
@@ -551,7 +552,7 @@ class _TranslationPageState extends State<TranslationPage>
                 children: [
                   // Source language section
                   _buildLanguageSection(
-                    title: 'Kan min na',
+                    title: t(context, 'source_language'),
                     language: _sourceLanguage,
                     isSource: true,
                   ),
@@ -567,7 +568,7 @@ class _TranslationPageState extends State<TranslationPage>
 
                   // Target language section
                   _buildLanguageSection(
-                    title: 'Kan min ma',
+                    title: t(context, 'target_language'),
                     language: _targetLanguage,
                     isSource: false,
                   ),
@@ -690,7 +691,7 @@ class _TranslationPageState extends State<TranslationPage>
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
-              Text('Daɲɛ min bɛ ka baara kɛ', style: AppTextStyles.heading4),
+              Text(t(context, 'enter_text'), style: AppTextStyles.heading4),
               const Spacer(),
               if (_textController.text.isNotEmpty)
                 IconButton(
@@ -730,7 +731,7 @@ class _TranslationPageState extends State<TranslationPage>
         maxLines: 5,
         style: AppTextStyles.bodyMedium,
         decoration: InputDecoration(
-          hintText: 'Sɛbɛnni min bɛ ka bamanankan kɛ...',
+          hintText: t(context, 'enter_text'),
           hintStyle: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.mediumGrey,
           ),
@@ -795,7 +796,7 @@ class _TranslationPageState extends State<TranslationPage>
               color: AppColors.pureWhite,
               size: 28,
             ),
-            tooltip: 'Kanw cayali',
+            tooltip: t(context, 'swap_languages'),
             padding: const EdgeInsets.all(AppSpacing.md),
           ),
         ),
@@ -825,7 +826,8 @@ class _TranslationPageState extends State<TranslationPage>
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                Text('Bamanankan kɛcogo', style: AppTextStyles.heading4),
+                Text(t(context, 'translated_text'),
+                    style: AppTextStyles.heading4),
                 const Spacer(),
                 if (_translatedText.isNotEmpty) ...[
                   IconButton(
@@ -862,7 +864,7 @@ class _TranslationPageState extends State<TranslationPage>
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           Text(
-                            'Bamanankan kɛcogo bɛ jira yan',
+                            t(context, 'translated_text'),
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: AppColors.mediumGrey,
                               fontStyle: FontStyle.italic,
@@ -916,7 +918,9 @@ class _TranslationPageState extends State<TranslationPage>
 
     return PrimaryButton(
       key: _translateButtonKey,
-      text: _isTranslating ? 'Bamanankan ka kɛ...' : 'Bamanankan',
+      text: _isTranslating
+          ? t(context, 'translate_loading')
+          : t(context, 'translate'),
       onPressed: canTranslate
           ? () {
               _translateText();

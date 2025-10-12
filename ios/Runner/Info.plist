@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
+<plist version="1.1">
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Nous avons besoin de l'accès à la bibliothèque musicale.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>We need access to your microphone for recording</string>
+	<string>We need access to your microphone for recording, you might allow microphone for recording but Microphone access is used to capture your voice for real-time transcription. The audio is sent securely to our speech recognition system (ASR model) to generate text and is immediately deleted after transcription.</string>
 	<key>NSAudioSessionCategory</key>
 	<string>AVAudioSessionCategoryPlayAndRecord</string>
 	<key>NSAudioSessionMode</key>

@@ -32,6 +32,17 @@ subprojects {
                 if (namespace == null) {
                     namespace project.group
                 }
+                // Force all subprojects to use Java 17
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+            }
+        }
+        // Force Kotlin to use JVM 17 for all subprojects
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = "17"
             }
         }
     }

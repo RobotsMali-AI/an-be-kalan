@@ -112,38 +112,18 @@ class TutorialService {
       return false;
     }
 
-    final isFirstLaunch = await isFirstAppLaunch();
-
-    if (!isFirstLaunch) {
-      // Not first launch, check individual tutorial status
-      switch (tutorialType) {
-        case 'home':
-          return !(await hasSeenHomeTutorial());
-        case 'books':
-          return !(await hasSeenBooksTutorial());
-        case 'lesson':
-          return !(await hasSeenLessonTutorial());
-        case 'translate':
-          return !(await hasSeenTranslateTutorial());
-        case 'profile':
-          return !(await hasSeenProfileTutorial());
-        default:
-          return false;
-      }
-    }
-
-    // First launch - show appropriate tutorial based on type
+    // Simple logic: check if this specific tutorial has been seen
     switch (tutorialType) {
       case 'home':
-        return _currentTutorialStep == 0 && !(await hasSeenHomeTutorial());
+        return !(await hasSeenHomeTutorial());
       case 'books':
         return !(await hasSeenBooksTutorial());
+      case 'lesson':
+        return !(await hasSeenLessonTutorial());
       case 'translate':
         return !(await hasSeenTranslateTutorial());
       case 'profile':
         return !(await hasSeenProfileTutorial());
-      case 'lesson':
-        return !(await hasSeenLessonTutorial());
       default:
         return false;
     }
@@ -172,7 +152,6 @@ class TutorialService {
       final bottomPadding = mediaQuery.padding.bottom;
 
       // Reduced requirements for tutorial visibility - make it more flexible
-      final minPadding = 40.0; // Reduced from 80px
       final tutorialContentSpace = 200.0; // Reduced from 320px
 
       // Check if element and tutorial content can fit properly on screen
@@ -453,7 +432,7 @@ class TutorialService {
               icon: Icons.book,
               title: 'Gafew',
               description:
-                  'Nin ye gafew yɔrɔ ye. Aw bɛ se ka gafe caman lajɛ ani ka kalan daminɛ.',
+                  'Nin ye gafew mara yɔrɔ ye. Aw bɛ se ka gafe dɔ sugandi ka kalan daminɛ.',
               isFirst: true,
               controller: controller,
             ),
@@ -473,9 +452,9 @@ class TutorialService {
             align: _getOptimalContentAlign(navKeys[1]),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.translate,
-              title: 'Bamanankan-Faransi',
+              title: 'Bama',
               description:
-                  'Aw bɛ se ka daɲɛw baara bamanankan na ka kɛ faransi ye, ani ka faransi daɲɛw baara bamanankan na.',
+                  'Aw bɛ se ka bamanankan daɲɛw bayɛlɛma kan wɛrɛ la, ani ka kan wɛrɛ daɲɛw bayɛlɛma bamanankan na.',
               controller: controller,
             ),
           ),
@@ -494,9 +473,9 @@ class TutorialService {
             align: _getOptimalContentAlign(navKeys[2]),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.games,
-              title: 'Nkalan',
+              title: 'N kalan',
               description:
-                  'Yan, aw bɛ se ka tulon kɛ ani ka jateminɛw ɲɛnabɔ walasa ka dɔnniya jigin.',
+                  'Yan, aw bɛ se ka tulon kɛ ani ka jateminɛw kɛ walasa ka dɔnniya jiidi.',
               controller: controller,
             ),
           ),
@@ -515,24 +494,23 @@ class TutorialService {
             align: _getOptimalContentAlign(navKeys[3]),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.person,
-              title: 'Profil',
+              title: 'Profili',
               description:
-                  'Aw ka kunnafoniw, aw ka ɲɛtaa ani aw ka paramɛtiriw bɛ yan.',
+                  'Aw ka kunnafoniw, aw ka ɲɛtaa hakɛ, ani aw ka paramɛtiriw bɛ yan.',
               isLast: true,
               controller: controller,
-              onComplete: () async {
-                await markHomeTutorialSeen();
-                _currentTutorialStep = 1;
-                // Mark first launch complete after home tutorial
-                await markFirstLaunchComplete();
-              },
+              // Removed duplicate onComplete - handled by global callback
             ),
           ),
         ],
       ),
     );
 
-    _showTutorial(context, targets);
+    _showTutorial(context, targets, onFinishCallback: () async {
+      print('Home tutorial finished - ensuring it\'s marked as seen');
+      await markHomeTutorialSeen();
+      await markFirstLaunchComplete();
+    });
   }
 
   // Books Tutorial - search and book interaction
@@ -570,7 +548,7 @@ class TutorialService {
               icon: Icons.search,
               title: 'Gafe ɲinini',
               description:
-                  'Yan, aw bɛ se ka gafe kɛnɛ ni u tɔgɔ sɛbɛnni ye. Sɛbɛnni daminɛ walasa ka ɲinini kɛ.',
+                  'Yan, aw bɛ se ka gafe ɲini ni u tɔgɔ sɛbɛnni ye yan. Sɛbɛnni daminɛ walasa ka ɲinini kɛ.',
               isFirst: true,
               controller: controller,
               onShow: () => _ensureElementVisible(searchKey),
@@ -592,9 +570,8 @@ class TutorialService {
               align: _getOptimalContentAlign(refreshKey),
               builder: (context, controller) => _buildTutorialContent(
                 icon: Icons.refresh,
-                title: 'Gafew kurala',
-                description:
-                    'Nin button in na, aw bɛ se ka gafe kuraw lajɛ walasa ka kura sɔrɔ.',
+                title: 'Gafe kuraw sɔrɔli',
+                description: 'Nin butɔn in digi walasa ka gafe kuraw sɔrɔ.',
                 controller: controller,
                 onShow: () => _ensureElementVisible(refreshKey),
               ),
@@ -615,12 +592,12 @@ class TutorialService {
             align: _getOptimalContentAlign(firstBookKey),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.touch_app,
-              title: 'Gafe kirayɛ',
+              title: 'Gafe sugandi',
               description:
-                  'Gafe dɔ kirayɛ walasa ka kalan daminɛ. Gafe kɔnɔ, aw bɛ na ka kalan sahaniw lajɛ.',
+                  'Gafe dɔ sugandi walasa ka kalan daminɛ. Gafe kɔnɔ, aw bɛ sa siginidenw, daɲɛw walima kumasenw fɔcogo ɲɛdɔn',
               isLast: true,
               controller: controller,
-              onComplete: () => markBooksTutorialSeen(),
+              // Removed duplicate onComplete - handled by global callback
               onShow: () => _ensureElementVisible(firstBookKey),
             ),
           ),
@@ -628,7 +605,10 @@ class TutorialService {
       ),
     );
 
-    _showTutorial(context, targets);
+    _showTutorial(context, targets, onFinishCallback: () async {
+      print('Books tutorial finished - ensuring it\'s marked as seen');
+      await markBooksTutorialSeen();
+    });
   }
 
   // Lesson Tutorial - recording and playback
@@ -640,7 +620,12 @@ class TutorialService {
     GlobalKey? exitButtonKey,
   }) async {
     // Check if we should show this tutorial
-    if (!(await shouldShowTutorial('lesson'))) return;
+    if (!(await shouldShowTutorial('lesson'))) {
+      print('Lesson tutorial already shown - skipping');
+      return;
+    }
+
+    print('Starting lesson tutorial setup...');
     final targets = <TargetFocus>[];
 
     // Audio play button - use smart positioning
@@ -656,7 +641,7 @@ class TutorialService {
               icon: Icons.volume_up,
               title: 'Kumakan lamɛnni',
               description:
-                  'Fɔlɔ, nin button in kirayɛ walasa ka kumasen lamɛn. O bɛna aw dɛmɛ ka fɔcogo ɲuman dɔn.',
+                  'Fɔlɔ, nin butɔn in digi walasa ka kumasen lamɛn. O bɛna aw dɛmɛ ka a fɔcogo ɲuman dɔn.',
               isFirst: true,
               controller: controller,
               onShow: () => _ensureElementVisible(audioButtonKey),
@@ -677,9 +662,9 @@ class TutorialService {
             align: _getOptimalContentAlign(micButtonKey),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.mic,
-              title: 'Kan taju',
+              title: 'Kumuakan tali',
               description:
-                  'Kumasen lamɛnni kɔfɛ, nin button in kirayɛ walasa ka aw ka fɔli taju. Fɔ kumasen in cogo kelen na.',
+                  'Kumasen lamɛnni kɔfɛ, nin button in digi walasa ka aw ka kumakan ta.',
               controller: controller,
               onShow: () => _ensureElementVisible(micButtonKey),
             ),
@@ -699,9 +684,8 @@ class TutorialService {
             align: _getOptimalContentAlign(resetButtonKey),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.refresh,
-              title: 'Kan juturu segin',
-              description:
-                  'Ni aw tɛ kɛnɛ don aw ka kan juturu la, nin button in kirayɛ walasa ka a segin ka wɛrɛ taju.',
+              title: 'Seginni kumakan tali kan',
+              description: 'Ni butɔn in digi walasa ka segin kumakan tali kan.',
               controller: controller,
               onShow: () => _ensureElementVisible(resetButtonKey),
             ),
@@ -722,12 +706,12 @@ class TutorialService {
               align: _getOptimalContentAlign(exitButtonKey),
               builder: (context, controller) => _buildTutorialContent(
                 icon: Icons.close,
-                title: 'Kalan dabɔ',
+                title: 'Kalan jɔli',
                 description:
-                    'Kalan kɔfɛ walasa ka segin gafew la, nin button in kirayɛ. Aw ka ɲɛtaa bɛna mara.',
+                    'Kalan kɔfɛ walasa ka segin gafew la, nin butɔn in digi. ',
                 isLast: true,
                 controller: controller,
-                onComplete: () => markLessonTutorialSeen(),
+                // Removed duplicate onComplete - handled by global callback
                 onShow: () => _ensureElementVisible(exitButtonKey),
               ),
             ),
@@ -735,30 +719,39 @@ class TutorialService {
         ),
       );
     } else {
-      // If no exit button, mark as last step on reset
-      targets.last = TargetFocus(
-        identify: "reset_record",
-        keyTarget: resetButtonKey,
-        alignSkip: _getOptimalSkipAlign(resetButtonKey),
-        contents: [
-          TargetContent(
-            align: _getOptimalContentAlign(resetButtonKey),
-            builder: (context, controller) => _buildTutorialContent(
-              icon: Icons.refresh,
-              title: 'Kan juturu segin',
-              description:
-                  'Ni aw tɛ kɛnɛ don aw ka kan juturu la, nin button in kirayɛ walasa ka a segin ka wɛrɛ taju.',
-              isLast: true,
-              controller: controller,
-              onComplete: () => markLessonTutorialSeen(),
-              onShow: () => _ensureElementVisible(resetButtonKey),
+      // If no exit button, make the reset button the last step and mark tutorial as seen
+      // Remove the duplicate reset button target - it's already added above
+      // Just update the last reset button to mark tutorial as seen
+      targets.removeLast(); // Remove the previous reset button
+      targets.add(
+        TargetFocus(
+          identify: "reset_record_final",
+          keyTarget: resetButtonKey,
+          alignSkip: _getOptimalSkipAlign(resetButtonKey),
+          contents: [
+            TargetContent(
+              align: _getOptimalContentAlign(resetButtonKey),
+              builder: (context, controller) => _buildTutorialContent(
+                icon: Icons.refresh,
+                title: 'Seginni kumakan tali kan',
+                description:
+                    'Ni butɔn in digi walasa ka segin kumakan tali kan. Aw ni ce! Sisan aw bɛ se ka kalan daminɛ.',
+                isLast: true,
+                controller: controller,
+                // Removed duplicate onComplete - handled by global callback
+                onShow: () => _ensureElementVisible(resetButtonKey),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 
-    _showTutorial(context, targets);
+    // Show the tutorial and ensure it's marked as seen when finished
+    _showTutorial(context, targets, onFinishCallback: () async {
+      print('Lesson tutorial finished - ensuring it\'s marked as seen');
+      await markLessonTutorialSeen();
+    });
   }
 
   // Translation Tutorial - language selection and translation features
@@ -791,7 +784,7 @@ class TutorialService {
                 icon: Icons.language,
                 title: 'Kan sugandi',
                 description:
-                    'Yan, aw bɛ se ka kan sugandi min na aw bɛ baara kɛ ani kan min ma aw bɛ baara kɛ.',
+                    'Yan, aw bɛ se ka kan Bayɛlɛmata ani bayɛlɛmanen sugandi.',
                 isFirst: true,
                 controller: controller,
                 onShow: () => _ensureElementVisible(languageDropdownKey),
@@ -836,9 +829,8 @@ class TutorialService {
             align: _getOptimalContentAlign(swapButtonKey),
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.swap_vert,
-              title: 'Kanw cayali',
-              description:
-                  'Nin button in na, aw bɛ se ka kanw cayali - bamanankan ka kɛ faransi ye walima faransi ka kɛ bamanankan ye.',
+              title: 'Kan falenyɔrɔ',
+              description: 'Nin buton in na, aw bɛ se ka kanw falen.',
               controller: controller,
               isBottomElement: _isBottomElement(swapButtonKey),
               onShow: () => _ensureElementVisible(swapButtonKey),
@@ -860,12 +852,12 @@ class TutorialService {
             align: ContentAlign.top, // Force content above for translate button
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.translate,
-              title: 'Bamanankan',
-              description: 'Nin button in kirayɛ walasa ka bamanankan kɛ.',
+              title: 'Bayɛlɛmani',
+              description: 'Nin button in kirayɛ walasa ka bayɛlɛmani kɛ.',
               isLast: true,
               controller: controller,
               isBottomElement: true, // Force compact content
-              onComplete: () => markTranslateTutorialSeen(),
+              // Removed duplicate onComplete - handled by global callback
               onShow: () {
                 // Skip visibility check for translate button
                 print('Showing translate button tutorial (forced)');
@@ -876,7 +868,10 @@ class TutorialService {
       ),
     );
 
-    _showTutorial(context, targets);
+    _showTutorial(context, targets, onFinishCallback: () async {
+      print('Translate tutorial finished - ensuring it\'s marked as seen');
+      await markTranslateTutorialSeen();
+    });
   }
 
   // Profile Tutorial - user settings and account features
@@ -906,7 +901,7 @@ class TutorialService {
                 icon: Icons.account_circle,
                 title: 'Aw ka ja',
                 description:
-                    'Nin ye aw ka ja ye. Aw bɛ se ka aw ka ja caman lajɛ ani ka aw ka tɔgɔ fɔ.',
+                    'Nin ye aw ja bla yɔrɔ ye. Aw bɛ se ka ja in falen.',
                 isFirst: true,
                 controller: controller,
                 onShow: () => _ensureElementVisible(avatarKey),
@@ -928,9 +923,8 @@ class TutorialService {
             align: ContentAlign.top,
             builder: (context, controller) => _buildTutorialContent(
               icon: Icons.edit,
-              title: 'Aw ka tɔgɔ',
-              description:
-                  'Yan, aw bɛ se ka aw ka tɔgɔ sɛmɛntiya. Tɔgɔ kura sɛbɛn ka a mara.',
+              title: 'Aw tɔgɔ',
+              description: 'Yan, aw bɛ se ka aw ka tɔgɔ sɛbɛn.',
               isFirst: avatarKey == null,
               controller: controller,
               onShow: () => _ensureElementVisible(nameInputKey),
@@ -952,9 +946,9 @@ class TutorialService {
               align: ContentAlign.top,
               builder: (context, controller) => _buildTutorialContent(
                 icon: Icons.security,
-                title: 'Jatebɔsɛbɛn',
+                title: 'Tɔgɔsɛbɛn',
                 description:
-                    'Jatebɔsɛbɛn dabɔ walasa ka aw ka ɲɛtaa sabati ani ka baara kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+                    'I tɔgɔ sɛbɛ walasa ka i ka kunnafoniw mara ani ka i ka ɲɛtaa hakɛ don.',
                 controller: controller,
                 onShow: () => _ensureElementVisible(authBannerKey),
               ),
@@ -977,10 +971,10 @@ class TutorialService {
               icon: Icons.analytics,
               title: 'Aw ka ɲɛtaa',
               description:
-                  'Yan, aw bɛ se ka aw ka kalan ɲɛtaa lajɛ - aw ka XP, kalan waati ani aw ka tilennenya.',
+                  'Yan, aw bɛ se ka aw ka kalan ɲɛtaa lajɛ - aw ka sew ani kalan waatiw.',
               isLast: true,
               controller: controller,
-              onComplete: () => markProfileTutorialSeen(),
+              // Removed duplicate onComplete - handled by global callback
               onShow: () => _ensureElementVisible(statsKey, isBottom: true),
             ),
           ),
@@ -988,10 +982,17 @@ class TutorialService {
       ),
     );
 
-    _showTutorial(context, targets);
+    _showTutorial(context, targets, onFinishCallback: () async {
+      print('Profile tutorial finished - ensuring it\'s marked as seen');
+      await markProfileTutorialSeen();
+    });
   }
 
-  static void _showTutorial(BuildContext context, List<TargetFocus> targets) {
+  static void _showTutorial(
+    BuildContext context,
+    List<TargetFocus> targets, {
+    VoidCallback? onFinishCallback,
+  }) {
     // Prevent multiple tutorials from showing at once
     if (_isTutorialShowing) {
       print('Tutorial already showing, aborting new tutorial');
@@ -1021,6 +1022,8 @@ class TutorialService {
           onFinish: () {
             print('Tutorial completed successfully');
             _isTutorialShowing = false;
+            // Call the finish callback if provided
+            onFinishCallback?.call();
           },
           onClickTarget: (target) {
             print('Tutorial target clicked: ${target.identify}');
@@ -1034,12 +1037,16 @@ class TutorialService {
           onSkip: () {
             print('Tutorial skipped by user');
             _isTutorialShowing = false;
+            // Also call finish callback when skipped
+            onFinishCallback?.call();
             return true;
           },
         ).show(context: context);
       } catch (e) {
         print('Error showing tutorial: $e');
         _isTutorialShowing = false;
+        // Call finish callback even on error
+        onFinishCallback?.call();
       }
     });
   }
@@ -1212,7 +1219,7 @@ class TutorialService {
                               ),
                             ),
                             child: Text(
-                              isLast ? 'A ye' : 'Ka taa fɛ',
+                              isLast ? 'A daminɛ' : 'Taga a fɛ',
                               style: AppTextStyles.buttonText,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1227,6 +1234,63 @@ class TutorialService {
           ),
         );
       },
+    );
+  }
+
+  // Debug method to check tutorial status
+  static Future<void> debugTutorialStatus() async {
+    print('\n=== Tutorial Status Debug ===');
+    print('Home tutorial seen: ${await hasSeenHomeTutorial()}');
+    print('Books tutorial seen: ${await hasSeenBooksTutorial()}');
+    print('Lesson tutorial seen: ${await hasSeenLessonTutorial()}');
+    print('Translate tutorial seen: ${await hasSeenTranslateTutorial()}');
+    print('Profile tutorial seen: ${await hasSeenProfileTutorial()}');
+    print('Is first app launch: ${await isFirstAppLaunch()}');
+    print('Is tutorial showing: $_isTutorialShowing');
+    print('Current tutorial step: $_currentTutorialStep');
+    print('=============================\n');
+  }
+
+  // Debug method to reset specific tutorial
+  static Future<void> resetTutorial(String tutorialType) async {
+    final prefs = await SharedPreferences.getInstance();
+    switch (tutorialType) {
+      case 'home':
+        await prefs.setBool(_hasSeenHomeTutorial, false);
+        break;
+      case 'books':
+        await prefs.setBool(_hasSeenBooksTutorial, false);
+        break;
+      case 'lesson':
+        await prefs.setBool(_hasSeenLessonTutorial, false);
+        break;
+      case 'translate':
+        await prefs.setBool(_hasSeenTranslateTutorial, false);
+        break;
+      case 'profile':
+        await prefs.setBool(_hasSeenProfileTutorial, false);
+        break;
+    }
+    print('Reset tutorial: $tutorialType');
+  }
+
+  // Debug method to force show lesson tutorial (for testing)
+  static Future<void> forceShowLessonTutorial(
+    BuildContext context, {
+    required GlobalKey micButtonKey,
+    required GlobalKey audioButtonKey,
+    required GlobalKey resetButtonKey,
+    GlobalKey? exitButtonKey,
+  }) async {
+    // Temporarily reset the lesson tutorial flag
+    await resetTutorial('lesson');
+    // Show the tutorial
+    await showLessonTutorial(
+      context,
+      micButtonKey: micButtonKey,
+      audioButtonKey: audioButtonKey,
+      resetButtonKey: resetButtonKey,
+      exitButtonKey: exitButtonKey,
     );
   }
 }

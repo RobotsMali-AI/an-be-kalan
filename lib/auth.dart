@@ -37,7 +37,7 @@ class _AuthGateState extends State<AuthGate> {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    'Bamanan kan kalan',
+                    'Bamanankan kalan',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey,
@@ -71,7 +71,7 @@ class _AuthGateState extends State<AuthGate> {
                   ),
                   const SizedBox(height: 15),
                   const Text(
-                    'Aw bɛ se ka daminɛ ka kalan kɛ sisan.\nAw tɛ jatebɔsɛbɛn wajib ye.',
+                    'Aw bɛ se ka kanlan daminɛ sisan.\nTɔgɔsɛbɛn tɛ diyagoya ye.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,
@@ -132,7 +132,7 @@ class _AuthGateState extends State<AuthGate> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Ni aw ye jatebɔsɛbɛn dabɔ, aw bɛ se ka aw ka kunnafoniw mara ka baara ka kɛ kɛrɛnkɛrɛnnenya wɛrɛw la.',
+                          'Ni aw ye aw tɔgɔsɛbɛn, aw ka kunnafoniw bɛ se ka mara walasa ka baara kɛ fanwɛrɛ fɛ.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 14,

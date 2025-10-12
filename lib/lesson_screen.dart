@@ -9,6 +9,7 @@ import 'package:literacy_app/backend_code/asr_service.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
 import 'package:literacy_app/tutorial_service.dart';
+import 'package:literacy_app/services/translations.dart';
 import 'package:literacy_app/widgets/OneImageMultipleWordsPage.dart';
 import 'package:literacy_app/widgets/floatingHintButton.dart';
 import 'package:literacy_app/widgets/multiple_choose_question.dart';
@@ -767,14 +768,14 @@ class LessonScreenState extends State<LessonScreen>
                         color: AppColors.primaryGreen,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Kalan kaamalen don!',
-                      style: AppTextStyles.subtitle.copyWith(
-                        color: AppColors.wisdomTeal,
-                        fontSize: 18,
-                      ),
-                    ),
+                    // const SizedBox(height: AppSpacing.sm),
+                    // Text(
+                    //   'Kalan kaamalen don!',
+                    //   style: AppTextStyles.subtitle.copyWith(
+                    //     color: AppColors.wisdomTeal,
+                    //     fontSize: 18,
+                    //   ),
+                    // ),
                     const SizedBox(height: AppSpacing.xxl),
 
                     // Stats Container
@@ -792,7 +793,7 @@ class LessonScreenState extends State<LessonScreen>
                         children: [
                           _buildStatRow(
                             icon: Icons.star,
-                            label: 'XP Sɔrɔla',
+                            label: t(context, 'xp_score'),
                             value: '${updatedUserData.xp} XP',
                             color: AppColors.primaryGreen,
                           ),
@@ -801,7 +802,7 @@ class LessonScreenState extends State<LessonScreen>
                               color: AppColors.lightGrey),
                           _buildStatRow(
                             icon: Icons.timer_outlined,
-                            label: 'Waati min taara',
+                            label: t(context, 'spent_time'),
                             value:
                                 '${readingTimeInMinutes.toStringAsFixed(1)} minitiw',
                             color: AppColors.wisdomTeal,
@@ -811,7 +812,7 @@ class LessonScreenState extends State<LessonScreen>
                               color: AppColors.lightGrey),
                           _buildStatRow(
                             icon: Icons.speed,
-                            label: 'Kalan teliya',
+                            label: t(context, 'learning_fast'),
                             value: '$wordPerMin daɲɛw/minitiw',
                             color: AppColors.bookBlue,
                           ),
@@ -820,7 +821,7 @@ class LessonScreenState extends State<LessonScreen>
                               color: AppColors.lightGrey),
                           _buildStatRow(
                             icon: Icons.check_circle_outline,
-                            label: 'Tilennenya',
+                            label: t(context, 'accuracy'),
                             value: '$averageAcc%',
                             color: AppColors.accentOrange,
                           ),
@@ -1144,7 +1145,7 @@ class LessonScreenState extends State<LessonScreen>
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             Text(
-                              'Kalan labɛn...',
+                              t(context, 'loading'),
                               style: AppTextStyles.bodyLarge.copyWith(
                                 color: AppColors.primaryGreen,
                                 fontWeight: FontWeight.w600,
@@ -1153,7 +1154,7 @@ class LessonScreenState extends State<LessonScreen>
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
-                              'Aw ka kuma bɛ bamanankan kan na',
+                              t(context, 'loading_message'),
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.mediumGrey,
                               ),
@@ -1606,7 +1607,7 @@ class LessonScreenState extends State<LessonScreen>
                                   },
                                   icon: const Icon(Icons.refresh,
                                       color: Colors.white, size: 26),
-                                  tooltip: 'Reset',
+                                  tooltip: t(context, 'reset'),
                                 ),
                               ),
 
@@ -1654,8 +1655,10 @@ class LessonScreenState extends State<LessonScreen>
                                                 horizontal: AppSpacing.sm),
                                             child: Text(
                                               isRecording
-                                                  ? 'Ka fɔli ka daminɛ...'
-                                                  : 'Aw ka kan dɔn walasa ka kalan daminɛ',
+                                                  ? t(context,
+                                                      'beggining_recording')
+                                                  : t(context,
+                                                      'enter_recording'),
                                               style: AppTextStyles.bodySmall
                                                   .copyWith(
                                                 color: isRecording
