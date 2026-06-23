@@ -66,6 +66,7 @@ class UnifiedAppBar extends StatelessWidget implements PreferredSizeWidget {
                 height: 36,
                 width: 36,
                 fit: BoxFit.cover,
+                semanticLabel: 'An be Kalan logo',
               ),
             ),
           ),
@@ -205,15 +206,19 @@ class AppBarActionButton extends StatelessWidget {
           ),
         ],
       ),
-      child: IconButton(
-        icon: Icon(
-          icon,
-          color: iconColor ?? AppColors.primaryGreen,
-          size: 22,
+      child: Semantics(
+        button: true,
+        label: tooltip,
+        child: IconButton(
+          icon: Icon(
+            icon,
+            color: iconColor ?? AppColors.primaryGreen,
+            size: 22,
+          ),
+          onPressed: onPressed,
+          tooltip: tooltip,
+          splashRadius: 20,
         ),
-        onPressed: onPressed,
-        tooltip: tooltip,
-        splashRadius: 20,
       ),
     );
   }

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:literacy_app/auth.dart';
@@ -10,6 +12,9 @@ import 'package:literacy_app/confidialiter.dart';
 import 'package:literacy_app/firebase_options.dart';
 import 'package:literacy_app/home.dart';
 import 'package:literacy_app/onboarding_screens.dart';
+import 'package:literacy_app/routes.dart';
+import 'package:literacy_app/theme/app_colors.dart';
+import 'package:literacy_app/theme/app_styles.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'services/simple_locale.dart';
@@ -23,55 +28,40 @@ late final FirebaseApp app;
 // Requires that the Firebase Auth emulator is running locally
 // e.g via melos run firebase:emulator.
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  bool? hasSeenConfidialiter = prefs.getBool('hasSeenConfidialiter');
-  bool? hasSeenOnboarding = prefs.getBool('hasSeenOnboarding');
-  app = await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  // Load locale before runApp
-  final simpleLocale = SimpleLocale();
-  await simpleLocale.load();
-  // Initialize ASR service
-  try {
-    final success = await ASRService.instance.initialize();
-    if (!success) {
-      print(
-          'Warning: ASR service initialization failed, fallback to API will be used');
-    }
-  } catch (e) {
-    print('Error initializing ASR service: $e');
-  }
-  await FirebaseAppCheck.instance.activate(
-    // Default provider for Android is the Play Integrity provider. You can use the "AndroidProvider" enum to choose
-    // your preferred provider. Choose from:
-    // 1. Debug provider
-    // 2. Safety Net provider
-    // 3. Play Integrity provider
-    androidProvider: AndroidProvider.playIntegrity,
-    // Default provider for iOS/macOS is the Device Check provider. You can use the "AppleProvider" enum to choose
-    // your preferred provider. Choose from:
-    // 1. Debug provider
-    // 2. Device Check provider
-    // 3. App Attest provider
-    // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
-  );
+  runZonedGuarded<Future<void>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? hasSeenConfidialiter = prefs.getBool('hasSeenConfidialiter');
+    bool? hasSeenOnboarding = prefs.getBool('hasSeenOnboarding');
+    app = await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
 
-//const LiteracyAppEntry()
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => UserSessionService()),
-      ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
-      ChangeNotifierProvider(create: (_) => DatabaseHelper()),
-      ChangeNotifierProvider<SimpleLocale>.value(value: simpleLocale),
-    ],
-    child: LiteracyAppEntry(
-      hasSeenConfidialiter: hasSeenConfidialiter,
-      hasSeenOnboarding: hasSeenOnboarding,
-    ),
-  ));
-  //runApp();
+    // Initialize Crashlytics
+    FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+
+    // Load locale before runApp
+    final simpleLocale = SimpleLocale();
+    await simpleLocale.load();
+    await FirebaseAppCheck.instance.activate(
+      androidProvider: AndroidProvider.playIntegrity,
+    );
+
+    runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserSessionService()),
+        ChangeNotifierProvider(create: (_) => ApiFirebaseService()),
+        ChangeNotifierProvider(create: (_) => DatabaseHelper()),
+        ChangeNotifierProvider<SimpleLocale>.value(value: simpleLocale),
+      ],
+      child: LiteracyAppEntry(
+        hasSeenConfidialiter: hasSeenConfidialiter,
+        hasSeenOnboarding: hasSeenOnboarding,
+      ),
+    ));
+  }, (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  });
 }
 
 /// The entry point of the application.
@@ -91,11 +81,61 @@ class LiteracyAppEntry extends StatefulWidget {
 }
 
 class _LiteracyAppEntryState extends State<LiteracyAppEntry> {
+  bool _modelReady = false;
+  bool _isDownloading = false;
+  double _downloadProgress = 0.0;
+  String? _downloadError;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAndDownloadModel();
+  }
+
   @override
   void dispose() {
-    // Clean up ASR service when app is disposed
     ASRService.instance.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkAndDownloadModel() async {
+    setState(() {
+      _isDownloading = true;
+      _downloadError = null;
+    });
+
+    try {
+      ASRService.instance.setAllowAPIFallback(false);
+      final success = await ASRService.instance.initialize(
+        onDownloadProgress: (progress) {
+          if (mounted) {
+            setState(() => _downloadProgress = progress);
+          }
+        },
+      );
+      if (mounted) {
+        if (success) {
+          setState(() {
+            _modelReady = true;
+            _isDownloading = false;
+          });
+        } else {
+          setState(() {
+            _isDownloading = false;
+            _downloadError = 'Model initialization failed';
+          });
+        }
+      }
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'ASR model download');
+      if (mounted) {
+        setState(() {
+          _isDownloading = false;
+          _downloadError = e.toString();
+        });
+      }
+    }
   }
 
   @override
@@ -104,68 +144,210 @@ class _LiteracyAppEntryState extends State<LiteracyAppEntry> {
       debugShowCheckedModeBanner: false,
       title: 'An be Kalan',
       theme: ThemeData(primarySwatch: Colors.purple, useMaterial3: true),
-      home: Scaffold(
-        body: LayoutBuilder(
-          builder: (context, constraints) {
-            return Row(
+      onGenerateRoute: AppRoutes.onGenerateRoute,
+      home: _modelReady ? _buildAppContent() : _buildDownloadScreen(),
+    );
+  }
+
+  Widget _buildDownloadScreen() {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: AppColors.backgroundGradient,
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Visibility(
-                  visible: constraints.maxWidth >= 1200,
-                  child: Expanded(
-                    child: Container(
-                      height: double.infinity,
-                      color: Theme.of(context).colorScheme.primary,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                // App logo/icon area
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryGreen.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.menu_book_rounded,
+                      color: Colors.white, size: 40),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'An be Kalan',
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.charcoal,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Preparing speech recognition...',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.mediumGrey,
+                  ),
+                ),
+                const SizedBox(height: 40),
+
+                if (_downloadError != null) ...[
+                  Icon(Icons.error_outline, color: AppColors.error, size: 48),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Download failed. Please check your internet connection.',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.error),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _checkAndDownloadModel,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Retry'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryGreen,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // Progress bar
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'An be Kalan Desktop',
-                              style: Theme.of(context).textTheme.headlineMedium,
+                              _downloadProgress > 0
+                                  ? 'Downloading model...'
+                                  : 'Initializing...',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.charcoal,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
+                            if (_downloadProgress > 0)
+                              Text(
+                                '${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.primaryGreen,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                           ],
                         ),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: LinearProgressIndicator(
+                            value: _downloadProgress > 0
+                                ? _downloadProgress
+                                : null,
+                            backgroundColor: AppColors.lightGrey,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primaryGreen),
+                            minHeight: 8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'This only happens once',
+                    style: AppTextStyles.captionText.copyWith(
+                      color: AppColors.mediumGrey,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAppContent() {
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Row(
+            children: [
+              Visibility(
+                visible: constraints.maxWidth >= 1200,
+                child: Expanded(
+                  child: Container(
+                    height: double.infinity,
+                    color: Theme.of(context).colorScheme.primary,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'An be Kalan Desktop',
+                            style: Theme.of(context).textTheme.headlineMedium,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: constraints.maxWidth >= 1200
-                      ? constraints.maxWidth / 2
-                      : constraints.maxWidth,
-                  child: Consumer<UserSessionService>(
-                    builder: (context, userSession, _) {
-                      // Use a more stable approach that doesn't rebuild on every change
-                      if (userSession.currentUser == null) {
-                        // Only initialize once, don't rebuild
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (mounted) {
-                            userSession.initializeSession();
-                          }
-                        });
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
+              ),
+              SizedBox(
+                width: constraints.maxWidth >= 1200
+                    ? constraints.maxWidth / 2
+                    : constraints.maxWidth,
+                child: Consumer<UserSessionService>(
+                  builder: (context, userSession, _) {
+                    if (userSession.currentUser == null) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        if (mounted) {
+                          userSession.initializeSession();
+                        }
+                      });
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
-                      // Always check onboarding flow first, regardless of user session
-                      if (widget.hasSeenConfidialiter != true) {
-                        return const PrivacyPolicyPage();
-                      }
+                    if (widget.hasSeenConfidialiter != true) {
+                      return const PrivacyPolicyPage();
+                    }
 
-                      if (widget.hasSeenOnboarding != true) {
-                        return const OnboardingScreens();
-                      }
+                    if (widget.hasSeenOnboarding != true) {
+                      return const OnboardingScreens();
+                    }
 
-                      // After onboarding is complete, check user session
-                      return const HomePage();
-                    },
-                  ),
+                    return const HomePage();
+                  },
                 ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

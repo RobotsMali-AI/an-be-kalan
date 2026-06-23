@@ -2,26 +2,28 @@ import 'dart:ffi';
 import 'dart:io';
 import 'dart:convert';
 import 'package:ffi/ffi.dart';
-import 'package:flutter/services.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path_provider/path_provider.dart';
+// Note: flutter/services.dart (rootBundle) no longer needed - model downloaded from Firebase Storage
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 // FFI bindings for the native ASR library
-typedef InitSessionC = IntPtr Function(Pointer<Utf8> onnxPath);
-typedef InitSessionDart = int Function(Pointer<Utf8> onnxPath);
+typedef InitSessionC = Uint64 Function(Pointer<Utf8> onnxPath, Int32 modelType);
+typedef InitSessionDart = int Function(Pointer<Utf8> onnxPath, int modelType);
 
 typedef TranscribeC = Pointer<Utf8> Function(
-    IntPtr handle, Pointer<Utf8> wavPath);
+    Uint64 handle, Pointer<Utf8> wavPath);
 typedef TranscribeDart = Pointer<Utf8> Function(
     int handle, Pointer<Utf8> wavPath);
 
 typedef FreeCStringC = Void Function(Pointer<Utf8> ptr);
 typedef FreeCStringDart = void Function(Pointer<Utf8> ptr);
 
-typedef DisposeC = Void Function(IntPtr handle);
+typedef DisposeC = Void Function(Uint64 handle);
 typedef DisposeDart = void Function(int handle);
 
 class ASRService {
@@ -65,13 +67,18 @@ class ASRService {
   }
 
   /// Initialize the ASR service
-  Future<bool> initialize() async {
+  Future<bool> initialize({Function(double)? onDownloadProgress}) async {
+    if (_isInitialized) {
+      print('ASR service already initialized, skipping');
+      return true;
+    }
+
     print('=== ASR Service Initialization ===');
     print('Platform: ${Platform.operatingSystem}');
     print('Allow API fallback: $_allowAPIFallback');
 
     if (Platform.isAndroid) {
-      final result = await _initializeAndroid();
+      final result = await _initializeAndroid(onDownloadProgress: onDownloadProgress);
       _isInitialized = result;
       print('Android ASR initialization result: $result');
       return result;
@@ -83,7 +90,7 @@ class ASRService {
   }
 
   /// Initialize the Android native ASR
-  Future<bool> _initializeAndroid() async {
+  Future<bool> _initializeAndroid({Function(double)? onDownloadProgress}) async {
     try {
       print('Loading native library: libNeMoOnnxSharp.so');
       // Load the native library
@@ -101,9 +108,9 @@ class ASRService {
       _dispose = _lib!.lookupFunction<DisposeC, DisposeDart>('Dispose');
       print('✓ Function pointers obtained');
 
-      // Get or copy the model file
+      // Get or download the model file
       print('Getting model path...');
-      _modelPath = await _getModelPath();
+      _modelPath = await _getModelPath(onProgress: onDownloadProgress);
       if (_modelPath == null) {
         _lastError = 'Failed to get model path';
         print('✗ $_lastError');
@@ -123,10 +130,10 @@ class ASRService {
       print(
           '✓ Model file exists, size: ${(fileSize / 1024 / 1024).toStringAsFixed(2)} MB');
 
-      // Initialize the session
+      // Initialize the session with modelType 1 (Soloni)
       print('Initializing ASR session...');
       final modelPathUtf8 = _modelPath!.toNativeUtf8();
-      _sessionHandle = _initSession(modelPathUtf8);
+      _sessionHandle = _initSession(modelPathUtf8, 1);
       malloc.free(modelPathUtf8);
 
       if (_sessionHandle == null || _sessionHandle == 0) {
@@ -138,34 +145,47 @@ class ASRService {
       print('✓ ASR service initialized successfully');
       print('Session handle: $_sessionHandle');
       return true;
-    } catch (e) {
+    } catch (e, stack) {
       _lastError = 'Failed to initialize ASR service: $e';
       print('✗ $_lastError');
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'ASR Android initialization');
       return false;
     }
   }
 
-  /// Get the model path, copying from assets if necessary
-  Future<String?> _getModelPath() async {
+  /// Get the model path, downloading from Firebase Storage if necessary
+  Future<String?> _getModelPath({Function(double)? onProgress}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final existingPath = prefs.getString('asr_model_path');
 
-      if (existingPath != null && await File(existingPath).exists()) {
+      if (existingPath != null &&
+          existingPath.contains('soloni-be-kalan') &&
+          await File(existingPath).exists()) {
         print('Using existing model at: $existingPath');
         return existingPath;
       }
 
-      // Copy model from assets to app documents directory
+      // Download model from Firebase Storage
       final dir = await getApplicationDocumentsDirectory();
-      final modelFile = File('${dir.path}/stt-bm-quartznet15x5-V0.onnx');
+      final modelFile = File('${dir.path}/soloni-be-kalan.onnx');
 
       if (!await modelFile.exists()) {
-        print('Copying ASR model from assets...');
-        final bytes =
-            await rootBundle.load('assets/stt-bm-quartznet15x5-V0.onnx');
-        await modelFile.writeAsBytes(bytes.buffer.asUint8List());
-        print('Model copied successfully');
+        print('Downloading ASR model from Firebase Storage...');
+        final ref = FirebaseStorage.instance.ref('models/soloni-be-kalan.onnx');
+        final downloadTask = ref.writeToFile(modelFile);
+
+        downloadTask.snapshotEvents.listen((event) {
+          if (event.totalBytes > 0) {
+            final progress = event.bytesTransferred / event.totalBytes;
+            print('Download progress: ${(progress * 100).toStringAsFixed(1)}%');
+            onProgress?.call(progress);
+          }
+        });
+
+        await downloadTask;
+        print('Model downloaded successfully');
       } else {
         print('Model already exists in app directory');
       }
@@ -249,10 +269,12 @@ class ASRService {
           'Result preview: ${result.length > 50 ? result.substring(0, 50) + "..." : result}');
 
       return result;
-    } catch (e) {
+    } catch (e, stack) {
       final error = 'Error during Android transcription: $e';
       print('✗ $error');
       _lastError = error;
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'ASR Android transcription');
 
       if (_allowAPIFallback) {
         print('Falling back to API...');
@@ -310,10 +332,12 @@ class ASRService {
         _lastError = error;
         return null;
       }
-    } catch (e) {
+    } catch (e, stack) {
       final error = 'Error during API transcription: $e';
       print('✗ $error');
       _lastError = error;
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'ASR API transcription');
       return null;
     }
   }

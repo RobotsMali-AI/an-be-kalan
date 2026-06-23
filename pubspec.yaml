@@ -41,6 +41,7 @@ dependencies:
   firebase_auth: ^5.5.2
   firebase_storage: ^12.4.5
   firebase_analytics: ^11.4.5
+  firebase_crashlytics: ^4.3.2
   cloud_firestore: ^5.6.6
   # Google (sign in)
   google_sign_in_dartio: ^0.3.0
@@ -127,7 +128,6 @@ flutter:
     - assets/jsons/chooseCorrectSpellPage.json
     - assets/jsons/wordCompletPage.json
     - assets/jsons/alphabet.json
-    - assets/stt-bm-quartznet15x5-V0.onnx
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

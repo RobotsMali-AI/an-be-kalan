@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:fade_shimmer_master/fade_shimmer_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/api_firebase_service.dart';
-import 'package:literacy_app/lesson_screen.dart';
+import 'package:literacy_app/routes.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
 import 'package:literacy_app/models/bookUser.dart';
@@ -367,21 +367,20 @@ class _BookPageWidgetState extends State<BookPageWidget> {
 
   Future<void> openLesson(
       BuildContext context, String bookTitle, Users? userData) async {
-    final updatedUserData = await Navigator.push(
+    final result = await Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => LessonScreen(
-          isOffLine: false,
-          uid: widget.userSession.currentUser?.uid ?? '',
-          userdata: userData!,
-          bookTitle: bookTitle,
-        ),
+      AppRoutes.lesson,
+      arguments: LessonScreenArgs(
+        isOffLine: false,
+        uid: widget.userSession.currentUser?.uid ?? '',
+        bookTitle: bookTitle,
+        userData: userData,
       ),
     );
 
-    if (updatedUserData != null && mounted) {
+    if (result != null && result is Users && mounted) {
       setState(() {
-        widget.userData = updatedUserData;
+        widget.userData = result;
       });
     }
   }

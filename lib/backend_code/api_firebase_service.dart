@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -29,7 +30,9 @@ class ApiFirebaseService with ChangeNotifier {
       var fetchedBooks = await fetchBooksFromFirebase(); // Your implementation
       books = List<Book>.from(fetchedBooks);
       return books;
-    } catch (e) {
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'Failed to load books');
       throw Exception('Failed to load books: $e');
     }
   }
@@ -231,8 +234,9 @@ class ApiFirebaseService with ChangeNotifier {
     try {
       // Use the new ASR service which handles platform-specific logic
       return await ASRService.instance.transcribeAudio(filePath);
-    } catch (e) {
-      print('Failed to transcribe audio: $e');
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'ASR inference failed');
       return null;
     }
   }

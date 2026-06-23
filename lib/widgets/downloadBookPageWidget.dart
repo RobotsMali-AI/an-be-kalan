@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/semb_database.dart';
-import 'package:literacy_app/lesson_screen.dart';
+import 'package:literacy_app/routes.dart';
 import 'package:literacy_app/main.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/models/book.dart';
@@ -215,21 +215,20 @@ class _BookPageWidgetState extends State<DownloadBookPageWidget> {
 
   Future<void> openLesson(
       BuildContext context, String bookTitle, Users? userData) async {
-    final updatedUserData = await Navigator.push(
+    final result = await Navigator.pushNamed(
       context,
-      MaterialPageRoute(
-        builder: (context) => LessonScreen(
-          isOffLine: true,
-          uid: widget.user.uid,
-          userdata: userData!,
-          bookTitle: bookTitle,
-        ),
+      AppRoutes.lesson,
+      arguments: LessonScreenArgs(
+        isOffLine: true,
+        uid: widget.user.uid,
+        bookTitle: bookTitle,
+        userData: userData,
       ),
     );
 
-    if (updatedUserData != null) {
+    if (result != null && result is Users) {
       setState(() {
-        userData = updatedUserData;
+        userData = result;
       });
     }
   }

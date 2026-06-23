@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:literacy_app/auth.dart';
+import 'package:literacy_app/routes.dart';
 import 'package:literacy_app/theme/app_colors.dart';
 import 'package:literacy_app/theme/app_styles.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,10 +28,7 @@ class _OnboardingScreensState extends State<OnboardingScreens> {
     await prefs.setBool('hasSeenOnboarding', true);
 
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthGate()),
-      );
+      Navigator.pushReplacementNamed(context, AppRoutes.auth);
     }
   }
 

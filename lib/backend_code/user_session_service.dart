@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/Users.dart';
@@ -108,8 +109,9 @@ class UserSessionService with ChangeNotifier {
       _isAuthenticated = false;
 
       _safeNotifyListeners();
-    } catch (e) {
-      print('Error creating anonymous user: $e');
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'Creating anonymous user');
       // Fallback to local-only user
       await _createLocalAnonymousUser();
     }
@@ -212,7 +214,9 @@ class UserSessionService with ChangeNotifier {
         'message': 'Fɛn dɔ ma ɲɛ',
         'messageEn': 'Something went wrong'
       };
-    } catch (e) {
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'Account creation');
       return {
         'success': false,
         'message': 'Fɛn dɔ ma ɲɛ: $e',
@@ -280,7 +284,9 @@ class UserSessionService with ChangeNotifier {
         'message': 'I sera la ka ɲɛ!',
         'messageEn': 'Signed in successfully!'
       };
-    } catch (e) {
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'Sign in');
       return {
         'success': false,
         'message': 'Fɛn dɔ ma ɲɛ: $e',
@@ -348,7 +354,9 @@ class UserSessionService with ChangeNotifier {
         'message': 'Jatebɔsɛbɛn bɔra ka ɲɛ!',
         'messageEn': 'Account deleted successfully!'
       };
-    } catch (e) {
+    } catch (e, stack) {
+      FirebaseCrashlytics.instance.recordError(e, stack,
+          reason: 'Account deletion');
       return {
         'success': false,
         'message': 'Fɛn dɔ ma ɲɛ: $e',

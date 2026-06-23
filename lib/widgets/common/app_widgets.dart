@@ -23,48 +23,53 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: AppDecorations.primaryButtonDecoration,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: isLoading ? null : onPressed,
-          child: Center(
-            child: isLoading
-                ? SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: AppColors.pureWhite,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (icon != null) ...[
-                          Icon(icon, color: AppColors.pureWhite, size: 20),
-                          const SizedBox(width: AppSpacing.sm),
-                        ],
-                        Flexible(
-                          child: Text(
-                            text,
-                            style: AppTextStyles.buttonText,
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
+    return Semantics(
+      button: true,
+      enabled: !isLoading,
+      label: isLoading ? '$text, loading' : text,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: AppDecorations.primaryButtonDecoration,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            onTap: isLoading ? null : onPressed,
+            child: Center(
+              child: isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: AppColors.pureWhite,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (icon != null) ...[
+                            Icon(icon, color: AppColors.pureWhite, size: 20),
+                            const SizedBox(width: AppSpacing.sm),
+                          ],
+                          Flexible(
+                            child: Text(
+                              text,
+                              style: AppTextStyles.buttonText,
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+            ),
           ),
         ),
       ),
@@ -93,61 +98,66 @@ class SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: BoxDecoration(
-        color: AppColors.pureWhite,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.primaryGreen, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+    return Semantics(
+      button: true,
+      enabled: !isLoading,
+      label: isLoading ? '$text, loading' : text,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: BoxDecoration(
+          color: AppColors.pureWhite,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: isLoading ? null : onPressed,
-          child: Center(
-            child: isLoading
-                ? SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: AppColors.primaryGreen,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (icon != null) ...[
-                          Icon(icon, color: AppColors.primaryGreen, size: 20),
-                          const SizedBox(width: AppSpacing.sm),
-                        ],
-                        Flexible(
-                          child: Text(
-                            text,
-                            style: AppTextStyles.buttonText.copyWith(
-                              color: AppColors.primaryGreen,
+          border: Border.all(color: AppColors.primaryGreen, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryGreen.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            onTap: isLoading ? null : onPressed,
+            child: Center(
+              child: isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (icon != null) ...[
+                            Icon(icon, color: AppColors.primaryGreen, size: 20),
+                            const SizedBox(width: AppSpacing.sm),
+                          ],
+                          Flexible(
+                            child: Text(
+                              text,
+                              style: AppTextStyles.buttonText.copyWith(
+                                color: AppColors.primaryGreen,
+                              ),
+                              textAlign: TextAlign.center,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
                             ),
-                            textAlign: TextAlign.center,
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+            ),
           ),
         ),
       ),
@@ -176,35 +186,40 @@ class AccentButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: width,
-      height: height,
-      decoration: AppDecorations.accentButtonDecoration,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          onTap: isLoading ? null : onPressed,
-          child: Center(
-            child: isLoading
-                ? SizedBox(
-                    height: 24,
-                    width: 24,
-                    child: CircularProgressIndicator(
-                      color: AppColors.pureWhite,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (icon != null) ...[
-                        Icon(icon, color: AppColors.pureWhite, size: 20),
-                        const SizedBox(width: AppSpacing.sm),
+    return Semantics(
+      button: true,
+      enabled: !isLoading,
+      label: isLoading ? '$text, loading' : text,
+      child: Container(
+        width: width,
+        height: height,
+        decoration: AppDecorations.accentButtonDecoration,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            onTap: isLoading ? null : onPressed,
+            child: Center(
+              child: isLoading
+                  ? SizedBox(
+                      height: 24,
+                      width: 24,
+                      child: CircularProgressIndicator(
+                        color: AppColors.pureWhite,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (icon != null) ...[
+                          Icon(icon, color: AppColors.pureWhite, size: 20),
+                          const SizedBox(width: AppSpacing.sm),
+                        ],
+                        Text(text, style: AppTextStyles.buttonText),
                       ],
-                      Text(text, style: AppTextStyles.buttonText),
-                    ],
-                  ),
+                    ),
+            ),
           ),
         ),
       ),
@@ -288,40 +303,43 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+    return Semantics(
+      label: '$title: $value',
+      child: AppCard(
+        onTap: onTap,
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Icon(icon, color: AppColors.pureWhite, size: 24),
             ),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Icon(icon, color: AppColors.pureWhite, size: 24),
-          ),
-          const SizedBox(width: AppSpacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.bodyMedium),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  value,
-                  style: AppTextStyles.heading4.copyWith(color: color),
-                ),
-              ],
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTextStyles.bodyMedium),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    value,
+                    style: AppTextStyles.heading4.copyWith(color: color),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -404,26 +422,30 @@ class LoadingOverlay extends StatelessWidget {
       children: [
         child,
         if (isLoading)
-          Container(
-            color: AppColors.charcoal.withOpacity(0.5),
-            child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                decoration: BoxDecoration(
-                  color: AppColors.pureWhite,
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircularProgressIndicator(
-                      color: AppColors.primaryGreen,
-                    ),
-                    if (message != null) ...[
-                      const SizedBox(height: AppSpacing.md),
-                      Text(message!, style: AppTextStyles.bodyMedium),
+          Semantics(
+            label: message ?? 'Loading',
+            liveRegion: true,
+            child: Container(
+              color: AppColors.charcoal.withOpacity(0.5),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  decoration: BoxDecoration(
+                    color: AppColors.pureWhite,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        color: AppColors.primaryGreen,
+                      ),
+                      if (message != null) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        Text(message!, style: AppTextStyles.bodyMedium),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),

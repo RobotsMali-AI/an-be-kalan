@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:literacy_app/auth.dart';
 import 'package:literacy_app/backend_code/user_session_service.dart';
-import 'package:literacy_app/feedback.dart';
+import 'package:literacy_app/routes.dart';
 import 'package:literacy_app/models/Users.dart';
 import 'package:literacy_app/widgets/common/unified_app_bar.dart';
 import 'package:literacy_app/theme/app_colors.dart';
@@ -118,10 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _signOut() async {
     await widget.userSession.signOut();
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AuthGate()),
-      );
+      Navigator.pushReplacementNamed(context, AppRoutes.auth);
     }
   }
 
@@ -825,10 +821,7 @@ class _ProfilePageState extends State<ProfilePage> {
           // Small delay to ensure SnackBar is shown
           await Future.delayed(const Duration(milliseconds: 500));
           if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const AuthGate()),
-            );
+            Navigator.pushReplacementNamed(context, AppRoutes.auth);
           }
         }
       } catch (e) {
@@ -857,10 +850,7 @@ class _ProfilePageState extends State<ProfilePage> {
           actions: [
             AppBarActionButton(
               icon: Icons.feedback,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FeedbackScreen()),
-              ),
+              onPressed: () => Navigator.pushNamed(context, AppRoutes.feedback),
               tooltip: 'Lafili',
             ),
             AppBarActionButton(

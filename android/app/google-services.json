@@ -1,55 +1,10 @@
 {
   "project_info": {
     "project_number": "44150089003",
-    "firebase_url": "https://bam-literacy-app-default-rtdb.firebaseio.com",
     "project_id": "bam-literacy-app",
     "storage_bucket": "bam-literacy-app.firebasestorage.app"
   },
   "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:44150089003:android:53f0b2e38e82a459f2916e",
-        "android_client_info": {
-          "package_name": "com.example.litteracy_app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "44150089003-o0crpaq3kpla6u0l7o2nfmeemg79vf21.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.litteracy_app",
-            "certificate_hash": "f90d97118db2d32bdfeabff9f141c8c3c226f29c"
-          }
-        },
-        {
-          "client_id": "44150089003-adelpogbvbm6uei4u48u28ksfpt6jmem.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAdofqgVLcR-ieQHPBFLgJxy02vmrceSo4"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "44150089003-adelpogbvbm6uei4u48u28ksfpt6jmem.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "44150089003-2qborf6ee411tr1v60esiouj9pc59uoq.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.litteracyApp"
-              }
-            }
-          ]
-        }
-      }
-    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:44150089003:android:967aa6903fe5ab1cf2916e",
@@ -57,52 +12,7 @@
           "package_name": "org.robotsmali.literacy_app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "44150089003-0thjs7jdddtbg0bu6b07bdq39iso04qh.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "org.robotsmali.literacy_app",
-            "certificate_hash": "91d70bef9ed71c5ef6b8f79839d224d5139f1bee"
-          }
-        },
-        {
-          "client_id": "44150089003-67as75ijnf3mhr0oc7v6scu891jric8k.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "org.robotsmali.literacy_app",
-            "certificate_hash": "8648bf25306eb13335ab17b0dbfe19b9567f7c98"
-          }
-        },
-        {
-          "client_id": "44150089003-6npvpj7l4gh0gjgqu7cd6v6nbej0h5f3.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "org.robotsmali.literacy_app",
-            "certificate_hash": "f90d97118db2d32bdfeabff9f141c8c3c226f29c"
-          }
-        },
-        {
-          "client_id": "44150089003-71l9im9ihvfhm6f1de5o2tdoe8lbnooc.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "org.robotsmali.literacy_app",
-            "certificate_hash": "3f3f57fdad58916e2349e6c7e6e027b72ae5615a"
-          }
-        },
-        {
-          "client_id": "44150089003-fklgoe7dee6oerg17l6g2uqi2senaul9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "org.robotsmali.literacy_app",
-            "certificate_hash": "7ac2c53ed939dbd3ebb8c319343018d2099fa339"
-          }
-        },
-        {
-          "client_id": "44150089003-adelpogbvbm6uei4u48u28ksfpt6jmem.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyAdofqgVLcR-ieQHPBFLgJxy02vmrceSo4"
@@ -110,19 +20,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "44150089003-adelpogbvbm6uei4u48u28ksfpt6jmem.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "44150089003-2qborf6ee411tr1v60esiouj9pc59uoq.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.litteracyApp"
-              }
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

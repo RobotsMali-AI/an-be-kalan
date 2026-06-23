@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:literacy_app/backend_code/user_session_service.dart';
-import 'package:literacy_app/home.dart';
+import 'package:literacy_app/routes.dart';
 import 'package:provider/provider.dart';
 
 /// Simple welcome screen for optional authentication
@@ -167,10 +167,7 @@ class _AuthGateState extends State<AuthGate> {
 
       // Navigate to home
       if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
       }
     } catch (e) {
       if (mounted) {

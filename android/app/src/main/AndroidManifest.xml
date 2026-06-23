@@ -2,10 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.robotsmali.literacy_app">
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
     <!-- Required for advertising ID access (Google Play Console requirement) -->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-    
+
     <!-- Remove other AD-related permissions that may be added by dependencies -->
     <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
@@ -14,7 +14,7 @@
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
-        
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -30,7 +30,6 @@
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
-              android:value="@integer/google_play_services_version" 
               />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

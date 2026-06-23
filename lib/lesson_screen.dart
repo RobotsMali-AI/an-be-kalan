@@ -87,6 +87,12 @@ class LessonScreenState extends State<LessonScreen>
   DateTime? sessionStartTime; // Start time of entire lesson session
 
   List<double> accuracies = [];
+  String? _transcriptionText;
+  double? _currentAccuracy;
+
+  // ASR Download/Init state
+  bool _isDownloadingModel = false;
+  double _downloadProgress = 0.0;
 
   // ASR Debug variables
   bool _showASRDebug = false;
@@ -209,15 +215,33 @@ class LessonScreenState extends State<LessonScreen>
 
   Future<void> _initializeASR() async {
     try {
-      final initialized = await ASRService.instance.initialize();
+      if (mounted) {
+        setState(() {
+          _isDownloadingModel = true;
+          _downloadProgress = 0.0;
+        });
+      }
+      final initialized = await ASRService.instance.initialize(
+        onDownloadProgress: (progress) {
+          if (mounted) {
+            setState(() => _downloadProgress = progress);
+          }
+        },
+      );
       if (initialized) {
         print('ASR service initialized successfully for lesson screen');
       } else {
         print('ASR service initialization failed, will fall back to API');
       }
+      if (mounted) {
+        setState(() => _isDownloadingModel = false);
+      }
       _loadASRStatus();
     } catch (e) {
       print('Error initializing ASR service: $e');
+      if (mounted) {
+        setState(() => _isDownloadingModel = false);
+      }
     }
   }
 
@@ -248,12 +272,13 @@ class LessonScreenState extends State<LessonScreen>
       await _sentencePlayer.pause(); // Pause sentence audio before recording
       final directory = await getTemporaryDirectory();
       _filePath = path.join(
-          directory.path, '${DateTime.now().millisecondsSinceEpoch}.m4a');
+          directory.path, '${DateTime.now().millisecondsSinceEpoch}.wav');
       await _audioRecorder.start(
         path: _filePath,
         encoder: AudioEncoder.wav,
         bitRate: 128000,
-        samplingRate: 44100,
+        samplingRate: 16000,
+        numChannels: 1,
       );
       setState(() {
         isRecording = true;
@@ -358,6 +383,7 @@ class LessonScreenState extends State<LessonScreen>
         List<TextSpan> highlightedSpans =
             getHighlightedTextSpans(transcription);
         setState(() {
+          _transcriptionText = transcription;
           currentTextSpans = highlightedSpans;
           hasTranscription = true;
           _loading = false;
@@ -378,107 +404,101 @@ class LessonScreenState extends State<LessonScreen>
   }
 
   List<TextSpan> getHighlightedTextSpans(String transcription) {
-    String correctSentence = currentSentence;
-    String correctCompare =
-        correctSentence.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
-    String transcriptionCompare =
-        transcription.toLowerCase().replaceAll(RegExp(r'[^\w\s]'), '');
+    // Split into words for word-level comparison
+    List<String> originalWords = currentSentence
+        .toLowerCase()
+        .replaceAll(RegExp(r'[^\w\s]'), '')
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    List<String> transcriptionWords = transcription
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    List<String> transcriptionWordsLower = transcriptionWords
+        .map((w) => w.toLowerCase().replaceAll(RegExp(r'[^\w]'), ''))
+        .toList();
 
-    // Get alignment operations for correctSentence
-    Map<String, dynamic> result =
-        computeAlignmentAndDistance(correctCompare, transcriptionCompare);
-    List<String> alignment = result['alignment'];
-
-    // Build highlighted spans for correctSentence (original text)
-    List<TextSpan> highlightedSpans = [];
-    int q = 0; // Index into alignment
-    int matching = 0;
-    for (int i = 0; i < correctSentence.length; i++) {
-      String char = correctSentence[i];
-      if (RegExp(r'[\w\s]').hasMatch(char)) {
-        if (q < alignment.length) {
-          String op = alignment[q];
-          bool isCorrect = op == 'match';
-          if (isCorrect) matching++;
-          highlightedSpans.add(TextSpan(
-            text: char,
-            style: TextStyle(color: isCorrect ? Colors.green : Colors.red),
-          ));
-          if (op != 'insertion')
-            q++; // Move alignment index only if not an insertion in transcription
-        } else {
-          // Beyond transcription length, assume incorrect
-          highlightedSpans.add(TextSpan(
-            text: char,
-            style: TextStyle(color: Colors.red),
-          ));
-        }
-      } else {
-        // Check if character is punctuation or number - always highlight in green
-        bool isPunctuationOrNumber = RegExp(r'[.,!?;:()\-\d]').hasMatch(char) ||
-            char == '"' ||
-            char == "'";
-        highlightedSpans.add(TextSpan(
-          text: char,
-          style: TextStyle(
-            color: isPunctuationOrNumber ? Colors.green : Colors.red,
-          ),
-        ));
+    // Word-level alignment using edit distance
+    int m = originalWords.length, n = transcriptionWordsLower.length;
+    List<List<int>> dp = List.generate(m + 1, (_) => List.filled(n + 1, 0));
+    for (int i = 0; i <= m; i++) dp[i][0] = i;
+    for (int j = 0; j <= n; j++) dp[0][j] = j;
+    for (int i = 1; i <= m; i++) {
+      for (int j = 1; j <= n; j++) {
+        int cost = originalWords[i - 1] == transcriptionWordsLower[j - 1] ? 0 : 1;
+        dp[i][j] = min(dp[i - 1][j] + 1, min(dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost));
       }
+    }
+
+    // Backtrace to get per-transcription-word operations
+    List<String> ops = [];
+    int i = m, j = n;
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 &&
+          dp[i][j] == dp[i - 1][j - 1] + (originalWords[i - 1] == transcriptionWordsLower[j - 1] ? 0 : 1)) {
+        ops.add(originalWords[i - 1] == transcriptionWordsLower[j - 1] ? 'match' : 'substitution');
+        i--; j--;
+      } else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
+        ops.add('deletion');
+        i--;
+      } else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
+        ops.add('insertion');
+        j--;
+      }
+    }
+    ops = ops.reversed.toList();
+
+    // Build spans from transcription words, coloring each word
+    List<TextSpan> highlightedSpans = [];
+    int tIdx = 0; // index into transcriptionWords
+    int matching = 0;
+    for (int k = 0; k < ops.length; k++) {
+      if (ops[k] == 'match') {
+        matching++;
+        if (tIdx < transcriptionWords.length) {
+          if (highlightedSpans.isNotEmpty) {
+            highlightedSpans.add(const TextSpan(text: ' '));
+          }
+          highlightedSpans.add(TextSpan(
+            text: transcriptionWords[tIdx],
+            style: const TextStyle(color: Colors.green),
+          ));
+          tIdx++;
+        }
+      } else if (ops[k] == 'substitution' || ops[k] == 'insertion') {
+        if (tIdx < transcriptionWords.length) {
+          if (highlightedSpans.isNotEmpty) {
+            highlightedSpans.add(const TextSpan(text: ' '));
+          }
+          highlightedSpans.add(TextSpan(
+            text: transcriptionWords[tIdx],
+            style: const TextStyle(color: Colors.red),
+          ));
+          tIdx++;
+        }
+      }
+      // 'deletion' = word in original missing from transcription, skip (no transcription word)
+    }
+    // Any remaining transcription words (extra words not in original)
+    while (tIdx < transcriptionWords.length) {
+      if (highlightedSpans.isNotEmpty) {
+        highlightedSpans.add(const TextSpan(text: ' '));
+      }
+      highlightedSpans.add(TextSpan(
+        text: transcriptionWords[tIdx],
+        style: const TextStyle(color: Colors.red),
+      ));
+      tIdx++;
     }
 
     // Compute accuracy
-    double accuracy =
-        correctCompare.isEmpty ? 0 : matching / correctCompare.length;
+    double accuracy = originalWords.isEmpty ? 0 : matching / originalWords.length;
     double adjustedAccuracy = (accuracy * 1.15 > 1.0) ? 1.0 : accuracy * 1.15;
     accuracies.add(adjustedAccuracy);
+    _currentAccuracy = adjustedAccuracy;
 
     return highlightedSpans;
-  }
-
-// Alignment function to track operations for correctSentence
-  Map<String, dynamic> computeAlignmentAndDistance(String ref, String hyp) {
-    int m = ref.length, n = hyp.length;
-    List<List<int>> dp = List.generate(m + 1, (_) => List.filled(n + 1, 0));
-
-    // Initialize DP table
-    for (int i = 0; i <= m; i++) dp[i][0] = i; // Deletions
-    for (int j = 0; j <= n; j++) dp[0][j] = j; // Insertions
-
-    // Fill DP table
-    for (int i = 1; i <= m; i++) {
-      for (int j = 1; j <= n; j++) {
-        int cost = ref[i - 1] == hyp[j - 1] ? 0 : 1;
-        dp[i][j] = min(
-          dp[i - 1][j] + 1, // Deletion
-          min(
-              dp[i][j - 1] + 1, // Insertion
-              dp[i - 1][j - 1] + cost), // Substitution
-        );
-      }
-    }
-
-    // Backtrace to determine operations for ref (correctSentence)
-    List<String> alignment = [];
-    int i = m, j = n;
-    while (i > 0 || j > 0) {
-      if (i > 0 &&
-          j > 0 &&
-          dp[i][j] == dp[i - 1][j - 1] + (ref[i - 1] == hyp[j - 1] ? 0 : 1)) {
-        alignment.add(ref[i - 1] == hyp[j - 1] ? 'match' : 'substitution');
-        i--;
-        j--;
-      } else if (i > 0 && dp[i][j] == dp[i - 1][j] + 1) {
-        alignment.add('deletion');
-        i--;
-      } else if (j > 0 && dp[i][j] == dp[i][j - 1] + 1) {
-        // Insertion in transcription, skip for ref
-        alignment.add('insertion');
-        j--;
-      }
-    }
-    alignment = alignment.reversed.toList();
-    return {'alignment': alignment, 'editDistance': dp[m][n]};
   }
 
   void moveToNextSentence() {
@@ -536,6 +556,8 @@ class LessonScreenState extends State<LessonScreen>
       hasRecording = false;
       isPlaying = false;
       _currentPosition = Duration.zero;
+      _transcriptionText = null;
+      _currentAccuracy = null;
       currentTextSpans = [TextSpan(text: currentSentence)];
 
       // Reset start time for the new sentence
@@ -1165,6 +1187,63 @@ class LessonScreenState extends State<LessonScreen>
                       ),
                     ),
                   ),
+                // Model download progress overlay
+                if (_isDownloadingModel && _downloadProgress > 0 && _downloadProgress < 1.0)
+                  Container(
+                    color: Colors.black54,
+                    child: Center(
+                      child: Container(
+                        margin: const EdgeInsets.all(AppSpacing.xl),
+                        padding: const EdgeInsets.all(AppSpacing.xl),
+                        decoration: BoxDecoration(
+                          color: AppColors.pureWhite,
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryGreen.withOpacity(0.2),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.download_rounded,
+                                color: AppColors.primaryGreen, size: 40),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              'Downloading ASR model...',
+                              style: AppTextStyles.bodyLarge.copyWith(
+                                color: AppColors.primaryGreen,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: _downloadProgress,
+                                backgroundColor: AppColors.lightGrey,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    AppColors.primaryGreen),
+                                minHeight: 8,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            Text(
+                              '${(_downloadProgress * 100).toStringAsFixed(0)}%',
+                              style: AppTextStyles.bodyMedium.copyWith(
+                                color: AppColors.mediumGrey,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -1437,16 +1516,15 @@ class LessonScreenState extends State<LessonScreen>
                             ),
                           ),
 
-                          // Text and Audio Section - compact and efficient
+                          // Text and Audio Section
                           Container(
                             width: double.infinity,
                             constraints: BoxConstraints(
-                              minHeight:
-                                  120, // Minimum height for text and audio button
+                              minHeight: 120,
                               maxHeight: MediaQuery.of(context).size.height *
-                                  0.25, // Maximum 25% of screen
+                                  (hasTranscription ? 0.35 : 0.25),
                             ),
-                            padding: const EdgeInsets.all(AppSpacing.lg),
+                            padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: AppColors.pureWhite,
                               boxShadow: [
@@ -1457,78 +1535,9 @@ class LessonScreenState extends State<LessonScreen>
                                 ),
                               ],
                             ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Text Display - scrollable if needed
-                                Flexible(
-                                  child: SingleChildScrollView(
-                                    child: Center(
-                                      child: AnimatedSwitcher(
-                                        duration:
-                                            const Duration(milliseconds: 400),
-                                        child: RichText(
-                                          key: ValueKey(currentSentence),
-                                          text: TextSpan(
-                                            text: '',
-                                            style:
-                                                AppTextStyles.heading4.copyWith(
-                                              fontSize: 20,
-                                              height: 1.4,
-                                              color: AppColors.charcoal,
-                                            ),
-                                            children: currentTextSpans,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                const SizedBox(height: AppSpacing.md),
-
-                                // Audio Button - compact but prominent
-                                Container(
-                                  decoration: BoxDecoration(
-                                    gradient: AppColors.accentGradient,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.accentOrange
-                                            .withOpacity(0.4),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 6),
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
-                                  child: IconButton(
-                                    key: _audioButtonKey,
-                                    iconSize: 28,
-                                    icon: const Icon(Icons.volume_up,
-                                        color: Colors.white, size: 28),
-                                    tooltip: 'Écouter la phrase',
-                                    onPressed: () async {
-                                      try {
-                                        if (widget.isOffLine) {
-                                          await _sentencePlayer.setSource(
-                                              DeviceFileSource(currentAudio));
-                                        } else {
-                                          await _sentencePlayer.setSource(
-                                              UrlSource(currentAudio));
-                                        }
-                                        await _sentencePlayer
-                                            .play(UrlSource(currentAudio));
-                                      } catch (e) {
-                                        print(
-                                            'Error playing sentence audio: $e');
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: hasTranscription
+                                ? _buildTranscriptionView()
+                                : _buildOriginalView(),
                           ),
                         ],
                       ),
@@ -1599,6 +1608,8 @@ class LessonScreenState extends State<LessonScreen>
                                       _currentPosition = Duration.zero;
                                       _audioDuration = Duration.zero;
                                       _filePath = null;
+                                      _transcriptionText = null;
+                                      _currentAccuracy = null;
                                       // Reset text spans to show original sentence
                                       currentTextSpans = [
                                         TextSpan(text: currentSentence)
@@ -1684,6 +1695,211 @@ class LessonScreenState extends State<LessonScreen>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Original sentence view (before transcription)
+  Widget _buildOriginalView() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Flexible(
+          child: SingleChildScrollView(
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                child: Text(
+                  currentSentence,
+                  key: ValueKey(currentSentence),
+                  style: AppTextStyles.heading4.copyWith(
+                    fontSize: 20,
+                    height: 1.4,
+                    color: AppColors.charcoal,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        _buildListenButton(),
+      ],
+    );
+  }
+
+  /// Post-transcription view with original, comparison, accuracy
+  Widget _buildTranscriptionView() {
+    final accuracy = _currentAccuracy ?? 0.0;
+    final accuracyPercent = (accuracy * 100).toStringAsFixed(0);
+    final accuracyColor = accuracy >= 0.8
+        ? AppColors.success
+        : accuracy >= 0.5
+            ? AppColors.accentOrange
+            : AppColors.error;
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Original phrase
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: AppColors.lightGrey, width: 0.5),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Kuma',
+                  style: AppTextStyles.captionText.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.wisdomTeal,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  currentSentence,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.charcoal,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Transcription with highlights
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: AppColors.pureWhite,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: accuracyColor.withOpacity(0.3), width: 1),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'I ka kalan',
+                  style: AppTextStyles.captionText.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: accuracyColor,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                RichText(
+                  text: TextSpan(
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                    children: currentTextSpans,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Accuracy bar
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+            decoration: BoxDecoration(
+              color: accuracyColor.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  accuracy >= 0.8
+                      ? Icons.emoji_events
+                      : accuracy >= 0.5
+                          ? Icons.thumb_up_alt_outlined
+                          : Icons.refresh,
+                  color: accuracyColor,
+                  size: 20,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: accuracy,
+                      backgroundColor: AppColors.lightGrey,
+                      valueColor: AlwaysStoppedAnimation<Color>(accuracyColor),
+                      minHeight: 8,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Text(
+                  '$accuracyPercent%',
+                  style: AppTextStyles.heading4.copyWith(
+                    color: accuracyColor,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Listen button centered
+          Center(child: _buildListenButton()),
+        ],
+      ),
+    );
+  }
+
+  /// Reusable listen button
+  Widget _buildListenButton() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppColors.accentGradient,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.accentOrange.withOpacity(0.4),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: IconButton(
+        key: _audioButtonKey,
+        iconSize: 28,
+        icon: const Icon(Icons.volume_up, color: Colors.white, size: 28),
+        tooltip: 'Ka kuma lamɛn',
+        onPressed: () async {
+          try {
+            if (widget.isOffLine) {
+              await _sentencePlayer
+                  .setSource(DeviceFileSource(currentAudio));
+            } else {
+              await _sentencePlayer
+                  .setSource(UrlSource(currentAudio));
+            }
+            await _sentencePlayer.play(UrlSource(currentAudio));
+          } catch (e) {
+            print('Error playing sentence audio: $e');
+          }
+        },
       ),
     );
   }

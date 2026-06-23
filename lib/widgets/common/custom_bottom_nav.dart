@@ -85,21 +85,25 @@ class CustomBottomNav extends StatelessWidget {
   }) {
     final isSelected = currentIndex == index;
 
-    return GestureDetector(
-      key: key,
-      onTap: () => onTap(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Icon container with background
-            AnimatedContainer(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$label tab',
+      child: GestureDetector(
+        key: key,
+        onTap: () => onTap(index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon container with background
+              AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
               width: isSelected ? 40 : 40,
@@ -144,6 +148,7 @@ class CustomBottomNav extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
@@ -227,6 +232,8 @@ class FloatingBottomNav extends StatelessWidget {
     );
   }
 
+  static const List<String> _floatingLabels = ['Books', 'Translate', 'Games', 'Profile'];
+
   Widget _buildFloatingNavItem({
     required int index,
     required IconData icon,
@@ -234,9 +241,13 @@ class FloatingBottomNav extends StatelessWidget {
   }) {
     final isSelected = currentIndex == index;
 
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: AnimatedContainer(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '${_floatingLabels[index]} tab',
+      child: GestureDetector(
+        onTap: () => onTap(index),
+        child: AnimatedContainer(
         duration: const Duration(milliseconds: 350),
         curve: Curves.easeInOut,
         width: isSelected ? 56 : 48,
@@ -302,6 +313,7 @@ class FloatingBottomNav extends StatelessWidget {
                 ),
               ),
           ],
+        ),
         ),
       ),
     );
@@ -390,20 +402,24 @@ class MinimalBottomNav extends StatelessWidget {
   }) {
     final isSelected = currentIndex == index;
 
-    return GestureDetector(
-      onTap: () => onTap(index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Icon with indicator
-            Stack(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: '$label tab',
+      child: GestureDetector(
+        onTap: () => onTap(index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon with indicator
+              Stack(
               children: [
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 250),
@@ -470,6 +486,7 @@ class MinimalBottomNav extends StatelessWidget {
               ],
             ),
           ],
+        ),
         ),
       ),
     );
